@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH Project Dashboard V2.1 | Fixed Version</title>
+    <title>DOH Network Dashboard V3.0 | Stable</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg-app: #f1f5f9; }
+        :root { --bg-app: #f8fafc; }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg-app); color: #334155; }
         
         /* Status Colors */
@@ -34,26 +34,35 @@
         #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
         
         /* Table */
-        .custom-table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 12px; text-align: left; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; }
+        .custom-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 12px; text-align: left; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.875rem; }
         .custom-table tr:hover { background-color: #f8fafc; }
 
         /* Loader & Error */
-        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .error-msg { color: #ef4444; margin-top: 10px; font-size: 0.9rem; max-width: 400px; }
+        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .error-msg { color: #dc2626; margin-top: 10px; font-size: 0.85rem; max-width: 80%; }
+        .success-msg { color: #16a34a; font-size: 0.8rem; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loader-overlay">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <h2 class="text-xl font-bold text-slate-700">Connecting to DOH Database...</h2>
-        <p class="text-sm text-slate-500 mb-4">Syncing Google Sheets via Secure Proxy</p>
-        <div id="error-container" class="hidden">
-            <p class="error-msg" id="error-text"></p>
-            <button onclick="loadDemoData()" class="mt-4 px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-900 transition text-sm">
-                ใช้ข้อมูลตัวอย่าง (Demo Data)
-            </button>
+        <h2 class="text-xl font-bold text-slate-800">Connecting to DOH Database...</h2>
+        <p id="loading-status" class="text-sm text-slate-500 mb-4">Attempting secure connection...</p>
+        
+        <div id="manual-actions" class="hidden flex-col items-center gap-3 mt-4">
+            <p class="text-red-500 font-bold">ไม่สามารถดึงข้อมูล Real-time ได้</p>
+            <p class="text-xs text-slate-500">อาจเกิดจาก Internet หรือ Google Sheets ปิดกั้นการเข้าถึง</p>
+            <div class="flex gap-2 mt-2">
+                <button onclick="loadDemoData()" class="px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-900 transition text-sm shadow-lg">
+                    ใช้งานข้อมูลสำรอง (Offline Mode)
+                </button>
+                <button onclick="location.reload()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded hover:bg-slate-50 transition text-sm">
+                    ลองใหม่
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-4" id="error-detail"></p>
         </div>
     </div>
 
@@ -81,9 +90,9 @@
                 </div>
             </nav>
             <div class="p-4 border-t border-slate-700 text-xs text-slate-400">
-                <p>Version 2.1 (Fixed)</p>
-                <div class="mt-2 flex items-center gap-2">
-                     <div class="w-2 h-2 rounded-full bg-green-500"></div> Online
+                <p>Version 3.0 (Stable)</p>
+                <div id="connection-status" class="mt-2 flex items-center gap-2 text-yellow-500">
+                     <div class="w-2 h-2 rounded-full bg-yellow-500"></div> Connecting...
                 </div>
             </div>
         </aside>
@@ -97,7 +106,7 @@
                 </div>
                 <div class="flex gap-3">
                     <input type="file" id="csvUpload" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
-                    <button onclick="document.getElementById('csvUpload').click()" class="bg-white border border-slate-300 text-slate-600 px-3 py-2 rounded text-sm hover:bg-slate-50">
+                    <button onclick="document.getElementById('csvUpload').click()" class="bg-white border border-slate-300 text-slate-600 px-3 py-2 rounded text-sm hover:bg-slate-50 transition">
                         <i class="fa-solid fa-upload mr-1"></i> Upload CSV
                     </button>
                     <select id="filter-region" onchange="applyFilters()" class="bg-slate-100 border-none rounded px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500">
@@ -159,10 +168,10 @@
                 </div>
 
                 <div id="tab-control" class="tab-content hidden space-y-4">
-                    <div class="flex gap-2">
-                        <button onclick="filterTable('All')" class="px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 text-sm">Show All</button>
-                        <button onclick="filterTable('Delay')" class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded shadow-sm hover:bg-red-100 font-bold text-sm">Show Delays Only</button>
-                        <button onclick="filterTable('Handover')" class="px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded shadow-sm hover:bg-green-100 text-sm">Show Completed</button>
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <button onclick="filterTable('All')" class="whitespace-nowrap px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 text-sm">Show All</button>
+                        <button onclick="filterTable('Delay')" class="whitespace-nowrap px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded shadow-sm hover:bg-red-100 font-bold text-sm">Show Delays Only</button>
+                        <button onclick="filterTable('Handover')" class="whitespace-nowrap px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded shadow-sm hover:bg-green-100 text-sm">Show Completed</button>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
                         <div class="overflow-x-auto max-h-[600px]">
@@ -216,8 +225,11 @@
     <script>
         // --- CONFIG ---
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
-        // ใช้ Proxy เพื่อแก้ปัญหาเปิดไฟล์แล้วค้าง (CORS)
-        const PROXY_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(SHEET_CSV_URL);
+        const PROXIES = [
+            '', // Direct
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?'
+        ];
 
         let rawData = [];
         let filteredData = [];
@@ -227,57 +239,95 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            fetchData();
+            // Start fetch logic with timeout protection
+            const timeout = setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if(loader.style.display !== 'none') {
+                    showManualActions("Connection Timeout (10s limit exceeded)");
+                }
+            }, 10000); // 10 seconds max wait
+
+            fetchData().then(() => clearTimeout(timeout));
+            
             setInterval(fetchData, 300000); // 5 mins auto-refresh
         });
 
-        // --- DATA ENGINE ---
+        // --- ROBUST FETCH ENGINE ---
         async function fetchData() {
-            const loader = document.getElementById('loader');
-            const errContainer = document.getElementById('error-container');
+            const statusText = document.getElementById('loading-status');
             
-            loader.style.display = 'flex';
-            errContainer.classList.add('hidden');
+            for (let i = 0; i < PROXIES.length; i++) {
+                const proxy = PROXIES[i];
+                const url = proxy + (proxy ? encodeURIComponent(SHEET_CSV_URL) : SHEET_CSV_URL);
+                const methodLabel = proxy ? (proxy.includes('allorigins') ? "Proxy A" : "Proxy B") : "Direct Connection";
 
-            try {
-                // 1. ลองโหลดผ่าน Proxy ก่อน (เพื่อแก้ปัญหา Local File)
-                let response = await fetch(PROXY_URL);
-                if (!response.ok) {
-                    // 2. ถ้า Proxy ล่ม ลองโหลดตรง (กรณีเปิดบน Server)
-                    console.warn("Proxy failed, trying direct...");
-                    response = await fetch(SHEET_CSV_URL);
-                }
-                
-                if (!response.ok) throw new Error("Network response was not ok");
-                
-                const csvText = await response.text();
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (results) => {
-                        processData(results.data);
-                        loader.style.display = 'none';
+                try {
+                    statusText.innerText = `Trying ${methodLabel}...`;
+                    console.log(`Attempting: ${methodLabel}`);
+                    
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+                    
+                    const csvText = await response.text();
+                    
+                    // Validate CSV content briefly
+                    if(!csvText.includes('site_name') && !csvText.includes('id')) {
+                        throw new Error("Invalid CSV Data");
                     }
-                });
 
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                document.querySelector('.animate-spin').style.display = 'none';
-                errContainer.classList.remove('hidden');
-                document.getElementById('error-text').innerText = "ไม่สามารถเชื่อมต่อ Google Sheets ได้\n(อาจเกิดจาก Internet หรือ CORS Policy)";
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
+                            if(results.data.length > 0) {
+                                processData(results.data);
+                                updateConnectionStatus("Online", "bg-green-500", "text-green-400");
+                                document.getElementById('loader').style.display = 'none';
+                            } else {
+                                throw new Error("Empty Data");
+                            }
+                        }
+                    });
+                    
+                    return; // Success, exit loop
+
+                } catch (error) {
+                    console.warn(`${methodLabel} Failed:`, error);
+                }
             }
+
+            // If all fail
+            showManualActions("All connection methods failed. CORS or Network issue.");
+        }
+
+        function showManualActions(errorDetails) {
+            document.querySelector('.animate-spin').style.display = 'none';
+            document.getElementById('loading-status').style.display = 'none';
+            document.getElementById('manual-actions').classList.remove('hidden');
+            document.getElementById('manual-actions').classList.add('flex');
+            document.getElementById('error-detail').innerText = errorDetails;
+            updateConnectionStatus("Offline", "bg-red-500", "text-red-400");
+        }
+
+        function updateConnectionStatus(text, colorBg, colorText) {
+            const el = document.getElementById('connection-status');
+            el.className = `mt-2 flex items-center gap-2 ${colorText}`;
+            el.innerHTML = `<div class="w-2 h-2 rounded-full ${colorBg}"></div> ${text}`;
         }
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if(!file) return;
-            
             const reader = new FileReader();
             reader.onload = (e) => {
                 Papa.parse(e.target.result, {
                     header: true,
                     skipEmptyLines: true,
-                    complete: (results) => processData(results.data)
+                    complete: (results) => {
+                        processData(results.data);
+                        document.getElementById('loader').style.display = 'none';
+                        updateConnectionStatus("Local File", "bg-blue-500", "text-blue-400");
+                    }
                 });
             };
             reader.readAsText(file);
@@ -288,20 +338,19 @@
             const today = new Date();
             
             rawData = data.map(row => {
-                // Safe extraction
                 const phase = row.phase || 'Survey';
                 let status = row.status || 'Not Start';
                 const planDate = row.plan_handover ? new Date(row.plan_handover) : null;
                 
                 // AUTO PROGRESS LOGIC
                 let progress = 0;
-                if(status.toLowerCase().includes('handover complete') || (phase === 'Handover' && status === 'Complete')) progress = 100;
-                else if(status.toLowerCase().includes('install complete') || (phase === 'Install' && status === 'Complete')) progress = 80;
-                else if(status.toLowerCase().includes('survey complete') || (phase === 'Survey' && status === 'Complete')) progress = 30;
+                let sLower = status.toLowerCase();
+                if(sLower.includes('handover complete') || (phase === 'Handover' && status === 'Complete')) progress = 100;
+                else if(sLower.includes('install complete') || (phase === 'Install' && status === 'Complete')) progress = 80;
+                else if(sLower.includes('survey complete') || (phase === 'Survey' && status === 'Complete')) progress = 30;
                 else if(phase === 'Install') progress = 40;
                 else if(phase === 'Handover') progress = 90;
                 
-                // FORCE COMPLETE OVERRIDE
                 if(progress === 100) status = 'Handover Complete';
 
                 // DELAY LOGIC
@@ -313,10 +362,10 @@
                 }
 
                 // COLOR LOGIC
-                let color = '#94a3b8'; // Gray
-                if(isDelay) color = '#ef4444'; // Red
-                else if(progress === 100) color = '#10b981'; // Green
-                else if(progress > 0) color = '#f59e0b'; // Yellow
+                let color = '#94a3b8'; 
+                if(isDelay) color = '#ef4444';
+                else if(progress === 100) color = '#10b981';
+                else if(progress > 0) color = '#f59e0b';
 
                 return {
                     ...row,
@@ -345,7 +394,6 @@
 
         // --- RENDERERS ---
         function updateUI() {
-            document.getElementById('loader').style.display = 'none';
             renderKPI();
             renderCharts();
             renderTable(filteredData);
@@ -358,7 +406,6 @@
             const delay = filteredData.filter(d => d.isDelay).length;
             const avg = total ? Math.round(filteredData.reduce((a,b)=>a+b.progress,0)/total) : 0;
             
-            // Mode Phase
             const phases = filteredData.map(d => d.phase);
             const modePhase = phases.sort((a,b) => phases.filter(v=>v===a).length - phases.filter(v=>v===b).length).pop();
 
@@ -382,7 +429,6 @@
                 colors: ['#10b981', '#f59e0b', '#ef4444', '#94a3b8']
             });
 
-            // S-Curve (Mock)
             updateChart('chart-scurve', {
                 type: 'line',
                 series: [{ name: 'Plan', data: [10,30,50,70,90,100] }, { name: 'Actual', data: [10,25,40,55, null, null] }],
@@ -390,7 +436,6 @@
                 colors: ['#cbd5e1', '#2563eb']
             });
 
-            // Team Load
             const teams = {};
             filteredData.forEach(d => { teams[d.team] = (teams[d.team]||0)+1; });
             updateChart('chart-team-load', {
@@ -400,7 +445,6 @@
                 colors: ['#3b82f6']
             });
             
-             // Eng Load
             const engs = {};
             filteredData.forEach(d => { if(d.engineer) engs[d.engineer] = (engs[d.engineer]||0)+1; });
             updateChart('chart-eng-load', {
@@ -429,20 +473,21 @@
             tbody.innerHTML = '';
             data.forEach(d => {
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="font-bold text-slate-700">${d.site_name}</td>
-                    <td class="text-xs text-slate-500">${d.region}</td>
-                    <td><span class="px-2 py-1 bg-slate-100 rounded text-xs">${d.phase}</span></td>
-                    <td><span class="px-2 py-1 rounded-full text-xs text-white" style="background:${d.color}">${d.cleanStatus}</span></td>
-                    <td>
+                    <td class="font-bold text-slate-700 p-3">${d.site_name}</td>
+                    <td class="text-xs text-slate-500 p-3">${d.region}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${d.phase}</span></td>
+                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs text-white" style="background:${d.color}">${d.cleanStatus}</span></td>
+                    <td class="p-3">
                         <div class="flex items-center gap-2">
                              <div class="w-16 bg-slate-200 h-1.5 rounded-full"><div class="h-1.5 rounded-full bg-blue-600" style="width:${d.progress}%"></div></div>
                              <span class="text-xs">${d.progress}%</span>
                         </div>
                     </td>
-                    <td class="text-xs font-mono">${d.plan_handover||'-'}</td>
-                    <td class="font-bold text-red-600 text-center">${d.isDelay ? d.delayDays : '-'}</td>
-                    <td class="text-xs">${d.team}</td>
+                    <td class="text-xs font-mono p-3">${d.plan_handover||'-'}</td>
+                    <td class="font-bold text-red-600 text-center p-3">${d.isDelay ? d.delayDays : '-'}</td>
+                    <td class="text-xs p-3">${d.team}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -470,7 +515,6 @@
             });
         }
 
-        // --- UTILS ---
         function initMap() {
             map = L.map('map').setView([13.7563, 100.5018], 6);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
@@ -484,10 +528,19 @@
             if(id === 'map') setTimeout(() => map.invalidateSize(), 300);
         }
         
-        // --- DEMO MODE (FALLBACK) ---
         function loadDemoData() {
             console.log("Loading Demo Data...");
             const demo = [
                 { site_name: "ทล.เชียงใหม่", region: "ภาคเหนือ", phase: "Survey", status: "Survey Complete", progress: 30, plan_handover: "2024-04-01", team: "Team A", lat: 18.7, lng: 98.9 },
                 { site_name: "ทล.ภูเก็ต", region: "ภาคใต้", phase: "Install", status: "Not Start", progress: 0, plan_handover: "2024-03-01", team: "Team B", lat: 7.8, lng: 98.3 },
-                { site_name: "ทล.ขอนแก่น", region: "ภาคอีสาน", phase: "Handover", status: "Handover Complete", progress: 100, plan_handover: "2024-01
+                { site_name: "ทล.ขอนแก่น", region: "ภาคอีสาน", phase: "Handover", status: "Handover Complete", progress: 100, plan_handover: "2024-01-01", team: "Team C", lat: 16.4, lng: 102.8 },
+                { site_name: "ทล.กรุงเทพ", region: "ภาคกลาง", phase: "Install", status: "Complete", progress: 80, plan_handover: "2024-05-01", team: "Team A", lat: 13.7, lng: 100.5 },
+                { site_name: "ทล.สงขลา (Delay)", region: "ภาคใต้", phase: "Survey", status: "Survey Complete", progress: 30, plan_handover: "2023-12-01", team: "Team B", lat: 7.0, lng: 100.4 }
+            ];
+            processData(demo);
+            document.getElementById('loader').style.display = 'none';
+            updateConnectionStatus("Offline (Demo)", "bg-gray-500", "text-gray-400");
+        }
+    </script>
+</body>
+</html>

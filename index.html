@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH Network Dashboard V3.0 | Stable</title>
+    <title>PROJECT MONITORING SYSTEM | DOH Project 2026</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -11,536 +11,647 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg-app: #f8fafc; }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-app); color: #334155; }
+        :root {
+            --primary-dark: #0f172a;
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --bg-page: #f1f5f9;
+        }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #334155; }
         
-        /* Status Colors */
-        .bg-status-red { background-color: #ef4444; color: white; }
-        .bg-status-yellow { background-color: #f59e0b; color: white; }
-        .bg-status-green { background-color: #10b981; color: white; }
-        .bg-status-gray { background-color: #94a3b8; color: white; }
+        /* Layout & Cards */
+        .dashboard-header {
+            background: linear-gradient(to right, #0f172a, #1e3a8a);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-        /* UI Elements */
-        .nav-btn { cursor: pointer; padding: 12px 20px; border-radius: 8px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
-        .nav-btn:hover { background-color: rgba(255,255,255,0.1); }
-        .nav-btn.active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
+        /* Navigation */
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: #94a3b8;
+        }
+        .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-item.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+        }
 
-        .kpi-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid; }
-        
-        #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
-        
+        /* Status Colors (Badges & Map) */
+        .st-green { background-color: #10b981; color: white; } /* Completed */
+        .st-blue { background-color: #3b82f6; color: white; }  /* WIP */
+        .st-yellow { background-color: #facc15; color: #854d0e; } /* Survey */
+        .st-red { background-color: #ef4444; color: white; }     /* Delay */
+        .st-gray { background-color: #94a3b8; color: white; }    /* Pending */
+
+        /* Map Tweaks */
+        #map { height: 650px; width: 100%; border-radius: 12px; z-index: 1; }
+        .leaflet-layer { filter: brightness(90%) contrast(110%); } /* Darken Map 10% */
+
         /* Table */
-        .custom-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 12px; text-align: left; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.875rem; }
-        .custom-table tr:hover { background-color: #f8fafc; }
+        .data-table th { background: #f8fafc; color: #475569; padding: 12px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .data-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .data-table tr:hover { background: #f8fafc; }
+        .clickable-name { color: #2563eb; cursor: pointer; text-decoration: underline; }
+        .clickable-name:hover { color: #1e40af; }
 
-        /* Loader & Error */
-        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .error-msg { color: #dc2626; margin-top: 10px; font-size: 0.85rem; max-width: 80%; }
-        .success-msg { color: #16a34a; font-size: 0.8rem; margin-top: 5px; }
+        /* Loader */
+        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loader-overlay">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <h2 class="text-xl font-bold text-slate-800">Connecting to DOH Database...</h2>
-        <p id="loading-status" class="text-sm text-slate-500 mb-4">Attempting secure connection...</p>
-        
-        <div id="manual-actions" class="hidden flex-col items-center gap-3 mt-4">
-            <p class="text-red-500 font-bold">ไม่สามารถดึงข้อมูล Real-time ได้</p>
-            <p class="text-xs text-slate-500">อาจเกิดจาก Internet หรือ Google Sheets ปิดกั้นการเข้าถึง</p>
-            <div class="flex gap-2 mt-2">
-                <button onclick="loadDemoData()" class="px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-900 transition text-sm shadow-lg">
-                    ใช้งานข้อมูลสำรอง (Offline Mode)
-                </button>
-                <button onclick="location.reload()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded hover:bg-slate-50 transition text-sm">
-                    ลองใหม่
-                </button>
-            </div>
-            <p class="text-[10px] text-slate-400 mt-4" id="error-detail"></p>
-        </div>
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+        <h2 class="text-2xl font-bold text-slate-800">Initializing System...</h2>
+        <p class="text-slate-500">Connecting to DOH Project 2026 Database</p>
     </div>
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:flex flex-col">
-            <div class="p-6 border-b border-slate-700">
-                <h1 class="text-lg font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-tower-broadcast text-blue-400"></i> CONTROL TOWER
-                </h1>
-                <p class="text-xs text-slate-400 mt-1 pl-7">DOH Network Project</p>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <div class="nav-btn active" onclick="switchTab('overview', this)">
-                    <i class="fa-solid fa-chart-line"></i> Overview
-                </div>
-                <div class="nav-btn" onclick="switchTab('control', this)">
-                    <i class="fa-solid fa-table-list"></i> Project Control
-                </div>
-                <div class="nav-btn" onclick="switchTab('team', this)">
-                    <i class="fa-solid fa-users-gear"></i> Team Tracking
-                </div>
-                <div class="nav-btn" onclick="switchTab('map', this)">
-                    <i class="fa-solid fa-map-location-dot"></i> Live Map
-                </div>
-            </nav>
-            <div class="p-4 border-t border-slate-700 text-xs text-slate-400">
-                <p>Version 3.0 (Stable)</p>
-                <div id="connection-status" class="mt-2 flex items-center gap-2 text-yellow-500">
-                     <div class="w-2 h-2 rounded-full bg-yellow-500"></div> Connecting...
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto bg-slate-50">
-            
-            <header class="bg-white shadow-sm p-4 sticky top-0 z-20 flex justify-between items-center">
+    <header class="dashboard-header sticky top-0 z-50">
+        <div class="max-w-[1800px] mx-auto px-6 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-slate-600"><i class="fa-solid fa-bars text-xl"></i></button>
-                    <h2 class="text-lg font-bold text-slate-800" id="page-title">Executive Overview</h2>
-                </div>
-                <div class="flex gap-3">
-                    <input type="file" id="csvUpload" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
-                    <button onclick="document.getElementById('csvUpload').click()" class="bg-white border border-slate-300 text-slate-600 px-3 py-2 rounded text-sm hover:bg-slate-50 transition">
-                        <i class="fa-solid fa-upload mr-1"></i> Upload CSV
-                    </button>
-                    <select id="filter-region" onchange="applyFilters()" class="bg-slate-100 border-none rounded px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500">
-                        <option value="All">All Regions</option>
-                    </select>
-                    <button onclick="fetchData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow text-sm font-medium transition">
-                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
-                    </button>
-                </div>
-            </header>
-
-            <div class="p-6 max-w-[1600px] mx-auto">
-                
-                <div id="tab-overview" class="tab-content space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="kpi-card border-blue-500">
-                            <p class="text-xs font-bold text-slate-400 uppercase">Total Sites</p>
-                            <div class="flex justify-between items-end">
-                                <h3 class="text-4xl font-bold text-slate-800" id="kpi-total">0</h3>
-                                <i class="fa-solid fa-server text-blue-200 text-3xl"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-card border-green-500">
-                            <p class="text-xs font-bold text-slate-400 uppercase">Overall Progress</p>
-                            <div class="flex justify-between items-end">
-                                <h3 class="text-4xl font-bold text-green-600" id="kpi-progress">0%</h3>
-                                <div class="text-right">
-                                    <p class="text-xs text-slate-400">Target: 100%</p>
-                                    <p class="text-xs font-bold text-green-600" id="kpi-completed-count">0 Done</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="kpi-card border-red-500">
-                            <p class="text-xs font-bold text-slate-400 uppercase">Critical Delays</p>
-                            <div class="flex justify-between items-end">
-                                <h3 class="text-4xl font-bold text-red-600" id="kpi-delay">0</h3>
-                                <div class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">Action Req.</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card border-orange-500">
-                            <p class="text-xs font-bold text-slate-400 uppercase">Active Phase</p>
-                            <div class="flex justify-between items-end">
-                                <h3 class="text-2xl font-bold text-slate-800" id="kpi-phase-focus">-</h3>
-                                <i class="fa-solid fa-wrench text-orange-200 text-3xl"></i>
-                            </div>
-                        </div>
+                    <div class="bg-white p-2 rounded-lg">
+                        <i class="fa-solid fa-road text-3xl text-blue-900"></i>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
-                            <h3 class="font-bold text-slate-700 mb-4">Schedule Performance (S-Curve)</h3>
-                            <div id="chart-scurve"></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold text-slate-700 mb-4">Current Status</h3>
-                            <div id="chart-donut"></div>
-                        </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold leading-tight">PROJECT MONITORING SYSTEM | DOH Project 2026</h1>
+                        <p class="text-xs md:text-sm text-blue-200 opacity-90">Operated by Fatima R.B.D.S. International Co., Ltd.</p>
                     </div>
                 </div>
 
-                <div id="tab-control" class="tab-content hidden space-y-4">
-                    <div class="flex gap-2 overflow-x-auto pb-2">
-                        <button onclick="filterTable('All')" class="whitespace-nowrap px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 text-sm">Show All</button>
-                        <button onclick="filterTable('Delay')" class="whitespace-nowrap px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded shadow-sm hover:bg-red-100 font-bold text-sm">Show Delays Only</button>
-                        <button onclick="filterTable('Handover')" class="whitespace-nowrap px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded shadow-sm hover:bg-green-100 text-sm">Show Completed</button>
+                <nav class="flex gap-2 bg-slate-800/50 p-1 rounded-lg backdrop-blur-sm">
+                    <div class="nav-item active" onclick="switchTab('overview', this)">
+                        <i class="fa-solid fa-chart-pie mr-2"></i>Executive Overview
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
-                        <div class="overflow-x-auto max-h-[600px]">
-                            <table class="w-full custom-table">
-                                <thead class="sticky top-0 bg-slate-50 shadow-sm z-10">
-                                    <tr>
-                                        <th>Site Name</th>
-                                        <th>Region</th>
-                                        <th>Phase</th>
-                                        <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>Plan Handover</th>
-                                        <th>Delay</th>
-                                        <th>Team</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-control-body"></tbody>
-                            </table>
-                        </div>
+                    <div class="nav-item" onclick="switchTab('control', this)">
+                        <i class="fa-solid fa-table-list mr-2"></i>Project Control
                     </div>
-                </div>
-
-                <div id="tab-team" class="tab-content hidden space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold text-slate-700 mb-4">Team Workload</h3>
-                            <div id="chart-team-load"></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                             <h3 class="font-bold text-slate-700 mb-4">Engineer Performance</h3>
-                             <div id="chart-eng-load"></div>
-                        </div>
+                    <div class="nav-item" onclick="switchTab('team', this)">
+                        <i class="fa-solid fa-users-gear mr-2"></i>Team Tracking
                     </div>
-                </div>
-
-                <div id="tab-map" class="tab-content hidden h-full">
-                    <div class="bg-white p-4 rounded-xl shadow-sm">
-                        <div class="mb-4 flex gap-4 text-xs font-bold">
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-status-green"></span> Completed</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-status-yellow"></span> In Progress</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-status-red"></span> Delay</span>
-                        </div>
-                        <div id="map"></div>
+                    <div class="nav-item" onclick="switchTab('map', this)">
+                        <i class="fa-solid fa-map-location-dot mr-2"></i>Live Map
                     </div>
-                </div>
-
+                </nav>
             </div>
-        </main>
-    </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1800px] mx-auto p-6 space-y-6">
+
+        <div id="tab-overview" class="tab-content animate-fade-in">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <h3 class="font-bold text-slate-700 mb-2">PHASE 1: SURVEY</h3>
+                    <div id="gauge-survey"></div>
+                    <div class="absolute bottom-4 text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full">Weight: 20%</div>
+                </div>
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <h3 class="font-bold text-slate-700 mb-2">PHASE 2: INSTALL</h3>
+                    <div id="gauge-install"></div>
+                    <div class="absolute bottom-4 text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">Weight: 60%</div>
+                </div>
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <h3 class="font-bold text-slate-700 mb-2">PHASE 3: HANDOVER</h3>
+                    <div id="gauge-handover"></div>
+                    <div class="absolute bottom-4 text-xs font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full">Weight: 20%</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 border-l-4 border-blue-600 pl-3">Project S-Curve Performance</h3>
+                        <span class="text-xs text-slate-500">20 Jan 2026 - 30 Jun 2026</span>
+                    </div>
+                    <div id="chart-scurve"></div>
+                </div>
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 border-l-4 border-purple-600 pl-3">Regional Performance Analytics</h3>
+                        <span class="text-xs text-slate-500">Progress by Region</span>
+                    </div>
+                    <div id="chart-regional"></div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-slate-800 border-l-4 border-orange-500 pl-3 mb-4">Current Site Status Summary</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                    <div id="chart-donut" class="w-full max-w-[400px]"></div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                            <span class="block font-bold text-green-700 text-lg" id="stat-completed">0</span>
+                            <span class="text-slate-500">Completed (Green)</span>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <span class="block font-bold text-blue-700 text-lg" id="stat-wip">0</span>
+                            <span class="text-slate-500">Work In Progress (Blue)</span>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                            <span class="block font-bold text-yellow-700 text-lg" id="stat-survey">0</span>
+                            <span class="text-slate-500">Survey Stage (Yellow)</span>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                            <span class="block font-bold text-red-700 text-lg" id="stat-delay">0</span>
+                            <span class="text-slate-500">Delayed (Red)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-control" class="tab-content hidden animate-fade-in">
+            <div class="card p-6">
+                <div class="flex flex-wrap gap-4 mb-4 justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Detailed Project Control</h3>
+                    <div class="flex gap-2">
+                        <select id="filter-region" onchange="applyFilters()" class="border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="All">All Regions</option>
+                        </select>
+                        <select id="filter-status" onchange="applyFilters()" class="border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="All">All Statuses</option>
+                            <option value="Completed">Completed</option>
+                            <option value="WIP">Work In Progress</option>
+                            <option value="Survey">Survey Stage</option>
+                            <option value="Delay">Delay</option>
+                        </select>
+                        <button onclick="fetchData()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border border-slate-200 max-h-[700px]">
+                    <table class="w-full data-table text-left border-collapse">
+                        <thead class="sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="w-16">ID</th>
+                                <th>Site Name</th>
+                                <th>Region</th>
+                                <th>Phase</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Team (Click)</th>
+                                <th>Engineer (Click)</th>
+                                <th>Start Date</th>
+                                <th>Target</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-team" class="tab-content hidden animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="card p-6 md:col-span-1">
+                    <h3 class="font-bold text-slate-700 mb-4">Team Workload (9 Teams)</h3>
+                    <div id="chart-team-bar"></div>
+                </div>
+                <div class="card p-6 md:col-span-2">
+                    <h3 class="font-bold text-slate-700 mb-4">Engineer Workload (18 Engineers)</h3>
+                    <div id="chart-eng-bar"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 mb-4 text-center">Team Performance Radar</h3>
+                    <div id="chart-radar-team"></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 mb-4 text-center">Engineer Capability Radar</h3>
+                    <div id="chart-radar-eng"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-map" class="tab-content hidden animate-fade-in">
+            <div class="card p-4">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-satellite-dish mr-2 text-blue-600"></i>Nationwide Installation Sites (138 Sites)</h3>
+                    <div class="flex flex-wrap gap-3 text-xs font-bold">
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500"></span> Completed</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Work In Progress</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-yellow-400"></span> Survey Stage</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Delay</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-400"></span> Pending</span>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-slate-400 text-sm">
+        &copy; 2026 Fatima R.B.D.S. International Co., Ltd. All Rights Reserved.
+    </footer>
 
     <script>
-        // --- CONFIG ---
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
-        const PROXIES = [
-            '', // Direct
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
-        ];
-
-        let rawData = [];
-        let filteredData = [];
+        // CONFIG
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
+        const PROXIES = ['', 'https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+        
+        let rawData = [], filteredData = [], map, markers = [];
         let charts = {};
-        let map, markers = [];
 
-        // --- INIT ---
+        // INIT
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            // Start fetch logic with timeout protection
-            const timeout = setTimeout(() => {
-                const loader = document.getElementById('loader');
-                if(loader.style.display !== 'none') {
-                    showManualActions("Connection Timeout (10s limit exceeded)");
-                }
-            }, 10000); // 10 seconds max wait
-
-            fetchData().then(() => clearTimeout(timeout));
-            
-            setInterval(fetchData, 300000); // 5 mins auto-refresh
+            fetchData();
         });
 
-        // --- ROBUST FETCH ENGINE ---
+        // 1. Data Fetching
         async function fetchData() {
-            const statusText = document.getElementById('loading-status');
-            
-            for (let i = 0; i < PROXIES.length; i++) {
-                const proxy = PROXIES[i];
-                const url = proxy + (proxy ? encodeURIComponent(SHEET_CSV_URL) : SHEET_CSV_URL);
-                const methodLabel = proxy ? (proxy.includes('allorigins') ? "Proxy A" : "Proxy B") : "Direct Connection";
-
+            document.getElementById('loader').style.display = 'flex';
+            for (let proxy of PROXIES) {
                 try {
-                    statusText.innerText = `Trying ${methodLabel}...`;
-                    console.log(`Attempting: ${methodLabel}`);
-                    
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-                    
-                    const csvText = await response.text();
-                    
-                    // Validate CSV content briefly
-                    if(!csvText.includes('site_name') && !csvText.includes('id')) {
-                        throw new Error("Invalid CSV Data");
-                    }
-
-                    Papa.parse(csvText, {
-                        header: true,
-                        skipEmptyLines: true,
+                    const res = await fetch(proxy + encodeURIComponent(CSV_URL));
+                    if (!res.ok) continue;
+                    const text = await res.text();
+                    Papa.parse(text, {
+                        header: true, skipEmptyLines: true,
                         complete: (results) => {
-                            if(results.data.length > 0) {
+                            if (results.data.length > 0) {
                                 processData(results.data);
-                                updateConnectionStatus("Online", "bg-green-500", "text-green-400");
                                 document.getElementById('loader').style.display = 'none';
-                            } else {
-                                throw new Error("Empty Data");
                             }
                         }
                     });
-                    
-                    return; // Success, exit loop
-
-                } catch (error) {
-                    console.warn(`${methodLabel} Failed:`, error);
-                }
+                    return;
+                } catch (e) { console.error(e); }
             }
-
-            // If all fail
-            showManualActions("All connection methods failed. CORS or Network issue.");
+            alert("Failed to load data.");
         }
 
-        function showManualActions(errorDetails) {
-            document.querySelector('.animate-spin').style.display = 'none';
-            document.getElementById('loading-status').style.display = 'none';
-            document.getElementById('manual-actions').classList.remove('hidden');
-            document.getElementById('manual-actions').classList.add('flex');
-            document.getElementById('error-detail').innerText = errorDetails;
-            updateConnectionStatus("Offline", "bg-red-500", "text-red-400");
-        }
-
-        function updateConnectionStatus(text, colorBg, colorText) {
-            const el = document.getElementById('connection-status');
-            el.className = `mt-2 flex items-center gap-2 ${colorText}`;
-            el.innerHTML = `<div class="w-2 h-2 rounded-full ${colorBg}"></div> ${text}`;
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                Papa.parse(e.target.result, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (results) => {
-                        processData(results.data);
-                        document.getElementById('loader').style.display = 'none';
-                        updateConnectionStatus("Local File", "bg-blue-500", "text-blue-400");
-                    }
-                });
-            };
-            reader.readAsText(file);
-        }
-
-        // --- LOGIC PROCESSOR ---
+        // 2. Logic Processing (The Brain)
         function processData(data) {
-            const today = new Date();
-            
-            rawData = data.map(row => {
-                const phase = row.phase || 'Survey';
-                let status = row.status || 'Not Start';
-                const planDate = row.plan_handover ? new Date(row.plan_handover) : null;
-                
-                // AUTO PROGRESS LOGIC
-                let progress = 0;
-                let sLower = status.toLowerCase();
-                if(sLower.includes('handover complete') || (phase === 'Handover' && status === 'Complete')) progress = 100;
-                else if(sLower.includes('install complete') || (phase === 'Install' && status === 'Complete')) progress = 80;
-                else if(sLower.includes('survey complete') || (phase === 'Survey' && status === 'Complete')) progress = 30;
-                else if(phase === 'Install') progress = 40;
-                else if(phase === 'Handover') progress = 90;
-                
-                if(progress === 100) status = 'Handover Complete';
+            const today = new Date(); // Feb 2026
 
-                // DELAY LOGIC
-                let isDelay = false;
-                let delayDays = 0;
-                if(progress < 100 && planDate && today > planDate) {
-                    isDelay = true;
-                    delayDays = Math.ceil((today - planDate) / (1000 * 60 * 60 * 24));
+            rawData = data.map(row => {
+                // Determine Status Logic (Fixing the Gray Map Issue)
+                let status = "Pending";
+                let progress = 0;
+                let colorClass = "st-gray";
+                let colorHex = "#94a3b8";
+
+                // Check Dates for Activity
+                const surveyDate = row['actual_survey_date'];
+                const installDate = row['actual_install_date'];
+                const handoverDate = row['actual_handover'];
+                const planSurvey = row['plan_survey'] ? new Date(row['plan_survey']) : null;
+                const planHandover = row['plan_handover'] ? new Date(row['plan_handover']) : null;
+
+                // Priority Logic
+                if (handoverDate || (row['status'] && row['status'].includes('Handover Complete'))) {
+                    status = "Completed"; progress = 100;
+                    colorClass = "st-green"; colorHex = "#10b981";
+                } else if (installDate || (row['status'] && row['status'].includes('Install Complete'))) {
+                    status = "Work In Progress"; progress = 60; // Approx
+                    colorClass = "st-blue"; colorHex = "#3b82f6";
+                } else if (surveyDate || (row['status'] && row['status'].includes('Survey Complete'))) {
+                    status = "Survey Stage"; progress = 20;
+                    colorClass = "st-yellow"; colorHex = "#facc15";
+                } else {
+                    // Check Delay
+                    if (planSurvey && today > planSurvey) {
+                        status = "Delay";
+                        colorClass = "st-red"; colorHex = "#ef4444";
+                    }
                 }
 
-                // COLOR LOGIC
-                let color = '#94a3b8'; 
-                if(isDelay) color = '#ef4444';
-                else if(progress === 100) color = '#10b981';
-                else if(progress > 0) color = '#f59e0b';
+                // Explicit Override from CSV column if needed
+                if(row['status'] && row['status'].toLowerCase().includes('delay')) {
+                    status = "Delay"; colorClass = "st-red"; colorHex = "#ef4444";
+                }
 
                 return {
-                    ...row,
-                    progress, isDelay, delayDays, color,
-                    cleanStatus: status,
-                    lat: parseFloat(row.lat),
-                    lng: parseFloat(row.lng)
+                    id: row['id'],
+                    site: row['site_name'],
+                    region: row['region'],
+                    team: row['team'],
+                    tel_team: row['tel_team'] || 'N/A',
+                    eng: row['engineer'],
+                    tel_eng: row['tel_eng'] || 'N/A',
+                    phase: row['phase'] || 'Survey',
+                    status: status,
+                    progress: parseInt(row['progress'] || progress),
+                    colorClass: colorClass,
+                    colorHex: colorHex,
+                    lat: parseFloat(row['lat']),
+                    lng: parseFloat(row['lng']),
+                    start: row['plan_survey'],
+                    end: row['plan_handover']
                 };
-            }).filter(d => d.site_name);
+            }).filter(d => d.site); // Remove empty rows
 
-            // Setup Filter
-            const regionSel = document.getElementById('filter-region');
-            const regions = [...new Set(rawData.map(d => d.region).filter(r => r))];
-            if(regionSel.options.length === 1) {
-                regions.forEach(r => regionSel.add(new Option(r, r)));
-            }
+            // Populate Filters
+            const regions = [...new Set(rawData.map(d => d.region))];
+            const regSel = document.getElementById('filter-region');
+            regSel.innerHTML = '<option value="All">All Regions</option>';
+            regions.forEach(r => regSel.add(new Option(r, r)));
 
             applyFilters();
         }
 
         function applyFilters() {
-            const region = document.getElementById('filter-region').value;
-            filteredData = rawData.filter(d => region === 'All' || d.region === region);
-            updateUI();
+            const regVal = document.getElementById('filter-region').value;
+            const statVal = document.getElementById('filter-status').value;
+
+            filteredData = rawData.filter(d => {
+                return (regVal === 'All' || d.region === regVal) &&
+                       (statVal === 'All' || (statVal === 'WIP' ? d.status === 'Work In Progress' : d.status.includes(statVal)));
+            });
+
+            updateDashboard();
         }
 
-        // --- RENDERERS ---
-        function updateUI() {
-            renderKPI();
-            renderCharts();
-            renderTable(filteredData);
+        function updateDashboard() {
+            renderGauges();
+            renderSCurve();
+            renderRegional();
+            renderDonut();
+            renderTable();
+            renderTeamCharts();
             renderMap();
         }
 
-        function renderKPI() {
-            const total = filteredData.length;
-            const done = filteredData.filter(d => d.progress === 100).length;
-            const delay = filteredData.filter(d => d.isDelay).length;
-            const avg = total ? Math.round(filteredData.reduce((a,b)=>a+b.progress,0)/total) : 0;
+        // --- CHARTS SECTION ---
+
+        function renderGauges() {
+            const phases = ['Survey', 'Install', 'Handover'];
+            const targets = [138, 138, 138]; // Total sites
+            // Count actual completions per phase
+            const actuals = [
+                filteredData.filter(d => d.progress >= 20).length,
+                filteredData.filter(d => d.progress >= 60).length,
+                filteredData.filter(d => d.progress === 100).length
+            ];
+            const colors = ['#facc15', '#3b82f6', '#10b981'];
+
+            phases.forEach((p, i) => {
+                const percent = Math.round((actuals[i] / targets[i]) * 100);
+                const options = {
+                    series: [percent],
+                    chart: { type: 'radialBar', height: 200 },
+                    plotOptions: {
+                        radialBar: {
+                            hollow: { size: '60%' },
+                            dataLabels: {
+                                name: { show: false },
+                                value: { fontSize: '24px', fontWeight: 'bold', color: '#1e293b', offsetY: 10 }
+                            },
+                            track: { background: '#e2e8f0' }
+                        }
+                    },
+                    colors: [colors[i]],
+                    labels: [p],
+                    stroke: { lineCap: 'round' }
+                };
+                if(charts[`gauge-${p.toLowerCase()}`]) charts[`gauge-${p.toLowerCase()}`].destroy();
+                charts[`gauge-${p.toLowerCase()}`] = new ApexCharts(document.querySelector(`#gauge-${p.toLowerCase()}`), options);
+                charts[`gauge-${p.toLowerCase()}`].render();
+            });
+        }
+
+        function renderSCurve() {
+            // Simulated Data for S-Curve (Jan - Jun)
+            const categories = ['20 Jan', '10 Feb', '28 Feb', '20 Mar', '10 Apr', '30 Apr', '20 May', '10 Jun', '30 Jun'];
+            const planned = [0, 10, 25, 40, 60, 80, 90, 95, 100];
             
-            const phases = filteredData.map(d => d.phase);
-            const modePhase = phases.sort((a,b) => phases.filter(v=>v===a).length - phases.filter(v=>v===b).length).pop();
+            // Calculate Actual based on total progress average
+            const currentAvg = filteredData.reduce((a,b)=>a+b.progress,0) / (filteredData.length || 1);
+            // Distribute actual curve (Mockup logic based on current progress)
+            const actual = planned.map(v => v <= currentAvg ? v : null); 
+            if(currentAvg > 0) actual[actual.findIndex(v=>v===null)-1] = currentAvg; // Set last known point
 
-            document.getElementById('kpi-total').innerText = total;
-            document.getElementById('kpi-progress').innerText = avg + '%';
-            document.getElementById('kpi-completed-count').innerText = done + ' Done';
-            document.getElementById('kpi-delay').innerText = delay;
-            document.getElementById('kpi-phase-focus').innerText = modePhase || '-';
+            const options = {
+                series: [
+                    { name: 'Planned Cumulative %', data: planned, type: 'line' },
+                    { name: 'Actual Cumulative %', data: actual, type: 'line' }
+                ],
+                chart: { height: 350, type: 'line', toolbar: { show: false } },
+                stroke: { width: [3, 4], dashArray: [5, 0], curve: 'smooth' }, // Dashed Planned, Solid Actual
+                colors: ['#94a3b8', '#2563eb'],
+                xaxis: { categories: categories },
+                yaxis: { min: 0, max: 100, tickAmount: 10, title: { text: '% Progress' } },
+                markers: { size: 5 },
+                legend: { position: 'top' },
+                grid: { borderColor: '#f1f5f9' }
+            };
+
+            if(charts['scurve']) charts['scurve'].destroy();
+            charts['scurve'] = new ApexCharts(document.querySelector("#chart-scurve"), options);
+            charts['scurve'].render();
         }
 
-        function renderCharts() {
-            const done = filteredData.filter(d => d.progress === 100).length;
-            const delay = filteredData.filter(d => d.isDelay).length;
-            const work = filteredData.filter(d => d.progress > 0 && d.progress < 100 && !d.isDelay).length;
-            const wait = filteredData.filter(d => d.progress === 0).length;
-
-            updateChart('chart-donut', {
-                type: 'donut',
-                series: [done, work, delay, wait],
-                labels: ['Done', 'Working', 'Delay', 'Pending'],
-                colors: ['#10b981', '#f59e0b', '#ef4444', '#94a3b8']
+        function renderRegional() {
+            const regions = [...new Set(filteredData.map(d=>d.region))];
+            const data = regions.map(r => {
+                const sites = filteredData.filter(d=>d.region===r);
+                return Math.round(sites.reduce((a,b)=>a+b.progress,0) / sites.length);
             });
 
-            updateChart('chart-scurve', {
-                type: 'line',
-                series: [{ name: 'Plan', data: [10,30,50,70,90,100] }, { name: 'Actual', data: [10,25,40,55, null, null] }],
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                colors: ['#cbd5e1', '#2563eb']
-            });
+            const options = {
+                series: [{ name: 'Progress', data: data }],
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: '50%' } },
+                colors: ['#8b5cf6'],
+                xaxis: { categories: regions },
+                yaxis: { max: 100 },
+                dataLabels: { enabled: true, formatter: (v) => v + "%" }
+            };
 
-            const teams = {};
-            filteredData.forEach(d => { teams[d.team] = (teams[d.team]||0)+1; });
-            updateChart('chart-team-load', {
-                type: 'bar',
-                series: [{ name: 'Sites', data: Object.values(teams) }],
-                labels: Object.keys(teams),
-                colors: ['#3b82f6']
-            });
+            if(charts['regional']) charts['regional'].destroy();
+            charts['regional'] = new ApexCharts(document.querySelector("#chart-regional"), options);
+            charts['regional'].render();
+        }
+
+        function renderDonut() {
+            const counts = {
+                'Completed': filteredData.filter(d=>d.status==='Completed').length,
+                'WIP': filteredData.filter(d=>d.status==='Work In Progress').length,
+                'Survey': filteredData.filter(d=>d.status==='Survey Stage').length,
+                'Delay': filteredData.filter(d=>d.status==='Delay').length
+            };
             
-            const engs = {};
-            filteredData.forEach(d => { if(d.engineer) engs[d.engineer] = (engs[d.engineer]||0)+1; });
-            updateChart('chart-eng-load', {
-                type: 'bar',
-                series: [{ name: 'Sites', data: Object.values(engs).slice(0,10) }],
-                labels: Object.keys(engs).slice(0,10),
-                colors: ['#8b5cf6']
-            });
+            // Update Stat Text
+            document.getElementById('stat-completed').innerText = counts.Completed;
+            document.getElementById('stat-wip').innerText = counts.WIP;
+            document.getElementById('stat-survey').innerText = counts.Survey;
+            document.getElementById('stat-delay').innerText = counts.Delay;
+
+            const options = {
+                series: [counts.Completed, counts.WIP, counts.Survey, counts.Delay],
+                labels: ['Completed', 'Work In Progress', 'Survey Stage', 'Delay'],
+                chart: { type: 'donut', height: 300 },
+                colors: ['#10b981', '#3b82f6', '#facc15', '#ef4444'],
+                plotOptions: { pie: { donut: { size: '70%' } } },
+                legend: { show: false }
+            };
+
+            if(charts['donut']) charts['donut'].destroy();
+            charts['donut'] = new ApexCharts(document.querySelector("#chart-donut"), options);
+            charts['donut'].render();
         }
 
-        function updateChart(id, config) {
-            if(charts[id]) charts[id].destroy();
-            charts[id] = new ApexCharts(document.querySelector('#'+id), {
-                series: config.series,
-                chart: { type: config.type, height: 250, toolbar:{show:false} },
-                labels: config.labels,
-                colors: config.colors,
-                xaxis: { categories: config.labels },
-                plotOptions: { bar: { borderRadius:4, horizontal: true }, pie: { donut: { size: '65%' } } }
-            });
-            charts[id].render();
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('table-control-body');
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
-            data.forEach(d => {
+            filteredData.forEach(d => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="font-bold text-slate-700 p-3">${d.site_name}</td>
-                    <td class="text-xs text-slate-500 p-3">${d.region}</td>
-                    <td class="p-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${d.phase}</span></td>
-                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs text-white" style="background:${d.color}">${d.cleanStatus}</span></td>
-                    <td class="p-3">
-                        <div class="flex items-center gap-2">
-                             <div class="w-16 bg-slate-200 h-1.5 rounded-full"><div class="h-1.5 rounded-full bg-blue-600" style="width:${d.progress}%"></div></div>
-                             <span class="text-xs">${d.progress}%</span>
+                    <td><span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded">${d.id}</span></td>
+                    <td class="font-bold text-slate-700">${d.site}</td>
+                    <td>${d.region}</td>
+                    <td>${d.phase}</td>
+                    <td>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${d.progress}%"></div>
                         </div>
+                        <span class="text-xs font-bold">${d.progress}%</span>
                     </td>
-                    <td class="text-xs font-mono p-3">${d.plan_handover||'-'}</td>
-                    <td class="font-bold text-red-600 text-center p-3">${d.isDelay ? d.delayDays : '-'}</td>
-                    <td class="text-xs p-3">${d.team}</td>
+                    <td><span class="px-3 py-1 rounded-full text-xs font-bold ${d.colorClass}">${d.status}</span></td>
+                    <td><span class="clickable-name" onclick="showPopup('${d.team}', '${d.tel_team}')">${d.team}</span></td>
+                    <td><span class="clickable-name" onclick="showPopup('${d.eng}', '${d.tel_eng}')">${d.eng}</span></td>
+                    <td class="text-xs">${d.start || '-'}</td>
+                    <td class="text-xs">${d.end || '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function filterTable(type) {
-            let res = filteredData;
-            if(type === 'Delay') res = filteredData.filter(d => d.isDelay);
-            if(type === 'Handover') res = filteredData.filter(d => d.progress === 100);
-            renderTable(res);
+        // 6. Popup Logic
+        window.showPopup = (name, tel) => {
+            Swal.fire({
+                title: `<span class="text-blue-900">${name}</span>`,
+                html: `<div class="text-xl my-4"><i class="fa-solid fa-phone-volume text-green-500 mr-2"></i> ${tel}</div>`,
+                icon: 'info',
+                confirmButtonColor: '#2563eb'
+            });
+        };
+
+        function renderTeamCharts() {
+            // Prepare Data & Extract Nicknames
+            const extractNick = (name) => {
+                if(!name) return 'Unknown';
+                const match = name.match(/\(([^)]+)\)/); // Get text inside ()
+                return match ? match[1] : name.split(' ')[0]; // Fallback to first name
+            };
+
+            const teams = {};
+            const engs = {};
+
+            filteredData.forEach(d => {
+                teams[d.team] = (teams[d.team] || 0) + 1;
+                engs[d.eng] = (engs[d.eng] || 0) + 1;
+            });
+
+            // Workload Bar Charts
+            const teamSeries = Object.keys(teams).map(k => ({ x: k, y: teams[k] }));
+            const engSeries = Object.keys(engs).map(k => ({ x: extractNick(k), y: engs[k] }));
+
+            const barOptions = (data, color, type='bar') => ({
+                series: [{ name: 'Sites', data: data }],
+                chart: { type: type, height: 300, toolbar: { show: false } },
+                plotOptions: { bar: { borderRadius: 4, horizontal: true } }, // Horizontal for Eng
+                colors: [color],
+                xaxis: { categories: data.map(d=>d.x) }
+            });
+
+            if(charts['teamBar']) charts['teamBar'].destroy();
+            charts['teamBar'] = new ApexCharts(document.querySelector("#chart-team-bar"), barOptions(teamSeries, '#3b82f6', 'bar')); // Vertical
+            charts['teamBar'].render();
+
+            // 7. Engineer Bar Ratio 1:2 (handled by column width in layout grid)
+            if(charts['engBar']) charts['engBar'].destroy();
+            charts['engBar'] = new ApexCharts(document.querySelector("#chart-eng-bar"), barOptions(engSeries, '#0ea5e9', 'bar'));
+            charts['engBar'].render();
+
+            // 8. Radar Charts
+            const radarOptions = (data, color) => ({
+                series: [{ name: 'Workload', data: data.map(d=>d.y) }],
+                chart: { type: 'radar', height: 300, toolbar: { show: false } },
+                labels: data.map(d=>d.x),
+                stroke: { width: 2, colors: [color] },
+                fill: { opacity: 0.2, colors: [color] },
+                markers: { size: 4, colors: ['#fff'], strokeColors: color, strokeWidth: 2 }
+            });
+
+            if(charts['radarTeam']) charts['radarTeam'].destroy();
+            charts['radarTeam'] = new ApexCharts(document.querySelector("#chart-radar-team"), radarOptions(teamSeries, '#8b5cf6'));
+            charts['radarTeam'].render();
+
+            if(charts['radarEng']) charts['radarEng'].destroy();
+            charts['radarEng'] = new ApexCharts(document.querySelector("#chart-radar-eng"), radarOptions(engSeries, '#ec4899'));
+            charts['radarEng'].render();
         }
 
         function renderMap() {
-            if(!map) return;
+            if (!map) return;
             markers.forEach(m => map.removeLayer(m));
             markers = [];
+
             filteredData.forEach(d => {
-                if(d.lat && d.lng) {
-                    const m = L.circleMarker([d.lat, d.lng], {
-                        radius: 8, fillColor: d.color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.8
+                if (d.lat && d.lng) {
+                    const marker = L.circleMarker([d.lat, d.lng], {
+                        radius: 8,
+                        fillColor: d.colorHex,
+                        color: "#fff",
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
                     }).addTo(map);
-                    m.bindPopup(`<b>${d.site_name}</b><br>Status: ${d.cleanStatus}<br>Delay: ${d.delayDays} days`);
-                    markers.push(m);
+                    
+                    marker.bindPopup(`
+                        <div class="text-center">
+                            <b class="text-blue-900">${d.site}</b><br>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded text-white" style="background:${d.colorHex}">${d.status}</span><br>
+                            <div class="text-xs mt-1 text-slate-500">Team: ${d.team}</div>
+                        </div>
+                    `);
+                    markers.push(marker);
                 }
             });
         }
 
+        // Utils
         function initMap() {
             map = L.map('map').setView([13.7563, 100.5018], 6);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
         }
 
-        function switchTab(id, btn) {
+        window.switchTab = (tabId, btn) => {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById('tab-'+id).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
-            if(id === 'map') setTimeout(() => map.invalidateSize(), 300);
-        }
-        
-        function loadDemoData() {
-            console.log("Loading Demo Data...");
-            const demo = [
-                { site_name: "ทล.เชียงใหม่", region: "ภาคเหนือ", phase: "Survey", status: "Survey Complete", progress: 30, plan_handover: "2024-04-01", team: "Team A", lat: 18.7, lng: 98.9 },
-                { site_name: "ทล.ภูเก็ต", region: "ภาคใต้", phase: "Install", status: "Not Start", progress: 0, plan_handover: "2024-03-01", team: "Team B", lat: 7.8, lng: 98.3 },
-                { site_name: "ทล.ขอนแก่น", region: "ภาคอีสาน", phase: "Handover", status: "Handover Complete", progress: 100, plan_handover: "2024-01-01", team: "Team C", lat: 16.4, lng: 102.8 },
-                { site_name: "ทล.กรุงเทพ", region: "ภาคกลาง", phase: "Install", status: "Complete", progress: 80, plan_handover: "2024-05-01", team: "Team A", lat: 13.7, lng: 100.5 },
-                { site_name: "ทล.สงขลา (Delay)", region: "ภาคใต้", phase: "Survey", status: "Survey Complete", progress: 30, plan_handover: "2023-12-01", team: "Team B", lat: 7.0, lng: 100.4 }
-            ];
-            processData(demo);
-            document.getElementById('loader').style.display = 'none';
-            updateConnectionStatus("Offline (Demo)", "bg-gray-500", "text-gray-400");
-        }
+            if(tabId === 'map') setTimeout(() => map.invalidateSize(), 300);
+        };
     </script>
 </body>
 </html>

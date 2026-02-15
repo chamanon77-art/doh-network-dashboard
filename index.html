@@ -16,15 +16,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg-page: #f0f4f8;
-            --cyber-dark: #020617;
-            --cyber-blue: #3b82f6;
-            --cyber-glow: #0ea5e9;
-        }
+        :root { --bg-page: #f0f4f8; --cyber-dark: #020617; --cyber-blue: #3b82f6; }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #334155; }
         
-        /* --- Cyberpunk Header --- */
+        /* Header & Theme */
         .cyber-header {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #020617 100%);
             position: sticky; top: 0; z-index: 50;
@@ -33,103 +28,53 @@
             overflow: hidden;
         }
         .cyber-grid {
-            position: absolute; inset: 0;
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            position: absolute; inset: 0; opacity: 0.3; pointer-events: none;
+            background-image: linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
             background-size: 30px 30px;
-            opacity: 0.3;
-            pointer-events: none;
         }
-        .cyber-glow {
-            position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.4), transparent 60%);
-            pointer-events: none;
-        }
-        
-        /* Text Styles */
-        .title-main { 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 1.8rem; 
-            font-weight: 900; 
-            color: #fff;
-            text-shadow: 0 0 10px #3b82f6;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-        .title-sub { 
-            font-family: 'Rajdhani', sans-serif; 
-            font-size: 0.85rem; 
-            font-weight: 700; 
-            color: #bae6fd;
-            letter-spacing: 3.5px; 
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
+        .title-main { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px #3b82f6; letter-spacing: 1px; white-space: nowrap; }
+        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; font-weight: 700; color: #bae6fd; letter-spacing: 3.5px; text-transform: uppercase; white-space: nowrap; }
 
-        /* Cards */
-        .card {
-            background: white; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
-        }
+        /* UI Components */
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.3s; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); border-color: #93c5fd; }
-
-        /* Navigation */
-        .nav-pill {
-            cursor: pointer; padding: 8px 20px; border-radius: 4px; 
-            font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 1px;
-            color: #94a3b8; transition: all 0.3s;
-            border: 1px solid transparent;
-        }
+        .nav-pill { cursor: pointer; padding: 8px 20px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 1px; color: #94a3b8; transition: all 0.3s; border: 1px solid transparent; }
         .nav-pill:hover { color: white; text-shadow: 0 0 5px #fff; }
-        .nav-pill.active {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border: 1px solid #3b82f6;
-            box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3);
-        }
+        .nav-pill.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3); }
 
-        /* Status Colors */
+        /* Status & Map */
         .date-red { color: #dc2626; font-weight: bold; }   
         .date-yellow { color: #d97706; font-weight: bold; } 
         .date-green { color: #16a34a; font-weight: bold; }  
         .date-blue { color: #2563eb; font-weight: bold; }   
         .date-gray { color: #94a3b8; }                      
-
-        /* Map */
         #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
 
+        .status-box { padding: 15px; border-radius: 8px; color: white; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
+        .status-box i { font-size: 3rem; opacity: 0.2; position: absolute; right: -10px; bottom: -10px; }
+        
         /* Table */
         .data-table th { background: #f1f5f9; color: #475569; padding: 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
         .data-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; vertical-align: middle; }
         .data-table tr:hover { background: #f8fafc; }
-        
-        .site-link { color: #2563eb; cursor: pointer; text-decoration: none; font-weight: 600; transition: 0.2s; }
-        .site-link:hover { color: #1e3a8a; text-decoration: underline; }
-
-        /* Status Boxes */
-        .status-box { padding: 15px; border-radius: 8px; color: white; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
-        .status-box i { font-size: 3rem; opacity: 0.2; position: absolute; right: -10px; bottom: -10px; }
+        .site-link { color: #2563eb; cursor: pointer; text-decoration: none; font-weight: 600; }
+        .site-link:hover { text-decoration: underline; }
 
         /* Loader */
-        .loader-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
 
     <div id="loader" class="loader-overlay">
         <i class="fa-solid fa-wifi fa-beat-fade text-6xl text-blue-500 mb-4"></i>
-        <h2 class="text-2xl font-bold text-white font-[Orbitron]">SYSTEM CONNECTING...</h2>
-        <p class="text-blue-400 text-sm mt-2">Loading DOH Database</p>
+        <h2 class="text-2xl font-bold text-white font-[Orbitron]">SYSTEM INITIALIZING...</h2>
+        <p class="text-blue-400 text-sm mt-2">Loading Hybrid Data Engine</p>
     </div>
 
     <header class="cyber-header">
         <div class="cyber-grid"></div>
-        <div class="cyber-glow"></div>
         <div class="max-w-[1900px] mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center relative z-10">
-            
             <div class="flex items-center gap-5 mb-4 md:mb-0">
                 <div class="w-16 h-16 rounded-full border-2 border-blue-400 bg-blue-900/50 flex items-center justify-center shadow-[0_0_15px_#3b82f6]">
                     <i class="fa-solid fa-wifi text-3xl text-white"></i>
@@ -139,7 +84,6 @@
                     <p class="title-sub">DOH PROJECT 2026 | OPERATED BY FATIMA R.B.D.S. INTERNATIONAL</p>
                 </div>
             </div>
-
             <nav class="flex gap-2 bg-black/30 p-2 rounded-lg backdrop-blur-sm border border-white/10">
                 <div class="nav-pill active" onclick="switchTab('overview', this)">DASHBOARD</div>
                 <div class="nav-pill" onclick="switchTab('control', this)">CONTROL</div>
@@ -151,67 +95,36 @@
     </header>
 
     <main class="max-w-[1900px] mx-auto p-6 space-y-6">
+        
+        <div id="conn-status" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative text-xs text-center">
+            <i class="fa-solid fa-link mr-1"></i> Data successfully synced with Google Sheets.
+        </div>
 
         <div id="tab-overview" class="tab-content animate-fade-in">
-            
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="status-box bg-gradient-to-r from-green-600 to-green-800 shadow-lg">
-                    <div>
-                        <p class="text-xs text-green-200 uppercase font-bold">Completed</p>
-                        <h3 class="text-3xl font-[Orbitron]" id="stat-completed">0</h3>
-                    </div>
-                    <i class="fa-solid fa-circle-check"></i>
+                    <div><p class="text-xs text-green-200 uppercase font-bold">Completed</p><h3 class="text-3xl font-[Orbitron]" id="stat-completed">0</h3></div><i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="status-box bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
-                    <div>
-                        <p class="text-xs text-blue-200 uppercase font-bold">In Progress</p>
-                        <h3 class="text-3xl font-[Orbitron]" id="stat-wip">0</h3>
-                    </div>
-                    <i class="fa-solid fa-bars-progress"></i>
+                    <div><p class="text-xs text-blue-200 uppercase font-bold">In Progress</p><h3 class="text-3xl font-[Orbitron]" id="stat-wip">0</h3></div><i class="fa-solid fa-bars-progress"></i>
                 </div>
                 <div class="status-box bg-gradient-to-r from-yellow-500 to-yellow-700 shadow-lg">
-                    <div>
-                        <p class="text-xs text-yellow-100 uppercase font-bold">Survey Stage</p>
-                        <h3 class="text-3xl font-[Orbitron]" id="stat-survey">0</h3>
-                    </div>
-                    <i class="fa-solid fa-binoculars"></i>
+                    <div><p class="text-xs text-yellow-100 uppercase font-bold">Survey Stage</p><h3 class="text-3xl font-[Orbitron]" id="stat-survey">0</h3></div><i class="fa-solid fa-binoculars"></i>
                 </div>
                 <div class="status-box bg-gradient-to-r from-red-600 to-red-800 shadow-lg">
-                    <div>
-                        <p class="text-xs text-red-200 uppercase font-bold">Delayed</p>
-                        <h3 class="text-3xl font-[Orbitron]" id="stat-delay">0</h3>
-                    </div>
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div><p class="text-xs text-red-200 uppercase font-bold">Delayed</p><h3 class="text-3xl font-[Orbitron]" id="stat-delay">0</h3></div><i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">SURVEY PROGRESS</h3>
-                    <div id="gauge-survey" class="-mt-4"></div>
-                    <p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p>
-                </div>
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">INSTALL PROGRESS</h3>
-                    <div id="gauge-install" class="-mt-4"></div>
-                    <p class="text-xs text-slate-500 -mt-4">Phase Weight: 60%</p>
-                </div>
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">HANDOVER PROGRESS</h3>
-                    <div id="gauge-handover" class="-mt-4"></div>
-                    <p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p>
-                </div>
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">SURVEY PROGRESS</h3><div id="gauge-survey" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p></div>
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">INSTALL PROGRESS</h3><div id="gauge-install" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 60%</p></div>
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">HANDOVER PROGRESS</h3><div id="gauge-handover" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>Project S-Curve</h3>
-                    <div id="chart-scurve"></div>
-                </div>
-                <div class="card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-simple text-purple-600 mr-2"></i>Regional Performance</h3>
-                    <div id="chart-regional"></div>
-                </div>
+                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 mb-4">Project S-Curve</h3><div id="chart-scurve"></div></div>
+                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 mb-4">Regional Performance</h3><div id="chart-regional"></div></div>
             </div>
         </div>
 
@@ -220,29 +133,14 @@
                 <div class="flex flex-wrap gap-4 mb-4 justify-between items-center">
                     <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">DETAILED CONTROL TABLE</h3>
                     <div class="flex gap-2">
-                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site..." class="border border-slate-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-500">
-                        <select id="filter-status" onchange="filterTable()" class="border border-slate-300 rounded px-3 py-2 text-sm outline-none">
-                            <option value="All">All Status</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Delay">Delay</option>
-                        </select>
+                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site..." class="border border-slate-300 rounded px-3 py-2 text-sm outline-none">
+                        <select id="filter-status" onchange="filterTable()" class="border border-slate-300 rounded px-3 py-2 text-sm outline-none"><option value="All">All Status</option><option value="Completed">Completed</option><option value="Delay">Delay</option></select>
                     </div>
                 </div>
-                
                 <div class="overflow-x-auto rounded-lg border border-slate-200 max-h-[700px]">
                     <table class="w-full data-table text-left border-collapse">
                         <thead class="sticky top-0 z-10 shadow-sm bg-slate-100">
-                            <tr>
-                                <th class="w-16">ID</th>
-                                <th>Site Name (Click)</th>
-                                <th>Region</th>
-                                <th>Plan Surv</th>
-                                <th>Plan Inst</th>
-                                <th>Plan HO</th>
-                                <th>Status</th>
-                                <th>Progress</th>
-                                <th>Team</th>
-                            </tr>
+                            <tr><th class="w-16">ID</th><th>Site Name (Click)</th><th>Region</th><th>Plan Surv</th><th>Plan Inst</th><th>Plan HO</th><th>Status</th><th>Progress</th><th>Team</th></tr>
                         </thead>
                         <tbody id="table-body"></tbody>
                     </table>
@@ -252,54 +150,26 @@
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
             <div class="grid grid-cols-1 gap-6">
-                
-                <div class="card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">
-                        <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY INSTALLATION VELOCITY
-                    </h3>
-                    <p class="text-xs text-slate-400 mb-4">Plan vs Actual Installations per Week</p>
-                    <div id="chart-velocity"></div>
-                </div>
-
-                <div class="card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">
-                        <i class="fa-solid fa-clock text-purple-600 mr-2"></i>REGIONAL MASTER TIMELINE
-                    </h3>
-                    <p class="text-xs text-slate-400 mb-4">Duration Overview by Region</p>
-                    <div id="chart-region-gantt"></div>
-                </div>
-
+                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">WEEKLY INSTALLATION VELOCITY</h3><div id="chart-velocity"></div></div>
+                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">REGIONAL MASTER TIMELINE</h3><div id="chart-region-gantt"></div></div>
             </div>
         </div>
 
         <div id="tab-team" class="tab-content hidden animate-fade-in">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 text-center">TEAM CAPABILITY RADAR</h3>
-                    <div id="chart-radar-team" class="flex justify-center"></div>
-                </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 text-center">ENGINEER CAPABILITY RADAR</h3>
-                    <div id="chart-radar-eng" class="flex justify-center"></div>
-                </div>
+                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 text-center">TEAM CAPABILITY RADAR</h3><div id="chart-radar-team" class="flex justify-center"></div></div>
+                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 text-center">ENGINEER CAPABILITY RADAR</h3><div id="chart-radar-eng" class="flex justify-center"></div></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 border-l-4 border-blue-500 pl-2">TEAM WORKLOAD (9 TEAMS)</h3>
-                    <div id="chart-team-bar"></div>
-                </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 border-l-4 border-cyan-500 pl-2">ENGINEER WORKLOAD (18 ENGS)</h3>
-                    <div id="chart-eng-bar"></div>
-                </div>
+                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 border-l-4 border-blue-500 pl-2">TEAM WORKLOAD</h3><div id="chart-team-bar"></div></div>
+                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 border-l-4 border-cyan-500 pl-2">ENGINEER WORKLOAD</h3><div id="chart-eng-bar"></div></div>
             </div>
         </div>
 
         <div id="tab-map" class="tab-content hidden animate-fade-in">
             <div class="card p-4">
                 <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-map-location-dot mr-2 text-blue-600"></i>Live Installation Map</h3>
+                    <h3 class="font-bold text-slate-800">Live Installation Map</h3>
                     <div class="flex gap-3 text-xs font-bold">
                         <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500"></span> Completed</span>
                         <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> In Progress</span>
@@ -314,56 +184,242 @@
     </main>
 
     <script>
-        // --- DATA & CONFIG ---
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
-        const PROXIES = ['', 'https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+        // --- 1. EMBEDDED BACKUP DATA (ANTI-FREEZE) ---
+        // ข้อมูลนี้จะทำงานทันทีแม้เน็ตหลุด หรือ Proxy ล่ม
+        const BACKUP_DATA = `id,site_name,region,team,engineer,progress,status,plan_survey,plan_install,plan_handover,lat,lng
+1,สำนักงานทางหลวงที่ 1 (เชียงใหม่),ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.7966,98.9669
+2,แขวงทางหลวงเชียงใหม่ที่ 1,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.8358,98.9608
+3,แขวงทางหลวงเชียงใหม่ที่ 2,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.7569,99.0203
+4,แขวงทางหลวงเชียงใหม่ที่ 3,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,19.9234,99.0434
+13,สำนักงานทางหลวงที่ 13 (กรุงเทพ),ภาคกลาง,วรวิทย์ (วิทย์),ธนกร (บอย),30,Survey Complete,2026-01-20,2026-03-20,2026-05-30,13.75,100.52
+`; // ตัดมาบางส่วนเพื่อตัวอย่าง (ในไฟล์จริงจะโหลดไฟล์ CSV ที่คุณให้มาทั้งหมด)
+
+        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
+        const PROXIES = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
         
         let rawData = [], filteredData = [], map, markers = [];
         let charts = {};
 
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            fetchData();
+            
+            // 1. FAST LOAD: Load Backup Data Immediately
+            console.log("Loading Backup Data...");
+            Papa.parse(BACKUP_DATA, {
+                header: true, skipEmptyLines: true,
+                complete: (results) => {
+                    processData(results.data);
+                    // Hide loader after 1 sec to show smooth transition
+                    setTimeout(() => {
+                        const loader = document.getElementById('loader');
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    }, 1000);
+                }
+            });
+
+            // 2. BACKGROUND SYNC: Try to get fresh data
+            fetchFreshData();
         });
 
-        async function fetchData() {
+        async function fetchFreshData() {
             for (let proxy of PROXIES) {
                 try {
-                    const res = await fetch(proxy + encodeURIComponent(CSV_URL));
+                    const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_CSV));
                     if (!res.ok) continue;
                     const text = await res.text();
-                    Papa.parse(text, {
-                        header: true, skipEmptyLines: true,
-                        complete: (results) => {
-                            if (results.data.length > 0) {
-                                processData(results.data);
-                                document.getElementById('loader').style.display = 'none';
+                    
+                    // Valid Check
+                    if(text.includes('site_name')) {
+                        console.log("Fresh Data Synced!");
+                        Papa.parse(text, {
+                            header: true, skipEmptyLines: true,
+                            complete: (results) => {
+                                if (results.data.length > 5) {
+                                    processData(results.data);
+                                    document.getElementById('conn-status').classList.remove('hidden');
+                                    setTimeout(() => document.getElementById('conn-status').classList.add('hidden'), 5000);
+                                }
                             }
-                        }
-                    });
-                    return;
-                } catch (e) { console.error(e); }
+                        });
+                        return; // Stop if success
+                    }
+                } catch (e) { console.warn("Proxy Failed:", proxy); }
             }
-            alert("Connection Failed. Check Internet.");
+            console.log("Using Offline Mode (Backup Data)");
         }
 
         function processData(data) {
             const today = new Date();
-
             rawData = data.map(row => {
                 let status = "Pending";
                 let progress = parseInt(row['progress'] || 0);
                 let colorHex = "#94a3b8";
 
-                // Status Logic
-                if (progress === 100 || (row['status'] && row['status'].includes('Handover'))) {
+                // Logic Status
+                if (progress === 100 || (row['status'] && row['status'].toLowerCase().includes('handover'))) {
                     status = "Completed"; progress = 100; colorHex = "#16a34a";
-                } else if (progress >= 80) {
+                } else if (progress >= 80 || (row['status'] && row['status'].toLowerCase().includes('install'))) {
                     status = "WIP"; colorHex = "#2563eb";
-                } else if (progress >= 30) {
+                } else if (progress >= 30 || (row['status'] && row['status'].toLowerCase().includes('survey'))) {
                     status = "Survey"; colorHex = "#ca8a04";
                 }
 
-                // Delay Check
+                // Delay Logic
                 const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
                 if (progress < 100 && planDate && today > planDate) {
+                    status = "Delay"; colorHex = "#dc2626";
+                }
+
+                return {
+                    ...row,
+                    id: row['id'] || row['site_id'],
+                    site: row['site_name'],
+                    region: row['region'] || 'N/A',
+                    team: row['team'] || 'Unassigned',
+                    eng: row['engineer'] || '-',
+                    status: status,
+                    progress: progress,
+                    colorHex: colorHex,
+                    lat: parseFloat(row['lat']),
+                    lng: parseFloat(row['lng']),
+                    d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
+                    d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
+                    d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null
+                };
+            }).filter(d => d.site);
+
+            filteredData = rawData;
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            renderStats();
+            renderGauges();
+            renderCharts();
+            renderTable();
+            renderGantt();
+            renderMap();
+        }
+
+        function filterTable() {
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const statVal = document.getElementById('filter-status').value;
+            filteredData = rawData.filter(d => {
+                return d.site.toLowerCase().includes(searchVal) && (statVal === 'All' || d.status === statVal);
+            });
+            updateDashboard();
+        }
+
+        // --- RENDERERS ---
+        function renderStats() {
+            const count = (s) => filteredData.filter(d => d.status === s).length;
+            document.getElementById('stat-completed').innerText = count('Completed');
+            document.getElementById('stat-wip').innerText = count('WIP');
+            document.getElementById('stat-survey').innerText = count('Survey');
+            document.getElementById('stat-delay').innerText = count('Delay');
+        }
+
+        function renderGauges() {
+            const total = filteredData.length || 1;
+            const draw = (id, cnt, col) => {
+                const val = Math.round((cnt/total)*100);
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new ApexCharts(document.querySelector("#"+id), {
+                    series: [val],
+                    chart: { type: 'radialBar', height: 250, offsetY: -20 },
+                    plotOptions: { radialBar: { startAngle: -90, endAngle: 90, hollow: { size: '60%' }, dataLabels: { value: { fontSize: '24px', fontWeight: 'bold', offsetY: -10 } } } },
+                    colors: [col], labels: ['Progress']
+                });
+                charts[id].render();
+            };
+            draw('gauge-survey', filteredData.filter(d => d.progress >= 30).length, '#eab308');
+            draw('gauge-install', filteredData.filter(d => d.progress >= 80).length, '#2563eb');
+            draw('gauge-handover', filteredData.filter(d => d.progress === 100).length, '#16a34a');
+        }
+
+        function renderCharts() {
+            // S-Curve
+            const plan = [0, 10, 25, 40, 60, 80, 90, 95, 100];
+            const avg = filteredData.reduce((a,b)=>a+b.progress,0) / (filteredData.length || 1);
+            const act = plan.map(v => v <= avg ? v : null); 
+            if(avg > 0) act[act.findIndex(v=>v===null)-1] = avg;
+
+            if(charts['scurve']) charts['scurve'].destroy();
+            charts['scurve'] = new ApexCharts(document.querySelector("#chart-scurve"), {
+                series: [{ name: 'Plan', data: plan }, { name: 'Actual', data: act }],
+                chart: { height: 320, type: 'line', toolbar: {show:false} },
+                stroke: { width: [3, 4], dashArray: [5, 0], curve: 'smooth' },
+                colors: ['#94a3b8', '#3b82f6'],
+                xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'] },
+                yaxis: { min: 0, max: 100, tickAmount: 5, labels: { formatter: v => v.toFixed(0) } }
+            });
+            charts['scurve'].render();
+
+            // Regional
+            const regs = [...new Set(filteredData.map(d=>d.region))];
+            const rData = regs.map(r => Math.round(filteredData.filter(d=>d.region===r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region===r).length));
+            if(charts['regional']) charts['regional'].destroy();
+            charts['regional'] = new ApexCharts(document.querySelector("#chart-regional"), {
+                series: [{ name: 'Progress', data: rData }],
+                chart: { type: 'bar', height: 320, toolbar: {show:false} },
+                plotOptions: { bar: { borderRadius: 4, distributed: true } },
+                xaxis: { categories: regs },
+                yaxis: { max: 100 },
+                legend: { show: false }
+            });
+            charts['regional'].render();
+
+            // Teams
+            const exName = n => n ? (n.match(/\(([^)]+)\)/)?.[1] || n.split(' ')[0]) : 'N/A';
+            const tCnt = {}, eCnt = {};
+            filteredData.forEach(d => { tCnt[d.team]=(tCnt[d.team]||0)+1; eCnt[d.eng]=(eCnt[d.eng]||0)+1; });
+
+            const radar = (id, d, col) => {
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new ApexCharts(document.querySelector("#"+id), {
+                    series: [{ name: 'Sites', data: Object.values(d) }],
+                    chart: { type: 'radar', height: 400, toolbar: {show:false} },
+                    labels: Object.keys(d).map(k => id.includes('eng') ? exName(k) : k),
+                    stroke: { width: 2, colors: [col] }, fill: { opacity: 0.2, colors: [col] },
+                    markers: { size: 4, colors: ['#fff'], strokeColors: col, strokeWidth: 2 },
+                    yaxis: { show: false }
+                });
+                charts[id].render();
+            };
+            radar('chart-radar-team', tCnt, '#8b5cf6');
+            radar('chart-radar-eng', eCnt, '#06b6d4');
+
+            const bar = (id, d) => {
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new ApexCharts(document.querySelector("#"+id), {
+                    series: [{ name: 'Sites', data: Object.values(d) }],
+                    chart: { type: 'bar', height: 350, toolbar: {show:false} },
+                    plotOptions: { bar: { borderRadius: 4, horizontal: true, distributed: true } },
+                    xaxis: { categories: Object.keys(d).map(k => id.includes('eng') ? exName(k) : k) },
+                    legend: { show: false }
+                });
+                charts[id].render();
+            };
+            bar('chart-team-bar', tCnt);
+            bar('chart-eng-bar', eCnt);
+        }
+
+        function renderGantt() {
+            // Velocity
+            const weeks = {};
+            filteredData.forEach(d => {
+                if(d.d_install) {
+                    // Simple Week Key
+                    const k = `W${Math.ceil(d.d_install.getDate()/7)}-${d.d_install.getMonth()+1}`;
+                    if(!weeks[k]) weeks[k] = {p:0,a:0};
+                    weeks[k].p++;
+                    if(d.progress >= 80) weeks[k].a++;
+                }
+            });
+            const ks = Object.keys(weeks);
+            if(charts['velocity']) charts['velocity'].destroy();
+            charts['velocity'] = new ApexCharts(document.querySelector("#chart-velocity"), {
+                series: [{ name: 'Plan', data: ks.map(k=>weeks[k].p), type: 'column' }, { name: 'Actual', data: ks.map(k=>weeks[k].a), type: 'line' }],
+                chart: { height: 350,

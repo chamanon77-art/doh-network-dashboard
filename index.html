@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.8</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.9</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -20,69 +20,83 @@
             --bg-page: #f1f5f9; 
             --card-bg: #ffffff;
             --primary-blue: #2563eb;
+            --deep-navy: #001f52; /* 3. Dark Blue Color */
         }
-        /* 3. RESIZE: Increased base font size */
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #1e293b; font-size: 16px; }
+
+        /* 1. FONT SIZE UPGRADE: Base font increased to 18px for readability */
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background-color: var(--bg-page); 
+            color: #1e293b; 
+            font-size: 18px; /* Bigger Base Font */
+            line-height: 1.6;
+        }
         
         /* Cyber Header */
         .cyber-header {
-            background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+            background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%);
             position: sticky; top: 0; z-index: 50;
-            border-bottom: 4px solid #3b82f6;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 5px solid #3b82f6;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
         }
-        .title-main { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 1px; }
-        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; }
+        .title-main { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 1px; }
+        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Navigation - Larger Touch Targets */
+        /* Navigation - Larger */
         .nav-pill { 
-            cursor: pointer; padding: 10px 24px; border-radius: 8px; 
-            font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 1px; 
+            cursor: pointer; padding: 12px 28px; border-radius: 10px; 
+            font-family: 'Orbitron', sans-serif; font-size: 1rem; letter-spacing: 1px; 
             color: #94a3b8; transition: all 0.3s; background: rgba(255,255,255,0.05);
             font-weight: 600;
         }
         .nav-pill:hover { color: white; background: rgba(255,255,255,0.15); }
         .nav-pill.active { 
             background: rgba(59, 130, 246, 0.3); color: #60a5fa; 
-            border: 1px solid #3b82f6; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.4); 
+            border: 2px solid #3b82f6; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.4); 
         }
 
-        /* Cards - Standardized Padding */
+        /* Cards */
         .card { 
-            background: var(--card-bg); border-radius: 16px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
-            border: 1px solid #e2e8f0; transition: transform 0.2s;
+            background: var(--card-bg); border-radius: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+            border: 1px solid #cbd5e1; 
         }
+
+        /* Status Cards - Big Numbers */
+        .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
+        .card-stat h3 { font-size: 4rem; font-weight: 800; line-height: 1; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+        .card-stat p { font-size: 1.2rem; font-weight: 700; z-index: 10; opacity: 1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-icon { position: absolute; right: 20px; bottom: 20px; font-size: 6rem; opacity: 0.25; z-index: 1; transform: rotate(-15deg); }
         
-        /* Status Cards */
-        .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 140px; display: flex; flex-direction: column; justify-content: center; padding: 1.5rem; }
-        .card-stat h3 { font-size: 3rem; font-weight: 800; line-height: 1; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .card-stat p { font-size: 1rem; font-weight: 600; z-index: 10; opacity: 0.95; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .stat-icon { position: absolute; right: 15px; bottom: 15px; font-size: 5rem; opacity: 0.25; z-index: 1; transform: rotate(-15deg); }
-        
-        /* Background Patterns */
         .bg-completed { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
         .bg-wip { background-color: #2563eb; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 20px, transparent 20px, transparent 40px); }
         .bg-survey { background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%); }
         .bg-pending { background-color: #475569; background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px); background-size: 15px 15px; }
         .bg-delay { background-color: #dc2626; background-image: linear-gradient(135deg, #b91c1c 25%, transparent 25%, transparent 50%, #b91c1c 50%, #b91c1c 75%, transparent 75%, transparent); background-size: 30px 30px; }
 
-        /* Logo Animation */
+        /* 3. LOGO: Dark Blue Background + White Blink */
         .logo-container {
-            width: 72px; height: 72px; background: #2563eb; border-radius: 50%;
+            width: 80px; height: 80px; 
+            background: var(--deep-navy); /* Dark Blue */
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px #3b82f6, inset 0 0 15px #60a5fa;
-            border: 3px solid #93c5fd; animation: logo-pulse 3s infinite ease-in-out;
+            box-shadow: 0 0 25px rgba(30, 58, 138, 0.6), inset 0 0 20px rgba(96, 165, 250, 0.3);
+            border: 4px solid #60a5fa; 
+            animation: logo-pulse 3s infinite ease-in-out;
         }
-        .wifi-animate { animation: wifi-blink 2s infinite; font-size: 2.5rem; }
-        @keyframes logo-pulse { 0%, 100% { box-shadow: 0 0 25px #3b82f6, inset 0 0 15px #60a5fa; } 50% { box-shadow: 0 0 45px #60a5fa, inset 0 0 25px #93c5fd; } }
-        @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+        .wifi-animate { animation: wifi-blink 1.5s infinite; font-size: 3rem; color: #ffffff; }
+        @keyframes logo-pulse { 0%, 100% { box-shadow: 0 0 25px rgba(30, 58, 138, 0.6); } 50% { box-shadow: 0 0 45px rgba(59, 130, 246, 0.8); } }
+        @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.95); } }
 
-        /* Map */
-        #map { height: 650px; width: 100%; border-radius: 12px; z-index: 1; border: 1px solid #cbd5e1; }
+        /* 2. MAP: Full Height */
+        #map { 
+            height: 85vh; /* 85% of Viewport Height */
+            min-height: 800px; /* Minimum height ensures it's always big */
+            width: 100%; border-radius: 12px; z-index: 1; border: 2px solid #94a3b8; 
+        }
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
-        .pin-icon { font-size: 24px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4)); z-index: 2; position: relative; top: -8px; }
-        .pin-pulse { position: absolute; width: 14px; height: 14px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        .pin-icon { font-size: 30px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); z-index: 2; position: relative; top: -10px; }
+        .pin-pulse { position: absolute; width: 18px; height: 18px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; } 80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; } }
 
         /* Color Utilities */
@@ -93,16 +107,20 @@
         .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
 
         /* Table & Fonts */
-        th { font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; letter-spacing: 0.5px; }
-        td { font-size: 0.95rem; }
-        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        th { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; letter-spacing: 0.5px; padding: 16px !important; }
+        td { font-size: 1.1rem; padding: 16px !important; }
+        .badge { padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Chart Containers */
-        .chart-container-large { position: relative; min-height: 500px; } /* Prevent overlap */
+        /* Chart Containers - Bigger for visibility */
+        .chart-container-large { position: relative; min-height: 600px; } 
         
-        .sync-badge { position: fixed; bottom: 15px; right: 15px; background: rgba(15, 23, 42, 0.95); color: white; padding: 8px 16px; border-radius: 30px; font-size: 12px; z-index: 999; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; }
-        .sync-dot.active { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .sync-badge { position: fixed; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.95); color: white; padding: 10px 20px; border-radius: 40px; font-size: 14px; z-index: 999; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .sync-dot { width: 12px; height: 12px; border-radius: 50%; background: #94a3b8; }
+        .sync-dot.active { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+        /* Custom Swal Font */
+        .swal2-title { font-size: 1.8rem !important; font-family: 'Prompt', sans-serif !important; }
+        .swal2-html-container { font-size: 1.2rem !important; font-family: 'Prompt', sans-serif !important; }
     </style>
 </head>
 <body>
@@ -110,17 +128,17 @@
     <div class="sync-badge"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">System Init...</span></div>
 
     <header class="cyber-header">
-        <div class="max-w-[1900px] mx-auto px-8 py-5 flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center gap-5 mb-4 md:mb-0">
+        <div class="max-w-[1900px] mx-auto px-8 py-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-6 mb-4 md:mb-0">
                 <div class="logo-container">
-                    <i class="fa-solid fa-wifi text-white wifi-animate"></i>
+                    <i class="fa-solid fa-wifi wifi-animate"></i>
                 </div>
                 <div>
-                    <h1 class="title-main">PROJECT MONITORING SYSTEM</h1>
-                    <p class="title-sub">DOH PROJECT 2026 | OPERATED BY FATIMA R.B.D.S. INTERNATIONAL</p>
+                    <h1 class="title-main">PROJECT MONITORING</h1>
+                    <p class="title-sub">DOH PROJECT 2026 | FATIMA R.B.D.S.</p>
                 </div>
             </div>
-            <nav class="flex gap-3 bg-slate-900/30 p-2 rounded-xl border border-white/10 backdrop-blur">
+            <nav class="flex gap-4 bg-slate-900/40 p-3 rounded-2xl border border-white/10 backdrop-blur">
                 <div class="nav-pill active" onclick="switchTab('overview', this)">DASHBOARD</div>
                 <div class="nav-pill" onclick="switchTab('control', this)">CONTROL</div>
                 <div class="nav-pill" onclick="switchTab('gantt', this)">SCHEDULE</div>
@@ -130,10 +148,10 @@
         </div>
     </header>
 
-    <main class="max-w-[1900px] mx-auto p-8 space-y-8">
+    <main class="max-w-[1900px] mx-auto p-8 space-y-10">
 
         <div id="tab-overview" class="tab-content animate-fade-in">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
                 <div class="card card-stat bg-completed"><p>Completed</p><h3 id="stat-completed">0</h3><i class="fa-solid fa-check-circle stat-icon"></i></div>
                 <div class="card card-stat bg-wip"><p>In Progress</p><h3 id="stat-wip">0</h3><i class="fa-solid fa-person-digging stat-icon"></i></div>
                 <div class="card card-stat bg-survey"><p>Survey</p><h3 id="stat-survey">0</h3><i class="fa-solid fa-map-location-dot stat-icon"></i></div>
@@ -141,104 +159,103 @@
                 <div class="card card-stat bg-delay"><p>Delayed</p><h3 id="stat-delay">0</h3><i class="fa-solid fa-triangle-exclamation stat-icon"></i></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">SURVEY PROGRESS</h3><canvas id="gauge-survey" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-yellow-500 mt-[-40px]" id="txt-survey">0%</p></div>
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">INSTALLATION PROGRESS</h3><canvas id="gauge-install" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-blue-500 mt-[-40px]" id="txt-install">0%</p></div>
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">HANDOVER PROGRESS</h3><canvas id="gauge-handover" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-green-500 mt-[-40px]" id="txt-handover">0%</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl">SURVEY PROGRESS</h3><canvas id="gauge-survey" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-yellow-500 mt-[-50px]" id="txt-survey">0%</p></div>
+                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl">INSTALLATION PROGRESS</h3><canvas id="gauge-install" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-blue-500 mt-[-50px]" id="txt-install">0%</p></div>
+                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl">HANDOVER PROGRESS</h3><canvas id="gauge-handover" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-green-500 mt-[-50px]" id="txt-handover">0%</p></div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="card p-8">
-                    <h3 class="font-bold text-slate-700 text-xl mb-6 border-b pb-3">Project S-Curve</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="card p-10">
+                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Project S-Curve</h3>
                     <div id="chart-scurve"></div>
                 </div>
-                <div class="card p-8">
-                    <h3 class="font-bold text-slate-700 text-xl mb-6 border-b pb-3">Regional Performance</h3>
+                <div class="card p-10">
+                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Regional Performance</h3>
                     <div id="chart-regional"></div>
                 </div>
             </div>
         </div>
 
         <div id="tab-control" class="tab-content hidden animate-fade-in">
-            <div class="card p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-slate-700 text-2xl">Master Control Table</h3>
-                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site or team..." class="border-2 border-slate-200 rounded-lg px-5 py-3 text-base w-80 focus:outline-none focus:border-blue-500 transition shadow-sm">
+            <div class="card p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-bold text-slate-700 text-3xl">Master Control Table</h3>
+                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหาชื่อไซต์ หรือ ทีม..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl w-96 focus:outline-none focus:border-blue-600 transition shadow-sm">
                 </div>
-                <div class="overflow-auto max-h-[750px] border border-slate-200 rounded-xl shadow-inner">
-                    <table class="w-full text-left border-collapse min-w-[1400px]">
-                        <thead class="bg-slate-100 sticky top-0 shadow-sm z-10">
+                <div class="overflow-auto max-h-[800px] border border-slate-300 rounded-xl shadow-inner">
+                    <table class="w-full text-left border-collapse min-w-[1500px]">
+                        <thead class="bg-slate-100 sticky top-0 shadow-md z-10">
                             <tr>
-                                <th class="p-4 text-slate-600 uppercase font-bold">ID</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Site Name</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Region</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold bg-yellow-50">Plan Surv</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold bg-blue-50">Plan Inst</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold bg-green-50">Plan HO</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Status</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Progress</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Team</th>
-                                <th class="p-4 text-slate-600 uppercase font-bold">Engineer</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">ID</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Site Name</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Region</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-yellow-100">Plan Surv</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-blue-100">Plan Inst</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-green-100">Plan HO</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Status</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Prog.</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Team</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Engineer</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body" class="text-base text-slate-700 bg-white divide-y divide-slate-100"></tbody>
+                        <tbody id="table-body" class="text-lg text-slate-800 bg-white divide-y divide-slate-200"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 gap-8">
-                <div class="card p-8">
-                    <div class="border-b pb-4 mb-6 flex justify-between items-end">
-                        <h3 class="font-bold text-slate-800 text-2xl">WEEKLY INSTALLATION VELOCITY</h3>
-                        <div class="flex gap-4 text-sm font-semibold">
-                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-yellow-200 rounded"></span>Plan Surv</span>
-                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-blue-200 rounded"></span>Plan Inst</span>
-                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-green-200 rounded"></span>Plan HO</span>
+            <div class="grid grid-cols-1 gap-10">
+                <div class="card p-10">
+                    <div class="border-b-2 pb-5 mb-8 flex justify-between items-end">
+                        <h3 class="font-bold text-slate-800 text-3xl">WEEKLY INSTALLATION VELOCITY</h3>
+                        <div class="flex gap-6 text-base font-bold">
+                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-yellow-200 rounded"></span>Plan Surv</span>
+                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-blue-200 rounded"></span>Plan Inst</span>
+                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-green-200 rounded"></span>Plan HO</span>
                         </div>
                     </div>
                     <div id="chart-weekly-breakdown"></div>
                 </div>
-                <div class="card p-8">
-                    <h3 class="font-bold text-slate-800 text-2xl mb-6">REGIONAL TIMELINE (ALL REGIONS)</h3>
+                <div class="card p-10">
+                    <h3 class="font-bold text-slate-800 text-3xl mb-8">REGIONAL TIMELINE (ALL REGIONS)</h3>
                     <div id="chart-timeline"></div>
                 </div>
             </div>
         </div>
 
         <div id="tab-map" class="tab-content hidden animate-fade-in">
-            <div class="card p-4 relative h-full shadow-xl">
+            <div class="card p-4 relative h-full shadow-2xl bg-slate-100">
                 <div id="map"></div>
-                <div class="absolute top-6 right-6 bg-white/95 backdrop-blur p-4 rounded-xl shadow-2xl z-[400] text-sm font-bold space-y-3 border border-slate-200 min-w-[160px]">
-                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
-                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
-                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
-                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
-                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-slate-400"></span> Pending</div>
+                <div class="absolute top-8 right-8 bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl z-[400] text-base font-bold space-y-4 border border-slate-300 min-w-[200px]">
+                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
+                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
+                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
+                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
+                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-slate-400"></span> Pending</div>
                 </div>
             </div>
         </div>
 
         <div id="tab-teams" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div class="card p-8 chart-container-large">
-                    <h3 class="font-bold text-center mb-6 text-xl">TEAM KPI (ACTUAL SITES)</h3>
-                    <div id="radar-team" class="h-[500px]"></div>
-                </div>
-                <div class="card p-8 chart-container-large">
-                    <h3 class="font-bold text-center mb-6 text-xl">ENGINEER KPI (ACTUAL SITES)</h3>
-                    <div id="radar-eng" class="h-[500px]"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                <div class="card p-10 chart-container-large">
+                    <h3 class="font-bold text-center mb-8 text-2xl">TEAM KPI (ACTUAL SITES)</h3>
+                    <div id="radar-team" class="h-[600px]"></div> </div>
+                <div class="card p-10 chart-container-large">
+                    <h3 class="font-bold text-center mb-8 text-2xl">ENGINEER KPI (ACTUAL SITES)</h3>
+                    <div id="radar-eng" class="h-[600px]"></div>
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="card p-8">
-                    <h3 class="font-bold mb-6 text-xl">TEAM WORKLOAD DISTRIBUTION</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="card p-10">
+                    <h3 class="font-bold mb-8 text-2xl">TEAM WORKLOAD DISTRIBUTION</h3>
                     <div id="bar-team-workload"></div>
                 </div>
-                <div class="card p-8">
-                    <h3 class="font-bold mb-6 text-xl">ENGINEER WORKLOAD DISTRIBUTION</h3>
+                <div class="card p-10">
+                    <h3 class="font-bold mb-8 text-2xl">ENGINEER WORKLOAD DISTRIBUTION</h3>
                     <div id="bar-eng-workload"></div>
                 </div>
             </div>
@@ -488,8 +505,8 @@
             cv.width = cv.clientWidth * 2; cv.height = cv.clientHeight * 2; ctx.scale(2,2);
             const cx = cv.clientWidth/2, cy = cv.clientHeight-10, r = Math.min(cx, cy)-25;
             ctx.clearRect(0,0,999,999);
-            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 2*Math.PI); ctx.lineWidth=25; ctx.strokeStyle='#e2e8f0'; ctx.stroke();
-            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI + (val/100)*Math.PI); ctx.lineWidth=25; ctx.strokeStyle=col; ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 2*Math.PI); ctx.lineWidth=30; ctx.strokeStyle='#e2e8f0'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI + (val/100)*Math.PI); ctx.lineWidth=30; ctx.strokeStyle=col; ctx.stroke();
             document.getElementById(txt).innerText = Math.round(val)+'%';
         }
 
@@ -499,30 +516,30 @@
             if(charts.scurve) charts.scurve.destroy();
             charts.scurve = new ApexCharts(document.querySelector("#chart-scurve"), {
                 series: [{ name:'Plan', data:plan }, { name:'Actual', data:act }],
-                chart: { height:350, type:'line', toolbar:{show:false} },
-                stroke: { width:[4,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
-                xaxis: { categories:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'] }
+                chart: { height:400, type:'line', toolbar:{show:false} },
+                stroke: { width:[5,6], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
+                xaxis: { categories:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], labels:{ style:{ fontSize:'14px' } } },
+                yaxis: { labels:{ style:{ fontSize:'14px' } } }
             }); charts.scurve.render();
 
             const regs = [...new Set(filteredData.map(d=>d.region))];
             if(charts.regional) charts.regional.destroy();
             charts.regional = new ApexCharts(document.querySelector("#chart-regional"), {
                 series: [{ name:'Progress', data:regs.map(r=>Math.round(filteredData.filter(d=>d.region==r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region==r).length)) }],
-                chart: { type:'bar', height:350, toolbar:{show:false} }, plotOptions:{ bar:{ distributed:true, borderRadius:6 } }, xaxis:{ categories:regs }, legend:{ show:false }
+                chart: { type:'bar', height:400, toolbar:{show:false} }, plotOptions:{ bar:{ distributed:true, borderRadius:8 } }, 
+                xaxis:{ categories:regs, labels:{ style:{ fontSize:'14px' } } }, legend:{ show:false }
             }); charts.regional.render();
         }
 
-        // --- 2. EXTRACT NICKNAME FUNCTION ---
         const getNick = (name) => {
             const match = name.match(/\(([^)]+)\)/);
             return match ? match[1] : name.split(' ')[0];
         };
 
         function renderTeamCharts() {
-            // Count actual sites
             const getD = (k) => Object.entries(filteredData.reduce((a,b)=>{ 
                 if(b[k] && b[k]!='-' && b[k]!='Unassigned') {
-                    const n = getNick(b[k]); // Use Nickname
+                    const n = getNick(b[k]); 
                     a[n]=(a[n]||0)+1; 
                 }
                 return a; 
@@ -530,31 +547,28 @@
             
             const tD = getD('team'), eD = getD('eng');
             
-            // 1. FIX OVERLAP: Explicit destruction & check
             const renderRadar = (id, d, col) => {
                 const el = document.querySelector("#"+id);
                 if(!el) return;
-                if(charts[id]) { charts[id].destroy(); charts[id] = null; } // Destroy old
-                el.innerHTML = ""; // Clear DOM
+                if(charts[id]) { charts[id].destroy(); charts[id] = null; } 
+                el.innerHTML = "";
 
                 charts[id] = new ApexCharts(el, {
                     series: [{ name:'Total Sites', data:d.map(x=>x.y) }],
-                    chart: { height: 500, type:'radar', toolbar:{show:false} },
+                    chart: { height: 600, type:'radar', toolbar:{show:false} },
                     labels: d.map(x=>x.x),
-                    fill: { opacity:0.2, colors:[col] }, stroke:{ width:3, colors:[col] }, markers:{ size:5, colors:[col] },
+                    fill: { opacity:0.2, colors:[col] }, stroke:{ width:3, colors:[col] }, markers:{ size:6, colors:[col] },
                     yaxis:{ show:false },
-                    xaxis: { labels: { style: { fontSize: '13px', fontWeight:'bold', fontFamily:'Prompt' } } }
+                    xaxis: { labels: { style: { fontSize: '16px', fontWeight:'bold', fontFamily:'Prompt' } } }
                 }); 
                 charts[id].render();
             };
             
-            // Short delay to ensure DOM is ready if switching tabs rapidly
             setTimeout(() => {
                 renderRadar('radar-team', tD, '#3b82f6');
                 renderRadar('radar-eng', eD, '#8b5cf6');
             }, 100);
 
-            // Workload Bar Charts
             const getColor = (val) => val > 15 ? '#dc2626' : val > 10 ? '#f59e0b' : val > 5 ? '#3b82f6' : '#93c5fd';
             const renderBar = (id, d) => {
                 const el = document.querySelector("#"+id);
@@ -564,11 +578,11 @@
 
                 charts[id] = new ApexCharts(el, {
                     series: [{ name:'Sites', data:d.map(x=>x.y) }],
-                    chart: { type:'bar', height: Math.max(450, d.length * 40), toolbar:{show:false} },
-                    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight: '70%', distributed: true } },
+                    chart: { type:'bar', height: Math.max(500, d.length * 50), toolbar:{show:false} },
+                    plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight: '70%', distributed: true } },
                     colors: d.map(x => getColor(x.y)),
-                    xaxis: { categories:d.map(x=>x.x) },
-                    yaxis: { labels: { style: { fontSize: '14px', fontWeight: 'bold' } } },
+                    xaxis: { categories:d.map(x=>x.x), labels:{ style:{ fontSize:'14px' } } },
+                    yaxis: { labels: { style: { fontSize: '16px', fontWeight: 'bold' } } },
                     legend: { show: false }
                 }); 
                 charts[id].render();
@@ -603,10 +617,10 @@
                     { name: 'Plan Install', group:'I', data: cats.map(k=>weeks[k].pI) }, { name: 'Act Install', group:'I', data: cats.map(k=>weeks[k].aI) },
                     { name: 'Plan Handover', group:'H', data: cats.map(k=>weeks[k].pH) }, { name: 'Act Handover', group:'H', data: cats.map(k=>weeks[k].aH) }
                 ],
-                chart: { type: 'bar', height: 400, stacked: false, toolbar: {show:false} },
+                chart: { type: 'bar', height: 450, stacked: false, toolbar: {show:false} },
                 colors: ['#fef08a', '#eab308', '#bfdbfe', '#2563eb', '#bbf7d0', '#16a34a'],
-                plotOptions: { bar: { columnWidth: '65%', borderRadius: 3 } },
-                xaxis: { categories: cats }, legend: { position: 'top' }
+                plotOptions: { bar: { columnWidth: '65%', borderRadius: 4 } },
+                xaxis: { categories: cats, labels:{ style:{ fontSize:'14px' } } }, legend: { position: 'top', fontSize:'14px' }
             });
             charts.weekly.render();
             
@@ -620,7 +634,9 @@
             if(charts.timeline) charts.timeline.destroy();
              charts.timeline = new ApexCharts(document.querySelector("#chart-timeline"), {
                 series: [{ data: Object.keys(rTime).map(r => ({ x: r, y: [rTime[r].min, rTime[r].max] })) }],
-                chart: { type:'rangeBar', height:400, toolbar:{show:false} }, plotOptions:{ bar:{ horizontal:true, borderRadius: 5 } }, xaxis:{ type:'datetime' }
+                chart: { type:'rangeBar', height:450, toolbar:{show:false} }, plotOptions:{ bar:{ horizontal:true, borderRadius: 6 } }, 
+                xaxis:{ type:'datetime', labels:{ style:{ fontSize:'14px' } } },
+                yaxis:{ labels:{ style:{ fontSize:'14px' } } }
             }); charts.timeline.render();
         }
 
@@ -637,16 +653,16 @@
                 
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-4 font-mono text-slate-400 font-bold">${d.id}</td>
-                    <td class="p-4 font-bold text-blue-600 cursor-pointer hover:underline" onclick="showPopup('${d.id}')">${d.site}</td>
-                    <td class="p-4">${d.region}</td>
-                    <td class="p-4 font-mono text-sm bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
-                    <td class="p-4 font-mono text-sm bg-blue-50/50">${fmtDate(d.d_install)}</td>
-                    <td class="p-4 font-mono text-sm bg-green-50/50">${fmtDate(d.d_handover)}</td>
-                    <td class="p-4"><span class="badge ${badge}">${d.status}</span></td>
-                    <td class="p-4 font-bold text-slate-700">${d.progress}%</td>
-                    <td class="p-4 text-sm font-semibold">${d.team}</td>
-                    <td class="p-4 text-sm text-slate-500">${d.eng}</td>`;
+                    <td class="font-mono text-slate-400 font-bold">${d.id}</td>
+                    <td class="font-bold text-blue-600 cursor-pointer hover:underline" onclick="showPopup('${d.id}')">${d.site}</td>
+                    <td class="">${d.region}</td>
+                    <td class="font-mono text-base bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
+                    <td class="font-mono text-base bg-blue-50/50">${fmtDate(d.d_install)}</td>
+                    <td class="font-mono text-base bg-green-50/50">${fmtDate(d.d_handover)}</td>
+                    <td class=""><span class="badge ${badge}">${d.status}</span></td>
+                    <td class="font-bold text-slate-700">${d.progress}%</td>
+                    <td class="text-base font-semibold">${d.team}</td>
+                    <td class="text-base text-slate-500">${d.eng}</td>`;
                 tb.appendChild(tr);
             });
         }
@@ -662,7 +678,7 @@
                     else if(d.status=="Survey") c = "pulse-yellow text-p-yellow";
                     else if(d.status=="Delay") c = "pulse-red text-p-red";
 
-                    const icon = L.divIcon({ className:'custom-pin', html:`<div class="pin-marker"><div class="pin-pulse ${c.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${c.split(' ')[1]}"></i></div>`, iconSize:[24,24], iconAnchor:[12,12] });
+                    const icon = L.divIcon({ className:'custom-pin', html:`<div class="pin-marker"><div class="pin-pulse ${c.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${c.split(' ')[1]}"></i></div>`, iconSize:[32,32], iconAnchor:[16,16] });
                     const m = L.marker([d.lat, d.lng], { icon }).addTo(map);
                     m.on('click', () => showPopup(d.id));
                     markers.push(m);
@@ -678,30 +694,30 @@
         window.showPopup = (id) => {
             const s = filteredData.find(d => d.id == id);
             Swal.fire({
-                title: `<div class="text-left border-b pb-3"><h3 class="text-xl font-bold text-slate-800">${s.site}</h3><p class="text-sm text-slate-500 font-normal mt-1">${s.region}</p></div>`,
+                title: `<div class="text-left border-b pb-3"><h3 class="text-2xl font-bold text-slate-800">${s.site}</h3><p class="text-base text-slate-500 font-normal mt-1">${s.region}</p></div>`,
                 html: `
                     <div class="mt-4 text-left">
-                        <div class="grid grid-cols-2 gap-3 mb-4">
-                            <div class="bg-slate-50 p-3 rounded-lg text-center shadow-sm"><p class="text-[11px] font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-lg text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.status}</p></div>
-                            <div class="bg-slate-50 p-3 rounded-lg text-center shadow-sm"><p class="text-[11px] font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-lg text-slate-700">${s.progress}%</p></div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.status}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-xl text-slate-700">${s.progress}%</p></div>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
                             <div class="border-b border-slate-200 pb-2 mb-2">
-                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Installation Team</p>
-                                <div class="flex justify-between items-center"><span class="font-bold text-slate-700">${s.team}</span><a href="tel:${s.tel_team}" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
+                                <p class="text-sm font-bold text-slate-400 uppercase mb-1">Installation Team</p>
+                                <div class="flex justify-between items-center"><span class="font-bold text-lg text-slate-700">${s.team}</span><a href="tel:${s.tel_team}" class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-base hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Site Engineer</p>
-                                <div class="flex justify-between items-center"><span class="font-bold text-slate-700">${s.eng}</span><a href="tel:${s.tel_eng}" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
+                                <p class="text-sm font-bold text-slate-400 uppercase mb-1">Site Engineer</p>
+                                <div class="flex justify-between items-center"><span class="font-bold text-lg text-slate-700">${s.eng}</span><a href="tel:${s.tel_eng}" class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-base hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
                             </div>
                         </div>
-                        <div class="space-y-2 text-sm">
+                        <div class="space-y-2 text-base">
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Survey</span><span class="font-mono font-bold">${fmtDate(s.d_survey)}</span></div>
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Install</span><span class="font-mono font-bold">${fmtDate(s.d_install)}</span></div>
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Handover</span><span class="font-mono font-bold">${fmtDate(s.d_handover)}</span></div>
                         </div>
                     </div>`,
-                width: 500, showConfirmButton: false, showCloseButton: true
+                width: 600, showConfirmButton: false, showCloseButton: true
             });
         };
 
@@ -713,7 +729,7 @@
             
             // Force Redraw & Cleanup
             if(id=='map') setTimeout(()=>map.invalidateSize(),300);
-            if(id=='teams') setTimeout(renderTeamCharts, 200); // Re-render to prevent overlap
+            if(id=='teams') setTimeout(renderTeamCharts, 200); 
             if(id=='gantt') setTimeout(()=>{if(charts.weekly)charts.weekly.render(); if(charts.timeline)charts.timeline.render();},300);
             if(id=='overview') setTimeout(renderGauge,200);
         }

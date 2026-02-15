@@ -24,7 +24,7 @@
         }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #334155; }
         
-        /* --- 1. & 3. Cyberpunk Header & Logo --- */
+        /* --- Cyberpunk Header --- */
         .cyber-header {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #020617 100%);
             position: sticky; top: 0; z-index: 50;
@@ -32,7 +32,6 @@
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
             overflow: hidden;
         }
-        /* Network Grid Effect */
         .cyber-grid {
             position: absolute; inset: 0;
             background-image: 
@@ -48,7 +47,7 @@
             pointer-events: none;
         }
         
-        /* 2. Text Alignment Logic */
+        /* Text Styles */
         .title-main { 
             font-family: 'Orbitron', sans-serif; 
             font-size: 1.8rem; 
@@ -63,7 +62,6 @@
             font-size: 0.85rem; 
             font-weight: 700; 
             color: #bae6fd;
-            /* เทคนิคปรับความยาวให้เท่าบรรทัดบนโดยประมาณ */
             letter-spacing: 3.5px; 
             text-transform: uppercase;
             white-space: nowrap;
@@ -93,12 +91,12 @@
             box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
-        /* 5. Date Status Colors */
-        .date-red { color: #dc2626; font-weight: bold; }   /* Overdue */
-        .date-yellow { color: #d97706; font-weight: bold; } /* < 7 Days */
-        .date-green { color: #16a34a; font-weight: bold; }  /* Done */
-        .date-blue { color: #2563eb; font-weight: bold; }   /* In Progress */
-        .date-gray { color: #94a3b8; }                      /* Pending */
+        /* Status Colors */
+        .date-red { color: #dc2626; font-weight: bold; }   
+        .date-yellow { color: #d97706; font-weight: bold; } 
+        .date-green { color: #16a34a; font-weight: bold; }  
+        .date-blue { color: #2563eb; font-weight: bold; }   
+        .date-gray { color: #94a3b8; }                      
 
         /* Map */
         #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
@@ -145,7 +143,8 @@
             <nav class="flex gap-2 bg-black/30 p-2 rounded-lg backdrop-blur-sm border border-white/10">
                 <div class="nav-pill active" onclick="switchTab('overview', this)">DASHBOARD</div>
                 <div class="nav-pill" onclick="switchTab('control', this)">CONTROL</div>
-                <div class="nav-pill" onclick="switchTab('gantt', this)">GANTT</div> <div class="nav-pill" onclick="switchTab('team', this)">TEAM</div>
+                <div class="nav-pill" onclick="switchTab('gantt', this)">SCHEDULE</div>
+                <div class="nav-pill" onclick="switchTab('team', this)">TEAM</div>
                 <div class="nav-pill" onclick="switchTab('map', this)">MAP</div>
             </nav>
         </div>
@@ -235,7 +234,8 @@
                         <thead class="sticky top-0 z-10 shadow-sm bg-slate-100">
                             <tr>
                                 <th class="w-16">ID</th>
-                                <th>Site Name (Click)</th> <th>Region</th>
+                                <th>Site Name (Click)</th>
+                                <th>Region</th>
                                 <th>Plan Surv</th>
                                 <th>Plan Inst</th>
                                 <th>Plan HO</th>
@@ -251,11 +251,24 @@
         </div>
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="card p-6 h-[800px] flex flex-col">
-                <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-4">MASTER SCHEDULE GANTT (138 SITES)</h3>
-                <div class="flex-1 overflow-y-auto pr-2 border border-slate-100 rounded">
-                    <div id="chart-gantt" style="min-height: 4000px;"></div> 
+            <div class="grid grid-cols-1 gap-6">
+                
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">
+                        <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY INSTALLATION VELOCITY
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-4">Plan vs Actual Installations per Week</p>
+                    <div id="chart-velocity"></div>
                 </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">
+                        <i class="fa-solid fa-clock text-purple-600 mr-2"></i>REGIONAL MASTER TIMELINE
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-4">Duration Overview by Region</p>
+                    <div id="chart-region-gantt"></div>
+                </div>
+
             </div>
         </div>
 
@@ -301,6 +314,7 @@
     </main>
 
     <script>
+        // --- DATA & CONFIG ---
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
         const PROXIES = ['', 'https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
         
@@ -339,9 +353,9 @@
             rawData = data.map(row => {
                 let status = "Pending";
                 let progress = parseInt(row['progress'] || 0);
-                
-                // --- Logic เดิม ---
                 let colorHex = "#94a3b8";
+
+                // Status Logic
                 if (progress === 100 || (row['status'] && row['status'].includes('Handover'))) {
                     status = "Completed"; progress = 100; colorHex = "#16a34a";
                 } else if (progress >= 80) {
@@ -350,327 +364,6 @@
                     status = "Survey"; colorHex = "#ca8a04";
                 }
 
+                // Delay Check
                 const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
                 if (progress < 100 && planDate && today > planDate) {
-                    status = "Delay"; colorHex = "#dc2626";
-                }
-
-                return {
-                    ...row, // Keep all raw data for Popup
-                    id: row['id'],
-                    site: row['site_name'],
-                    region: row['region'],
-                    team: row['team'],
-                    eng: row['engineer'],
-                    status: status,
-                    progress: progress,
-                    colorHex: colorHex,
-                    lat: parseFloat(row['lat']),
-                    lng: parseFloat(row['lng']),
-                    // Dates for Gantt & Table
-                    d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
-                    d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
-                    d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null
-                };
-            }).filter(d => d.site);
-
-            filteredData = rawData;
-            updateDashboard();
-        }
-
-        function updateDashboard() {
-            renderStats();
-            renderGauges();
-            renderCharts();
-            renderTable();
-            renderGantt(); // 8. Render Gantt
-            renderMap();
-        }
-
-        function filterTable() {
-            const searchVal = document.getElementById('search-input').value.toLowerCase();
-            const statVal = document.getElementById('filter-status').value;
-
-            filteredData = rawData.filter(d => {
-                const matchSearch = d.site.toLowerCase().includes(searchVal);
-                const matchStatus = statVal === 'All' || 
-                                    (statVal === 'Completed' && d.status === 'Completed') ||
-                                    (statVal === 'Delay' && d.status === 'Delay');
-                return matchSearch && matchStatus;
-            });
-            updateDashboard();
-        }
-
-        // --- 4. Gauge Charts (Semi-Circle) ---
-        function renderGauges() {
-            const total = filteredData.length || 1;
-            const surveyCount = filteredData.filter(d => d.progress >= 30).length;
-            const installCount = filteredData.filter(d => d.progress >= 80).length;
-            const handoverCount = filteredData.filter(d => d.progress === 100).length;
-
-            const drawGauge = (id, val, color) => {
-                const pct = Math.round((val / total) * 100);
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#" + id), {
-                    series: [pct],
-                    chart: { type: 'radialBar', height: 250, offsetY: -20 },
-                    plotOptions: {
-                        radialBar: {
-                            startAngle: -90, endAngle: 90, // Semi-circle
-                            hollow: { size: '60%' },
-                            dataLabels: {
-                                name: { show: false },
-                                value: { fontSize: '24px', fontWeight: 'bold', offsetY: -10 }
-                            },
-                            track: { background: '#f1f5f9' }
-                        }
-                    },
-                    colors: [color],
-                    stroke: { lineCap: 'butt' },
-                    labels: ['Progress']
-                });
-                charts[id].render();
-            };
-
-            drawGauge('gauge-survey', surveyCount, '#eab308');
-            drawGauge('gauge-install', installCount, '#2563eb');
-            drawGauge('gauge-handover', handoverCount, '#16a34a');
-        }
-
-        // --- 5. Table Logic (DD-MM-YY & Colors) ---
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
-            const today = new Date();
-
-            const formatDate = (dateObj, isDone) => {
-                if(!dateObj) return '<span class="text-slate-300">-</span>';
-                
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const year = String(dateObj.getFullYear()).slice(-2);
-                const str = `${day}-${month}-${year}`;
-
-                // Color Logic
-                if(isDone) return `<span class="date-green">${str}</span>`;
-                
-                const diffTime = dateObj - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if(diffDays < 0) return `<span class="date-red">${str}</span>`; // Overdue
-                if(diffDays <= 7) return `<span class="date-yellow">${str}</span>`; // Warning
-                return `<span class="date-gray">${str}</span>`;
-            };
-
-            filteredData.forEach(d => {
-                const isSurveyDone = d.progress >= 30;
-                const isInstDone = d.progress >= 80;
-                const isHODone = d.progress === 100;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-mono text-xs text-slate-500">${d.id}</td>
-                    <td><a class="site-link" onclick="showSiteDetail('${d.id}')">${d.site}</a></td>
-                    <td>${d.region}</td>
-                    <td class="font-mono text-xs">${formatDate(d.d_survey, isSurveyDone)}</td>
-                    <td class="font-mono text-xs">${formatDate(d.d_install, isInstDone)}</td>
-                    <td class="font-mono text-xs">${formatDate(d.d_handover, isHODone)}</td>
-                    <td><span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-white" style="background:${d.colorHex}">${d.status}</span></td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            <div class="w-16 bg-slate-200 rounded-full h-1.5"><div class="bg-blue-600 h-1.5 rounded-full" style="width: ${d.progress}%"></div></div>
-                            <span class="text-[10px]">${d.progress}%</span>
-                        </div>
-                    </td>
-                    <td class="text-xs">${d.team}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // --- 6. Popup Logic (SweetAlert) ---
-        window.showSiteDetail = (id) => {
-            const site = rawData.find(d => d.id == id);
-            if(!site) return;
-
-            Swal.fire({
-                title: `<strong class="text-blue-900 text-xl">${site.site}</strong>`,
-                html: `
-                    <div class="text-left text-sm space-y-2 p-2">
-                        <div class="grid grid-cols-2 gap-2 border-b pb-2">
-                            <span class="font-bold text-slate-500">ID:</span> <span>${site.id}</span>
-                            <span class="font-bold text-slate-500">Region:</span> <span>${site.region}</span>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded">
-                            <h4 class="font-bold text-blue-600 mb-2">Plan Schedule</h4>
-                            <p>Survey: <b>${site.d_survey?.toLocaleDateString() || '-'}</b></p>
-                            <p>Install: <b>${site.d_install?.toLocaleDateString() || '-'}</b></p>
-                            <p>Handover: <b>${site.d_handover?.toLocaleDateString() || '-'}</b></p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded">
-                            <h4 class="font-bold text-blue-600 mb-2">Team Info</h4>
-                            <p>Team: ${site.team} (${site.tel_team || '-'})</p>
-                            <p>Engineer: ${site.eng} (${site.tel_eng || '-'})</p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded">
-                            <h4 class="font-bold text-blue-600 mb-2">Hardware Spec</h4>
-                            <div class="grid grid-cols-3 text-center gap-2">
-                                <div class="bg-white p-1 border rounded"><b>AP+PoE</b><br>${site['AP+PoE'] || '-'}</div>
-                                <div class="bg-white p-1 border rounded"><b>L3 SW</b><br>${site['L3 SW'] || '-'}</div>
-                                <div class="bg-white p-1 border rounded"><b>Path 48</b><br>${site['Path 48 (71)'] || '-'}</div>
-                            </div>
-                        </div>
-                        <div class="mt-4 text-center">
-                             <a href="${site.Google_Maps_Link}" target="_blank" class="inline-block bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
-                                <i class="fa-solid fa-map-location-dot mr-2"></i> Open Google Maps
-                             </a>
-                        </div>
-                    </div>
-                `,
-                width: 500,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
-        };
-
-        // --- 8. Gantt Chart (RangeBar) ---
-        function renderGantt() {
-            const seriesData = [];
-            
-            // Limit to first 138 or all if less
-            filteredData.slice(0, 138).forEach(d => {
-                if(d.d_survey && d.d_handover) {
-                    seriesData.push({
-                        x: d.site,
-                        y: [d.d_survey.getTime(), d.d_handover.getTime()],
-                        fillColor: d.colorHex // Color by status
-                    });
-                }
-            });
-
-            if(charts['gantt']) charts['gantt'].destroy();
-            charts['gantt'] = new ApexCharts(document.querySelector("#chart-gantt"), {
-                series: [{ name: 'Project Duration', data: seriesData }],
-                chart: { type: 'rangeBar', height: 4000, toolbar: { show: false } }, // Tall Height
-                plotOptions: {
-                    bar: { horizontal: true, barHeight: '50%', rangeBarGroupRows: true }
-                },
-                xaxis: { type: 'datetime' },
-                tooltip: { x: { format: 'dd MMM yyyy' } },
-                grid: { xaxis: { lines: { show: true } } }
-            });
-            charts['gantt'].render();
-        }
-
-        // --- Other Render Functions (Kept from V4 but updated where needed) ---
-        function renderStats() {
-            document.getElementById('stat-completed').innerText = filteredData.filter(d => d.status === 'Completed').length;
-            document.getElementById('stat-wip').innerText = filteredData.filter(d => d.status === 'WIP').length;
-            document.getElementById('stat-survey').innerText = filteredData.filter(d => d.status === 'Survey').length;
-            document.getElementById('stat-delay').innerText = filteredData.filter(d => d.status === 'Delay').length;
-        }
-
-        function renderCharts() {
-            // S-Curve (Same as V4)
-            const planned = [0, 10, 25, 40, 60, 80, 90, 95, 100];
-            const currentAvg = filteredData.reduce((a,b)=>a+b.progress,0) / (filteredData.length || 1);
-            const actual = planned.map(v => v <= currentAvg ? v : null); 
-            if(currentAvg > 0) actual[actual.findIndex(v=>v===null)-1] = currentAvg;
-
-            if(charts['scurve']) charts['scurve'].destroy();
-            charts['scurve'] = new ApexCharts(document.querySelector("#chart-scurve"), {
-                series: [{ name: 'Plan', data: planned, type: 'line' }, { name: 'Actual', data: actual, type: 'line' }],
-                chart: { height: 320, type: 'line', toolbar: { show: false } },
-                stroke: { width: [3, 4], dashArray: [5, 0], curve: 'smooth' },
-                colors: ['#94a3b8', '#3b82f6'],
-                xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'] },
-                yaxis: { min: 0, max: 100, tickAmount: 5, labels: { formatter: (val) => val.toFixed(0) } }
-            });
-            charts['scurve'].render();
-
-            // Regional
-            const regions = [...new Set(filteredData.map(d=>d.region))];
-            const regData = regions.map(r => {
-                const sites = filteredData.filter(d=>d.region===r);
-                return Math.round(sites.reduce((a,b)=>a+b.progress,0) / sites.length);
-            });
-            if(charts['regional']) charts['regional'].destroy();
-            charts['regional'] = new ApexCharts(document.querySelector("#chart-regional"), {
-                series: [{ name: 'Progress', data: regData }],
-                chart: { type: 'bar', height: 320, toolbar: { show: false } },
-                plotOptions: { bar: { borderRadius: 4, distributed: true } },
-                colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#6366f1'],
-                xaxis: { categories: regions },
-                yaxis: { max: 100 },
-                legend: { show: false }
-            });
-            charts['regional'].render();
-
-            // Team Radar & Bar
-            const extractName = (n) => { if(!n) return 'N/A'; const m = n.match(/\(([^)]+)\)/); return m ? m[1] : n.split(' ')[0]; };
-            const teams = {}, engs = {};
-            filteredData.forEach(d => { teams[d.team] = (teams[d.team] || 0) + 1; engs[d.eng] = (engs[d.eng] || 0) + 1; });
-
-            const radarOpts = (data, color, id) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#" + id), {
-                    series: [{ name: 'Sites', data: Object.values(data) }],
-                    chart: { type: 'radar', height: 400, toolbar: { show: false } },
-                    labels: Object.keys(data).map(k => id.includes('eng') ? extractName(k) : k),
-                    stroke: { width: 2, colors: [color] },
-                    fill: { opacity: 0.2, colors: [color] },
-                    markers: { size: 4, colors: ['#fff'], strokeColors: color, strokeWidth: 2 },
-                    yaxis: { show: false }
-                });
-                charts[id].render();
-            };
-            radarOpts(teams, '#8b5cf6', 'chart-radar-team');
-            radarOpts(engs, '#06b6d4', 'chart-radar-eng');
-
-            const barOpts = (data, id) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#" + id), {
-                    series: [{ name: 'Sites', data: Object.values(data) }],
-                    chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                    plotOptions: { bar: { borderRadius: 4, horizontal: true, distributed: true } },
-                    colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1'],
-                    xaxis: { categories: Object.keys(data).map(k => id.includes('eng') ? extractName(k) : k) },
-                    legend: { show: false }
-                });
-                charts[id].render();
-            };
-            barOpts(teams, 'chart-team-bar');
-            barOpts(engs, 'chart-eng-bar');
-        }
-
-        function renderMap() {
-            if (!map) return;
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-            filteredData.forEach(d => {
-                if (d.lat && d.lng) {
-                    const marker = L.circleMarker([d.lat, d.lng], {
-                        radius: 8, fillColor: d.colorHex, color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9
-                    }).addTo(map);
-                    marker.bindPopup(`<b>${d.site}</b><br><span style="color:${d.colorHex}; font-weight:bold;">${d.status}</span>`);
-                    markers.push(marker);
-                }
-            });
-        }
-
-        function initMap() {
-            map = L.map('map').setView([13.7563, 100.5018], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        }
-
-        window.switchTab = (tabId, btn) => {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
-            btn.classList.add('active');
-            if(tabId === 'map') setTimeout(() => map.invalidateSize(), 300);
-            if(tabId === 'gantt') setTimeout(() => charts['gantt']?.render(), 300);
-        };
-    </script>
-</body>
-</html>

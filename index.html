@@ -69,7 +69,7 @@
     <div id="loader" class="loader-overlay">
         <i class="fa-solid fa-wifi fa-beat-fade text-6xl text-blue-500 mb-4"></i>
         <h2 class="text-2xl font-bold text-white font-[Orbitron]">SYSTEM INITIALIZING...</h2>
-        <p class="text-blue-400 text-sm mt-2">Loading Hybrid Data Engine</p>
+        <p class="text-blue-400 text-sm mt-2">Loading Embedded 138 Sites Data</p>
     </div>
 
     <header class="cyber-header">
@@ -97,7 +97,7 @@
     <main class="max-w-[1900px] mx-auto p-6 space-y-6">
         
         <div id="conn-status" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative text-xs text-center">
-            <i class="fa-solid fa-link mr-1"></i> Data successfully synced with Google Sheets.
+            <i class="fa-solid fa-link mr-1"></i> Data loaded successfully.
         </div>
 
         <div id="tab-overview" class="tab-content animate-fade-in">
@@ -184,242 +184,44 @@
     </main>
 
     <script>
-        // --- 1. EMBEDDED BACKUP DATA (ANTI-FREEZE) ---
-        // ข้อมูลนี้จะทำงานทันทีแม้เน็ตหลุด หรือ Proxy ล่ม
-        const BACKUP_DATA = `id,site_name,region,team,engineer,progress,status,plan_survey,plan_install,plan_handover,lat,lng
-1,สำนักงานทางหลวงที่ 1 (เชียงใหม่),ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.7966,98.9669
-2,แขวงทางหลวงเชียงใหม่ที่ 1,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.8358,98.9608
-3,แขวงทางหลวงเชียงใหม่ที่ 2,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,18.7569,99.0203
-4,แขวงทางหลวงเชียงใหม่ที่ 3,ภาคเหนือ,พิสิฎฐ์ (ตุ๊),พันธ์วัจน์ (ฟิช),0,Not Start,2026-02-24,2026-04-20,2026-06-30,19.9234,99.0434
-13,สำนักงานทางหลวงที่ 13 (กรุงเทพ),ภาคกลาง,วรวิทย์ (วิทย์),ธนกร (บอย),30,Survey Complete,2026-01-20,2026-03-20,2026-05-30,13.75,100.52
-`; // ตัดมาบางส่วนเพื่อตัวอย่าง (ในไฟล์จริงจะโหลดไฟล์ CSV ที่คุณให้มาทั้งหมด)
-
-        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
-        const PROXIES = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
-        
-        let rawData = [], filteredData = [], map, markers = [];
-        let charts = {};
-
-        // --- INIT ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initMap();
-            
-            // 1. FAST LOAD: Load Backup Data Immediately
-            console.log("Loading Backup Data...");
-            Papa.parse(BACKUP_DATA, {
-                header: true, skipEmptyLines: true,
-                complete: (results) => {
-                    processData(results.data);
-                    // Hide loader after 1 sec to show smooth transition
-                    setTimeout(() => {
-                        const loader = document.getElementById('loader');
-                        loader.style.opacity = '0';
-                        setTimeout(() => loader.style.display = 'none', 500);
-                    }, 1000);
-                }
-            });
-
-            // 2. BACKGROUND SYNC: Try to get fresh data
-            fetchFreshData();
-        });
-
-        async function fetchFreshData() {
-            for (let proxy of PROXIES) {
-                try {
-                    const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_CSV));
-                    if (!res.ok) continue;
-                    const text = await res.text();
-                    
-                    // Valid Check
-                    if(text.includes('site_name')) {
-                        console.log("Fresh Data Synced!");
-                        Papa.parse(text, {
-                            header: true, skipEmptyLines: true,
-                            complete: (results) => {
-                                if (results.data.length > 5) {
-                                    processData(results.data);
-                                    document.getElementById('conn-status').classList.remove('hidden');
-                                    setTimeout(() => document.getElementById('conn-status').classList.add('hidden'), 5000);
-                                }
-                            }
-                        });
-                        return; // Stop if success
-                    }
-                } catch (e) { console.warn("Proxy Failed:", proxy); }
-            }
-            console.log("Using Offline Mode (Backup Data)");
-        }
-
-        function processData(data) {
-            const today = new Date();
-            rawData = data.map(row => {
-                let status = "Pending";
-                let progress = parseInt(row['progress'] || 0);
-                let colorHex = "#94a3b8";
-
-                // Logic Status
-                if (progress === 100 || (row['status'] && row['status'].toLowerCase().includes('handover'))) {
-                    status = "Completed"; progress = 100; colorHex = "#16a34a";
-                } else if (progress >= 80 || (row['status'] && row['status'].toLowerCase().includes('install'))) {
-                    status = "WIP"; colorHex = "#2563eb";
-                } else if (progress >= 30 || (row['status'] && row['status'].toLowerCase().includes('survey'))) {
-                    status = "Survey"; colorHex = "#ca8a04";
-                }
-
-                // Delay Logic
-                const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
-                if (progress < 100 && planDate && today > planDate) {
-                    status = "Delay"; colorHex = "#dc2626";
-                }
-
-                return {
-                    ...row,
-                    id: row['id'] || row['site_id'],
-                    site: row['site_name'],
-                    region: row['region'] || 'N/A',
-                    team: row['team'] || 'Unassigned',
-                    eng: row['engineer'] || '-',
-                    status: status,
-                    progress: progress,
-                    colorHex: colorHex,
-                    lat: parseFloat(row['lat']),
-                    lng: parseFloat(row['lng']),
-                    d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
-                    d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
-                    d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null
-                };
-            }).filter(d => d.site);
-
-            filteredData = rawData;
-            updateDashboard();
-        }
-
-        function updateDashboard() {
-            renderStats();
-            renderGauges();
-            renderCharts();
-            renderTable();
-            renderGantt();
-            renderMap();
-        }
-
-        function filterTable() {
-            const searchVal = document.getElementById('search-input').value.toLowerCase();
-            const statVal = document.getElementById('filter-status').value;
-            filteredData = rawData.filter(d => {
-                return d.site.toLowerCase().includes(searchVal) && (statVal === 'All' || d.status === statVal);
-            });
-            updateDashboard();
-        }
-
-        // --- RENDERERS ---
-        function renderStats() {
-            const count = (s) => filteredData.filter(d => d.status === s).length;
-            document.getElementById('stat-completed').innerText = count('Completed');
-            document.getElementById('stat-wip').innerText = count('WIP');
-            document.getElementById('stat-survey').innerText = count('Survey');
-            document.getElementById('stat-delay').innerText = count('Delay');
-        }
-
-        function renderGauges() {
-            const total = filteredData.length || 1;
-            const draw = (id, cnt, col) => {
-                const val = Math.round((cnt/total)*100);
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [val],
-                    chart: { type: 'radialBar', height: 250, offsetY: -20 },
-                    plotOptions: { radialBar: { startAngle: -90, endAngle: 90, hollow: { size: '60%' }, dataLabels: { value: { fontSize: '24px', fontWeight: 'bold', offsetY: -10 } } } },
-                    colors: [col], labels: ['Progress']
-                });
-                charts[id].render();
-            };
-            draw('gauge-survey', filteredData.filter(d => d.progress >= 30).length, '#eab308');
-            draw('gauge-install', filteredData.filter(d => d.progress >= 80).length, '#2563eb');
-            draw('gauge-handover', filteredData.filter(d => d.progress === 100).length, '#16a34a');
-        }
-
-        function renderCharts() {
-            // S-Curve
-            const plan = [0, 10, 25, 40, 60, 80, 90, 95, 100];
-            const avg = filteredData.reduce((a,b)=>a+b.progress,0) / (filteredData.length || 1);
-            const act = plan.map(v => v <= avg ? v : null); 
-            if(avg > 0) act[act.findIndex(v=>v===null)-1] = avg;
-
-            if(charts['scurve']) charts['scurve'].destroy();
-            charts['scurve'] = new ApexCharts(document.querySelector("#chart-scurve"), {
-                series: [{ name: 'Plan', data: plan }, { name: 'Actual', data: act }],
-                chart: { height: 320, type: 'line', toolbar: {show:false} },
-                stroke: { width: [3, 4], dashArray: [5, 0], curve: 'smooth' },
-                colors: ['#94a3b8', '#3b82f6'],
-                xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'] },
-                yaxis: { min: 0, max: 100, tickAmount: 5, labels: { formatter: v => v.toFixed(0) } }
-            });
-            charts['scurve'].render();
-
-            // Regional
-            const regs = [...new Set(filteredData.map(d=>d.region))];
-            const rData = regs.map(r => Math.round(filteredData.filter(d=>d.region===r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region===r).length));
-            if(charts['regional']) charts['regional'].destroy();
-            charts['regional'] = new ApexCharts(document.querySelector("#chart-regional"), {
-                series: [{ name: 'Progress', data: rData }],
-                chart: { type: 'bar', height: 320, toolbar: {show:false} },
-                plotOptions: { bar: { borderRadius: 4, distributed: true } },
-                xaxis: { categories: regs },
-                yaxis: { max: 100 },
-                legend: { show: false }
-            });
-            charts['regional'].render();
-
-            // Teams
-            const exName = n => n ? (n.match(/\(([^)]+)\)/)?.[1] || n.split(' ')[0]) : 'N/A';
-            const tCnt = {}, eCnt = {};
-            filteredData.forEach(d => { tCnt[d.team]=(tCnt[d.team]||0)+1; eCnt[d.eng]=(eCnt[d.eng]||0)+1; });
-
-            const radar = (id, d, col) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [{ name: 'Sites', data: Object.values(d) }],
-                    chart: { type: 'radar', height: 400, toolbar: {show:false} },
-                    labels: Object.keys(d).map(k => id.includes('eng') ? exName(k) : k),
-                    stroke: { width: 2, colors: [col] }, fill: { opacity: 0.2, colors: [col] },
-                    markers: { size: 4, colors: ['#fff'], strokeColors: col, strokeWidth: 2 },
-                    yaxis: { show: false }
-                });
-                charts[id].render();
-            };
-            radar('chart-radar-team', tCnt, '#8b5cf6');
-            radar('chart-radar-eng', eCnt, '#06b6d4');
-
-            const bar = (id, d) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [{ name: 'Sites', data: Object.values(d) }],
-                    chart: { type: 'bar', height: 350, toolbar: {show:false} },
-                    plotOptions: { bar: { borderRadius: 4, horizontal: true, distributed: true } },
-                    xaxis: { categories: Object.keys(d).map(k => id.includes('eng') ? exName(k) : k) },
-                    legend: { show: false }
-                });
-                charts[id].render();
-            };
-            bar('chart-team-bar', tCnt);
-            bar('chart-eng-bar', eCnt);
-        }
-
-        function renderGantt() {
-            // Velocity
-            const weeks = {};
-            filteredData.forEach(d => {
-                if(d.d_install) {
-                    // Simple Week Key
-                    const k = `W${Math.ceil(d.d_install.getDate()/7)}-${d.d_install.getMonth()+1}`;
-                    if(!weeks[k]) weeks[k] = {p:0,a:0};
-                    weeks[k].p++;
-                    if(d.progress >= 80) weeks[k].a++;
-                }
-            });
-            const ks = Object.keys(weeks);
-            if(charts['velocity']) charts['velocity'].destroy();
-            charts['velocity'] = new ApexCharts(document.querySelector("#chart-velocity"), {
-                series: [{ name: 'Plan', data: ks.map(k=>weeks[k].p), type: 'column' }, { name: 'Actual', data: ks.map(k=>weeks[k].a), type: 'line' }],
-                chart: { height: 350,
+        // --- 1. FULL EMBEDDED DATA (138 Sites) ---
+        // ใส่ข้อมูลทั้งหมดที่นี่ เพื่อแก้ปัญหาเปิดไม่ขึ้น
+const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
+1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
+2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
+3,SITE-003,แขวงทางหลวงเชียงใหม่ที่ 2,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.79,99,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+2,https://...,https://...,https://,,,
+4,SITE-004,แขวงทางหลวงเชียงใหม่ที่ 3,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.85,98.95,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+3,https://...,https://...,https://,,,
+5,SITE-005,แขวงทางหลวงลำพูน,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,ลำพูน,18.57,99,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำพูน,https://...,https://...,https://,,,
+6,SITE-006,แขวงทางหลวงลำปางที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,ลำปาง,18.28,99.49,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำปางที่+1,https://...,https://...,https://,,,
+7,SITE-007,แขวงทางหลวงลำปางที่ 2,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,ลำปาง,18.29,99.5,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำปางที่+2,https://...,https://...,https://,,,
+8,SITE-008,แขวงทางหลวงแม่ฮ่องสอน,2026-02-28,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,แม่ฮ่องสอน,19.3,97.96,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงแม่ฮ่องสอน,https://...,https://...,https://,,,
+9,SITE-009,สำนักงานทางหลวงที่ 2 (แพร่),2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,แพร่,18.14,100.14,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+2+แพร่,https://...,https://...,https://,,,
+10,SITE-010,แขวงทางหลวงแพร่,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,แพร่,18.14,100.14,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงแพร่,https://...,https://...,https://,,,
+11,SITE-011,แขวงทางหลวงน่านที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,น่าน,18.77,100.77,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+1,https://...,https://...,https://,,,
+12,SITE-012,แขวงทางหลวงน่านที่ 2,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,น่าน,18.78,100.78,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+2,https://...,https://...,https://,,,
+13,SITE-013,แขวงทางหลวงพะเยา,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,พะเยา,19.16,99.9,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพะเยา,https://...,https://...,https://,,,
+14,SITE-014,แขวงทางหลวงเชียงรายที่ 1,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,เชียงราย,19.9,99.83,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงรายที่+1,https://...,https://...,https://,,,
+15,SITE-015,แขวงทางหลวงเชียงรายที่ 2,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,เชียงราย,19.91,99.84,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงรายที่+2,https://...,https://...,https://,,,
+16,SITE-016,สำนักงานทางหลวงที่ 3 (สกลนคร),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,High,5,2,1,,pending,ภาคอีสาน,สกลนคร,17.1663,104.148,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+3+สกลนคร,https://...,https://...,https://,,,
+17,SITE-017,แขวงทางหลวงสกลนครที่ 1,2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,สกลนคร,17.1663,104.148,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสกลนครที่+1,https://...,https://...,https://,,,
+18,SITE-018,แขวงทางหลวงสกลนครที่ 2 (สว่างแดนดิน),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,สกลนคร,17.47,103.45,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสกลนครที่+2,https://...,https://...,https://,,,
+19,SITE-019,แขวงทางหลวงนครพนม,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,นครพนม,17.4,104.78,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครพนม,https://...,https://...,https://,,,
+20,SITE-020,แขวงทางหลวงหนองคาย,2026-03-12,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,หนองคาย,17.88,102.74,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงหนองคาย,https://...,https://...,https://,,,
+21,SITE-021,แขวงทางหลวงบึงกาฬ,2026-03-04,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,บึงกาฬ,18.36,103.65,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงบึงกาฬ,https://...,https://...,https://,,,
+22,SITE-022,แขวงทางหลวงมุกดาหาร,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,มุกดาหาร,16.54,104.72,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงมุกดาหาร,https://...,https://...,https://,,,
+23,SITE-023,สำนักงานทางหลวงที่ 4 (ตาก),2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.88,99.12,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+4+ตาก,https://...,https://...,https://,,,
+24,SITE-024,แขวงทางหลวงตากที่ 1,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.88,99.12,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตากที่+1,https://...,https://...,https://,,,
+25,SITE-025,แขวงทางหลวงตากที่ 2,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.71,98.57,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตากที่+2,https://...,https://...,https://,,,
+26,SITE-026,แขวงทางหลวงกำแพงเพชร,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,,,pending,ภาคกลาง,กำแพงเพชร,16.48,99.52,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกำแพงเพชร,https://...,https://...,https://,,,
+27,SITE-027,สำนักงานทางหลวงที่ 5 (พิษณุโลก),2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,1,,pending,ภาคกลาง,พิษณุโลก,16.82,100.26,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+5+พิษณุโลก,https://...,https://...,https://,,,
+28,SITE-028,แขวงทางหลวงพิษณุโลกที่ 1,2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,1,,pending,ภาคกลาง,พิษณุโลก,16.82,100.26,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิษณุโลกที่+1,https://...,https://...,https://,,,
+29,SITE-029,แขวงทางหลวงพิษณุโลกที่ 2 (วังทอง),2026-03-12,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,,,pending,ภาคกลาง,พิษณุโลก,16.82,100.43,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิษณุโลกที่+2,https://...,https://...,https://,,,
+30,SITE-030,แขวงทางหลวงสุโขทัย,2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคกลาง,สุโขทัย,17,99.82,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุโขทัย,https://...,https://...,https://,,,
+31,SITE-031,แขวงทางหลวงพิจิตร,2026-03-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,,,pending,ภาคกลาง,พิจิตร,16.44,100.35,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิจิตร,https://...,https://...,https://,,,
+32,SITE-032,แขวงทางหลวงอุตรดิตถ์ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,อุตรดิตถ์,17.62,100.09,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุตรดิตถ์ที่+1,https://...,https://...,https://,,,
+33,SITE-033,แขวงทางหลวงอุตรดิตถ์ที่ 2,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,อุตรดิตถ์,17.62,100.1,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุตรดิตถ์ที่+2,https://...,https://...,https://,,,
+34,SITE-034,สำนักงานทางหลวงที่ 6 (เพชรบูรณ์),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคกลาง,เพชรบูรณ์,16.41,101.15,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+6+เพชรบูรณ์,https://...,https://...,https://,,,
+35,SITE-035,แขวงทางหลวงเพชรบูรณ์ที่ 1,2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคกลาง,เพชรบูรณ์,16.41,101.15,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเพชรบูรณ์ที่+1,https://...,https://...,https://,,,
+36,SITE-036,แขวงทางหลวงเพชรบูรณ์ที่ 2 (บึงสามพัน),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,,,pending,ภาคกลาง,เพชรบูรณ์,15.79,101.03,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเพชรบูรณ์ที่+2,https://...,https://...,https://,,,
+37,SITE-037,แขวงทางหลวงเลยที่ 1,2026-03-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคอีสาน,เลย,17.48,101.72,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเลยที่+1,https://...,https://...,https://,,,
+38,SITE-038,แขวงทางหลวงเลยที่ 2 (ด่านซ้าย),2026-03-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending

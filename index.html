@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | CYBER MONITORING V6.0</title>
+    <title>DOH PROJECT 2026 | REAL-TIME MONITORING</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -69,6 +69,12 @@
         /* Map Pin Custom Icon */
         .pin-marker { text-align: center; }
         .pin-marker i { filter: drop-shadow(0 3px 2px rgba(0,0,0,0.4)); font-size: 32px; }
+        
+        /* Sync Status Badge */
+        .sync-badge { position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 20px; font-size: 10px; z-index: 999; display: flex; align-items: center; gap: 5px; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
+        .sync-dot.active { background: #22c55e; box-shadow: 0 0 5px #22c55e; }
+        .sync-dot.error { background: #ef4444; }
     </style>
 </head>
 <body>
@@ -77,6 +83,11 @@
         <i class="fa-solid fa-wifi fa-beat-fade text-6xl text-blue-500 mb-4"></i>
         <h2 class="text-2xl font-bold text-white font-[Orbitron]">SYSTEM INITIALIZING...</h2>
         <p class="text-blue-400 text-sm mt-2">Loading Hybrid Data Engine</p>
+    </div>
+
+    <div id="sync-status" class="sync-badge">
+        <div id="sync-dot" class="sync-dot"></div>
+        <span id="sync-text">Offline Mode</span>
     </div>
 
     <header class="cyber-header">
@@ -103,10 +114,6 @@
 
     <main class="max-w-[1900px] mx-auto p-6 space-y-6">
         
-        <div id="conn-status" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative text-xs text-center">
-            <i class="fa-solid fa-link mr-1"></i> Data loaded successfully.
-        </div>
-
         <div id="tab-overview" class="tab-content animate-fade-in">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="status-box bg-gradient-to-r from-green-600 to-green-800 shadow-lg">
@@ -169,31 +176,20 @@
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-                
                 <div class="card p-6">
                     <div class="border-b pb-4 mb-4">
-                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">
-                            <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY INSTALLATION VELOCITY
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-1">
-                            กราฟแสดงความเร็วในการติดตั้งเปรียบเทียบระหว่าง <span class="text-slate-400 font-bold">แผนงาน (Planned)</span> กับ <span class="text-blue-600 font-bold">ผลงานจริง (Actual)</span> รายสัปดาห์ ช่วยวิเคราะห์แนวโน้ม Productivity ของทีม
-                        </p>
+                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]"><i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY INSTALLATION VELOCITY</h3>
+                        <p class="text-xs text-slate-500 mt-1">เปรียบเทียบแผนงาน (Planned) vs ผลงานจริง (Actual) รายสัปดาห์</p>
                     </div>
                     <div id="chart-velocity"></div>
                 </div>
-
                 <div class="card p-6">
                     <div class="border-b pb-4 mb-4">
-                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">
-                            <i class="fa-solid fa-clock text-purple-600 mr-2"></i>REGIONAL MASTER TIMELINE
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-1">
-                            ไทม์ไลน์แสดงช่วงเวลาเริ่มต้นและสิ้นสุดของแต่ละภูมิภาค (Duration Overview) ช่วยให้ผู้บริหารเห็นภาพรวมว่าภาคไหนเริ่มช้าหรือเร็ว และใช้เวลาดำเนินงานนานเท่าไหร่
-                        </p>
+                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]"><i class="fa-solid fa-clock text-purple-600 mr-2"></i>REGIONAL MASTER TIMELINE</h3>
+                        <p class="text-xs text-slate-500 mt-1">ภาพรวมระยะเวลาดำเนินงานของแต่ละภูมิภาค</p>
                     </div>
                     <div id="chart-region-gantt"></div>
                 </div>
-
             </div>
         </div>
 
@@ -226,7 +222,16 @@
     </main>
 
     <script>
-        // --- 1. FULL EMBEDDED DATA (138 Sites) ---
+        // --- CONFIG ---
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
+        // ใช้ Proxy เพื่อแก้ปัญหา CORS (ถ้า Proxy ไหนตาย มันจะลองตัวถัดไป)
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?'
+        ];
+
+        // --- STATIC BACKUP DATA (138 Sites) ---
+        // ใช้เป็นฐานข้อมูลสำรอง ถ้าดึง Real-time ไม่สำเร็จ
 const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
@@ -375,13 +380,12 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             
-            // 1. FAST LOAD
-            console.log("Loading Backup Data...");
+            // 1. FAST LOAD: Load Backup Data Immediately
+            console.log("Loading Embedded Data...");
             Papa.parse(BACKUP_DATA, {
                 header: true, skipEmptyLines: true,
                 complete: (results) => {
                     processData(results.data);
-                    // Hide loader after 1 sec
                     setTimeout(() => {
                         const loader = document.getElementById('loader');
                         loader.style.opacity = '0';
@@ -389,7 +393,49 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                     }, 500);
                 }
             });
+
+            // 2. BACKGROUND SYNC: Try to fetch fresh data
+            fetchFreshData();
         });
+
+        async function fetchFreshData() {
+            const syncDot = document.getElementById('sync-dot');
+            const syncText = document.getElementById('sync-text');
+            syncText.innerText = "Syncing...";
+
+            for (let proxy of PROXIES) {
+                try {
+                    const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_URL));
+                    if (!res.ok) continue;
+                    const text = await res.text();
+                    
+                    // Simple Validation
+                    if(text.includes('site_name') || text.includes('site_id')) {
+                        console.log("Fresh Data Synced via", proxy);
+                        Papa.parse(text, {
+                            header: true, skipEmptyLines: true,
+                            complete: (results) => {
+                                if (results.data.length > 10) {
+                                    processData(results.data);
+                                    // Update Badge
+                                    syncDot.classList.add('active');
+                                    syncText.innerText = "Real-Time";
+                                    // Flash Effect
+                                    document.body.classList.add('animate-pulse');
+                                    setTimeout(() => document.body.classList.remove('animate-pulse'), 500);
+                                }
+                            }
+                        });
+                        return;
+                    }
+                } catch (e) { console.warn("Proxy Failed:", proxy); }
+            }
+            
+            // If failed
+            syncDot.classList.add('error');
+            syncText.innerText = "Offline (Using Backup)";
+            console.log("Using Offline Mode");
+        }
 
         function processData(data) {
             const today = new Date();
@@ -442,7 +488,7 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
 
         function updateDashboard() {
             renderStats();
-            renderGaugeCanvases(); // 1. Custom Canvas Gauges
+            renderGaugeCanvases();
             renderCharts();
             renderTable();
             renderGantt();
@@ -467,7 +513,6 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
             document.getElementById('stat-delay').innerText = count('Delay');
         }
 
-        // 1. CUSTOM SPEEDOMETER GAUGE (Canvas)
         function renderGaugeCanvases() {
             const total = filteredData.length || 1;
             const surveyCount = filteredData.filter(d => d.progress >= 30).length;
@@ -482,48 +527,43 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
         function drawSpeedometer(canvasId, value, label) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
-            // Fix resolution
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
-
             const cx = rect.width / 2;
-            const cy = rect.height - 20; // Bottom aligned
+            const cy = rect.height - 20;
             const radius = Math.min(cx, cy) - 20;
 
             ctx.clearRect(0, 0, rect.width, rect.height);
 
-            // Draw Background Arc (Gray)
+            // BG Arc
             ctx.beginPath();
             ctx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
             ctx.lineWidth = 25;
             ctx.strokeStyle = '#e2e8f0';
             ctx.stroke();
 
-            // Draw Color Zones
-            // Red (0-40%)
+            // Zones
             drawArc(ctx, cx, cy, radius, 0, 40, '#ef4444');
-            // Yellow (40-70%)
             drawArc(ctx, cx, cy, radius, 40, 70, '#eab308');
-            // Green (70-100%)
             drawArc(ctx, cx, cy, radius, 70, 100, '#22c55e');
 
-            // Draw Needle
+            // Needle
             const angle = Math.PI + (value / 100) * Math.PI;
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(angle);
             ctx.beginPath();
             ctx.moveTo(0, -5);
-            ctx.lineTo(radius - 10, 0); // Point
+            ctx.lineTo(radius - 10, 0);
             ctx.lineTo(0, 5);
-            ctx.fillStyle = '#dc2626'; // Red needle
+            ctx.fillStyle = '#dc2626';
             ctx.fill();
             ctx.restore();
 
-            // Needle Base
+            // Base
             ctx.beginPath();
             ctx.arc(cx, cy, 8, 0, 2 * Math.PI);
             ctx.fillStyle = '#334155';
@@ -682,7 +722,6 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
             });
         }
 
-        // 4. MAP PIN MARKERS
         function renderMap() {
             if(!map) return;
             markers.forEach(m => map.removeLayer(m));
@@ -696,7 +735,6 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                     else if(d.status === "Survey") pinColor = "text-yellow-500";
                     else if(d.status === "Delay") pinColor = "text-red-600";
 
-                    // Custom Div Icon (FontAwesome Pin)
                     const icon = L.divIcon({
                         className: 'pin-marker',
                         html: `<i class="fa-solid fa-location-dot ${pinColor}"></i>`,
@@ -726,11 +764,9 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                 charts['velocity']?.render();
                 charts['ganttR']?.render();
             }, 300);
-            // Re-render canvas when tab shows
             if(id === 'overview') setTimeout(renderGaugeCanvases, 100);
         };
 
-        // 2. POPUP WITH PHONES
         window.showPopup = (id) => {
             const s = rawData.find(d => d.id == id);
             if(!s) return;

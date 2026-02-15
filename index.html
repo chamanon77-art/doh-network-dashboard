@@ -46,13 +46,14 @@
         /* Map & Markers */
         #map { height: 650px; width: 100%; border-radius: 16px; z-index: 1; }
         
+        /* Pin Marker Styling */
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
-        .pin-icon { font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2; position: relative; top: -12px;}
+        .pin-icon { font-size: 20px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); z-index: 2; position: relative; top: -5px;}
         
         /* Blinking Effect */
         .pin-pulse {
-            position: absolute; width: 12px; height: 12px; background: rgba(255,255,255,0.8);
-            border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%);
+            position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.8);
+            border-radius: 50%; bottom: 0px; left: 50%; transform: translateX(-50%);
             z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
         }
         @keyframes pulse-ring {
@@ -60,18 +61,18 @@
             80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; }
         }
 
-        /* Status Colors (Pastel) */
+        /* Status Colors (Pastel & Bright for Pins) */
         .text-p-green { color: #16a34a; } .bg-p-green { background: #dcfce7; color: #166534; } .pulse-green { background: #22c55e; }
         .text-p-blue { color: #2563eb; } .bg-p-blue { background: #dbeafe; color: #1e40af; } .pulse-blue { background: #3b82f6; }
         .text-p-yellow { color: #ca8a04; } .bg-p-yellow { background: #fef9c3; color: #854d0e; } .pulse-yellow { background: #eab308; }
         .text-p-red { color: #dc2626; } .bg-p-red { background: #fee2e2; color: #991b1b; } .pulse-red { background: #ef4444; }
         .text-p-gray { color: #64748b; } .bg-p-gray { background: #f1f5f9; color: #475569; } .pulse-gray { background: #94a3b8; }
 
-        /* Popup */
+        /* Popup Customization */
         .swal-wide { width: 600px !important; }
         .info-row { display: flex; border-bottom: 1px solid #e2e8f0; padding: 8px 0; align-items: center; }
-        .info-label { font-weight: 600; color: #64748b; width: 30%; }
-        .info-val { color: #1e293b; font-weight: 500; width: 70%; }
+        .info-label { font-weight: 600; color: #64748b; width: 30%; font-size: 0.9rem; }
+        .info-val { color: #1e293b; font-weight: 500; width: 70%; font-size: 0.95rem; }
         
         /* Gauge Canvas */
         .gauge-canvas { width: 100%; height: 200px; }
@@ -195,13 +196,13 @@
                     <div class="flex justify-between items-center border-b pb-4 mb-4">
                         <div>
                             <h3 class="font-bold text-slate-800 text-lg">Weekly Progress Breakdown</h3>
-                            <p class="text-xs text-slate-500">Plan vs Actual (Survey, Install, Handover)</p>
+                            <p class="text-xs text-slate-500">เปรียบเทียบแผนงาน (Plan) vs ผลงานจริง (Actual) รายสัปดาห์</p>
                         </div>
                     </div>
                     <div id="chart-weekly-breakdown"></div>
                 </div>
                 <div class="card p-6">
-                    <h3 class="font-bold text-slate-800 mb-4">Regional Timeline</h3>
+                    <h3 class="font-bold text-slate-800 mb-4">Regional Timeline Overview</h3>
                     <div id="chart-timeline"></div>
                 </div>
             </div>
@@ -214,7 +215,7 @@
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span> Delay</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-400"></span> Pending</div>
                 </div>
             </div>
@@ -224,6 +225,7 @@
 
     <script>
         // --- 1. EMBEDDED DATA (138 SITES) ---
+        // ฝังข้อมูลทั้งหมดจากไฟล์ CSV เพื่อให้เปิดปุ๊บติดปั๊บ
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,

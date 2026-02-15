@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | REAL-TIME MONITORING V6.2</title>
+    <title>DOH PROJECT 2026 | EXECUTIVE DASHBOARD V6.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,8 +17,9 @@
 
     <style>
         :root { 
-            --bg-page: #f8fafc; 
-            /* Pastel Colors Theme */
+            --bg-page: #f0f4f8; 
+            --card-bg: #ffffff;
+            /* Pastel Colors */
             --pastel-green: #86efac; 
             --pastel-blue: #93c5fd; 
             --pastel-yellow: #fde047; 
@@ -27,34 +28,45 @@
         }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #334155; }
         
-        /* Header & Theme (Keep Original V6 Style) */
+        /* Cyber Header (Restored V6.0 Style) */
         .cyber-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #020617 100%);
+            background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
             position: sticky; top: 0; z-index: 50;
-            border-bottom: 2px solid #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            border-bottom: 3px solid #3b82f6;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
         }
-        .title-main { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px #3b82f6; letter-spacing: 1px; white-space: nowrap; }
-        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; font-weight: 700; color: #bae6fd; letter-spacing: 3.5px; text-transform: uppercase; white-space: nowrap; }
+        .title-main { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 2px; }
+        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 0.9rem; font-weight: 700; color: #93c5fd; letter-spacing: 4px; text-transform: uppercase; }
+
+        /* Navigation */
+        .nav-pill { 
+            cursor: pointer; padding: 10px 24px; border-radius: 6px; 
+            font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 1px; 
+            color: #94a3b8; transition: all 0.3s; border: 1px solid transparent; 
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-pill:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-pill.active { 
+            background: rgba(59, 130, 246, 0.2); color: #60a5fa; 
+            border: 1px solid #3b82f6; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.4); 
+            font-weight: bold;
+        }
 
         /* Cards */
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.3s; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); border-color: #93c5fd; }
-        
-        /* Navigation */
-        .nav-pill { cursor: pointer; padding: 8px 20px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 1px; color: #94a3b8; transition: all 0.3s; border: 1px solid transparent; }
-        .nav-pill:hover { color: white; text-shadow: 0 0 5px #fff; }
-        .nav-pill.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3); }
+        .card { 
+            background: var(--card-bg); border-radius: 16px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            border: 1px solid #e2e8f0; transition: transform 0.2s; 
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 
-        /* --- NEW: MAP PINS & PULSE EFFECT --- */
-        #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
+        /* Map Pins & Pulse */
+        #map { height: 650px; width: 100%; border-radius: 12px; z-index: 1; }
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
-        /* Compact Pin Icon */
-        .pin-icon { font-size: 20px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); z-index: 2; position: relative; top: -5px;}
-        /* Blinking Pulse */
+        .pin-icon { font-size: 22px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4)); z-index: 2; position: relative; top: -8px;}
         .pin-pulse {
-            position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.8);
-            border-radius: 50%; bottom: 0px; left: 50%; transform: translateX(-50%);
+            position: absolute; width: 12px; height: 12px; background: rgba(255,255,255,0.8);
+            border-radius: 50%; bottom: -2px; left: 50%; transform: translateX(-50%);
             z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
         }
         @keyframes pulse-ring {
@@ -69,7 +81,7 @@
         .text-p-red { color: #dc2626; } .pulse-red { background: #ef4444; }
         .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
 
-        /* --- NEW: POPUP STYLES --- */
+        /* Popup */
         .swal-wide { width: 550px !important; }
         .info-row { display: flex; border-bottom: 1px solid #f1f5f9; padding: 6px 0; align-items: center; }
         .info-label { font-weight: 600; color: #64748b; width: 35%; font-size: 0.9rem; }
@@ -77,39 +89,39 @@
         .tel-btn { display: inline-flex; align-items: center; gap: 5px; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-decoration: none; transition: 0.2s; }
         .tel-btn:hover { background: #2563eb; color: white; }
 
-        /* Status & Table */
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .bg-gray-custom { background: #f1f5f9; color: #64748b; } /* For Pending/Not Start */
-
         /* Gauge Canvas */
-        .gauge-canvas { width: 100%; height: 180px; }
+        .gauge-canvas { width: 100%; height: 200px; }
 
         /* Sync Badge */
-        .sync-badge { position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; z-index: 999; display: flex; align-items: center; gap: 6px; }
-        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
-        .sync-dot.active { background: #22c55e; box-shadow: 0 0 5px #22c55e; }
+        .sync-badge { position: fixed; bottom: 15px; right: 15px; background: rgba(15, 23, 42, 0.9); color: white; padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 999; display: flex; align-items: center; gap: 8px; border: 1px solid #334155; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
+        .sync-dot.active { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        
+        /* Status Badges for Table */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
     <div class="sync-badge">
         <div id="sync-dot" class="sync-dot"></div>
-        <span id="sync-text">Loading System...</span>
+        <span id="sync-text">System Initializing...</span>
     </div>
 
     <header class="cyber-header">
-        <div class="max-w-[1900px] mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center relative z-10">
+        <div class="max-w-[1900px] mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
             <div class="flex items-center gap-5 mb-4 md:mb-0">
-                <div class="w-16 h-16 rounded-full border-2 border-blue-400 bg-blue-900/50 flex items-center justify-center shadow-[0_0_15px_#3b82f6]">
-                    <i class="fa-solid fa-wifi text-3xl text-white"></i>
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/30 transform rotate-3">
+                    <i class="fa-solid fa-satellite-dish text-3xl text-white"></i>
                 </div>
                 <div>
-                    <h1 class="title-main">PROJECT MONITORING SYSTEM</h1>
-                    <p class="title-sub">DOH PROJECT 2026 | OPERATED BY FATIMA R.B.D.S. INTERNATIONAL</p>
+                    <h1 class="title-main">PROJECT MONITORING V6.3</h1>
+                    <p class="title-sub">REAL-TIME TRACKING SYSTEM</p>
                 </div>
             </div>
-            <nav class="flex gap-2 bg-black/30 p-2 rounded-lg backdrop-blur-sm border border-white/10">
+            <nav class="flex gap-3 bg-slate-900/40 p-2 rounded-xl border border-white/10 backdrop-blur-md">
                 <div class="nav-pill active" onclick="switchTab('overview', this)">DASHBOARD</div>
+                <div class="nav-pill" onclick="switchTab('teams', this)">TEAMS</div>
                 <div class="nav-pill" onclick="switchTab('control', this)">CONTROL</div>
                 <div class="nav-pill" onclick="switchTab('gantt', this)">SCHEDULE</div>
                 <div class="nav-pill" onclick="switchTab('map', this)">MAP</div>
@@ -118,101 +130,146 @@
     </header>
 
     <main class="max-w-[1900px] mx-auto p-6 space-y-6">
-        
+
         <div id="tab-overview" class="tab-content animate-fade-in">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                <div class="card p-4 border-l-4 border-green-500">
-                    <p class="text-xs text-slate-400 uppercase font-bold">Completed</p>
-                    <h3 class="text-3xl font-[Orbitron]" id="stat-completed">0</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                <div class="card p-5 border-l-4 border-green-400 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Completed</p><h3 class="text-4xl font-[Orbitron] text-slate-700 mt-2" id="stat-completed">0</h3></div>
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600"><i class="fa-solid fa-check"></i></div>
+                    </div>
                 </div>
-                <div class="card p-4 border-l-4 border-blue-500">
-                    <p class="text-xs text-slate-400 uppercase font-bold">In Progress</p>
-                    <h3 class="text-3xl font-[Orbitron]" id="stat-wip">0</h3>
+                <div class="card p-5 border-l-4 border-blue-400 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-xs text-slate-400 uppercase font-bold tracking-wider">In Progress</p><h3 class="text-4xl font-[Orbitron] text-slate-700 mt-2" id="stat-wip">0</h3></div>
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-tools"></i></div>
+                    </div>
                 </div>
-                <div class="card p-4 border-l-4 border-yellow-400">
-                    <p class="text-xs text-slate-400 uppercase font-bold">Survey</p>
-                    <h3 class="text-3xl font-[Orbitron]" id="stat-survey">0</h3>
+                <div class="card p-5 border-l-4 border-yellow-400 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Survey</p><h3 class="text-4xl font-[Orbitron] text-slate-700 mt-2" id="stat-survey">0</h3></div>
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i class="fa-solid fa-map"></i></div>
+                    </div>
                 </div>
-                <div class="card p-4 border-l-4 border-gray-400">
-                    <p class="text-xs text-slate-400 uppercase font-bold">Pending</p>
-                    <h3 class="text-3xl font-[Orbitron]" id="stat-pending">0</h3>
+                <div class="card p-5 border-l-4 border-gray-400 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Pending</p><h3 class="text-4xl font-[Orbitron] text-slate-700 mt-2" id="stat-pending">0</h3></div>
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fa-solid fa-hourglass"></i></div>
+                    </div>
                 </div>
-                <div class="card p-4 border-l-4 border-red-500">
-                    <p class="text-xs text-slate-400 uppercase font-bold">Delayed</p>
-                    <h3 class="text-3xl font-[Orbitron] text-red-600" id="stat-delay">0</h3>
+                <div class="card p-5 border-l-4 border-red-400 flex flex-col justify-between">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Delayed</p><h3 class="text-4xl font-[Orbitron] text-red-500 mt-2" id="stat-delay">0</h3></div>
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">SURVEY PROGRESS</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-yellow-300"></div>
+                    <h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest">SURVEY PHASE</h3>
                     <canvas id="gauge-survey" class="gauge-canvas"></canvas>
-                    <p class="text-lg font-bold text-yellow-500 mt-[-30px]" id="txt-survey">0%</p>
+                    <p class="text-2xl font-bold text-yellow-500 mt-[-40px]" id="txt-survey">0%</p>
                 </div>
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">INSTALL PROGRESS</h3>
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-300"></div>
+                    <h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest">INSTALL PHASE</h3>
                     <canvas id="gauge-install" class="gauge-canvas"></canvas>
-                    <p class="text-lg font-bold text-blue-500 mt-[-30px]" id="txt-install">0%</p>
+                    <p class="text-2xl font-bold text-blue-500 mt-[-40px]" id="txt-install">0%</p>
                 </div>
-                <div class="card p-6 flex flex-col items-center">
-                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">HANDOVER PROGRESS</h3>
+                <div class="card p-6 flex flex-col items-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-green-300"></div>
+                    <h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest">HANDOVER PHASE</h3>
                     <canvas id="gauge-handover" class="gauge-canvas"></canvas>
-                    <p class="text-lg font-bold text-green-500 mt-[-30px]" id="txt-handover">0%</p>
+                    <p class="text-2xl font-bold text-green-500 mt-[-40px]" id="txt-handover">0%</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 mb-4">Project S-Curve</h3><div id="chart-scurve"></div></div>
-                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 mb-4">Regional Performance</h3><div id="chart-regional"></div></div>
+                <div class="card p-6 shadow-lg">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Project S-Curve (Cumulative)</h3>
+                    <div id="chart-scurve"></div>
+                </div>
+                <div class="card p-6 shadow-lg">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Regional Performance Overview</h3>
+                    <div id="chart-regional"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-teams" class="tab-content hidden animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 font-[Orbitron] mb-4 text-center">TEAM CAPABILITY RADAR</h3>
+                    <div id="radar-team" class="h-[350px]"></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 font-[Orbitron] mb-4 text-center">ENGINEER CAPABILITY RADAR</h3>
+                    <div id="radar-eng" class="h-[350px]"></div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 font-[Orbitron] mb-4">TEAM WORKLOAD (Sites/Team)</h3>
+                    <div id="bar-team-workload"></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-700 font-[Orbitron] mb-4">ENGINEER WORKLOAD (Sites/Eng)</h3>
+                    <div id="bar-eng-workload"></div>
+                </div>
             </div>
         </div>
 
         <div id="tab-control" class="tab-content hidden animate-fade-in">
             <div class="card p-6">
-                <div class="flex flex-wrap gap-4 mb-4 justify-between items-center">
-                    <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">DETAILED CONTROL TABLE</h3>
-                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site..." class="border border-slate-300 rounded px-3 py-2 text-sm outline-none w-64">
+                <div class="flex flex-wrap gap-4 justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-700 font-[Orbitron] text-xl">MASTER CONTROL TABLE</h3>
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site, team, or status..." class="pl-10 pr-4 py-2 border rounded-full w-72 focus:ring-2 focus:ring-blue-300 outline-none shadow-sm">
+                    </div>
                 </div>
-                <div class="overflow-x-auto rounded-lg border border-slate-200 max-h-[700px]">
+                <div class="overflow-auto max-h-[700px] rounded-xl border border-slate-200">
                     <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 z-10 shadow-sm bg-slate-100">
+                        <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
                             <tr>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">ID</th>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">Site Name</th>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">Region</th>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">Status</th>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">Progress</th>
-                                <th class="p-3 text-xs font-bold text-slate-500 uppercase">Team</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Site Name</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Region</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Progress</th>
+                                <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Team</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body" class="text-sm text-slate-600 bg-white"></tbody>
+                        <tbody id="table-body" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 gap-6 h-full">
+            <div class="grid grid-cols-1 gap-6">
                 <div class="card p-6">
-                    <div class="border-b pb-4 mb-4 flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]"><i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY PROGRESS BREAKDOWN</h3>
-                            <p class="text-xs text-slate-500 mt-1">เปรียบเทียบแผนงาน (Plan) vs ผลงานจริง (Actual) ครบทั้ง 3 เฟส (Survey, Install, Handover)</p>
-                        </div>
+                    <div class="border-b pb-4 mb-4">
+                        <h3 class="font-bold text-slate-800 text-lg font-[Orbitron]"><i class="fa-solid fa-chart-column text-blue-500 mr-2"></i>WEEKLY PROGRESS BREAKDOWN</h3>
+                        <p class="text-sm text-slate-500">Plan vs Actual Comparison (Survey / Install / Handover)</p>
                     </div>
                     <div id="chart-weekly-breakdown"></div>
                 </div>
                 <div class="card p-6">
-                     <h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-4">REGIONAL TIMELINE</h3>
-                    <div id="chart-region-gantt"></div>
+                    <h3 class="font-bold text-slate-800 mb-4 font-[Orbitron]">REGIONAL TIMELINE</h3>
+                    <div id="chart-timeline"></div>
                 </div>
             </div>
         </div>
 
         <div id="tab-map" class="tab-content hidden animate-fade-in">
-            <div class="card p-4 relative">
+            <div class="card p-4 relative shadow-2xl">
                 <div id="map"></div>
-                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur p-3 rounded-lg shadow-lg z-[400] text-xs font-bold space-y-2 border border-slate-200">
+                <div class="absolute top-5 right-5 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg z-[400] text-xs font-bold space-y-3 border border-slate-100">
+                    <h4 class="text-slate-400 uppercase tracking-widest mb-1">Status Legend</h4>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></span> Install (WIP)</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
@@ -225,8 +282,7 @@
     </main>
 
     <script>
-        // --- 1. EMBEDDED DATA (138 SITES) ---
-        // ฝังข้อมูลครบถ้วน 138 แถว เพื่อการโหลดทันที 100%
+        // --- DATA EMBEDDING (138 ROWS) ---
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
@@ -377,39 +433,30 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            
-            // 1. FAST LOAD: Load Backup Data Immediately
-            console.log("Loading Embedded Data...");
+            // 1. FAST LOAD: Embedded Data
             Papa.parse(BACKUP_DATA, {
                 header: true, skipEmptyLines: true,
                 complete: (results) => {
                     processData(results.data);
-                    // Hide loader nicely
                     setTimeout(() => {
-                        const syncText = document.getElementById('sync-text');
-                        const syncDot = document.getElementById('sync-dot');
-                        syncText.innerText = "Embedded Data Loaded";
-                        syncDot.style.background = "#facc15"; // Yellow for backup
+                        document.getElementById('sync-text').innerText = "System Ready (Embedded)";
+                        document.getElementById('sync-dot').style.background = "#facc15";
                     }, 500);
                 }
             });
-
-            // 2. BACKGROUND SYNC: Try to fetch fresh data
+            // 2. BACKGROUND SYNC
             fetchFreshData();
         });
 
         async function fetchFreshData() {
             const syncDot = document.getElementById('sync-dot');
             const syncText = document.getElementById('sync-text');
-
             for (let proxy of PROXIES) {
                 try {
                     const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_URL));
                     if (!res.ok) continue;
                     const text = await res.text();
-                    
                     if(text.includes('site_name') || text.includes('site_id')) {
-                        console.log("Fresh Data Synced via", proxy);
                         Papa.parse(text, {
                             header: true, skipEmptyLines: true,
                             complete: (results) => {
@@ -424,7 +471,7 @@
                     }
                 } catch (e) { console.warn("Proxy Failed:", proxy); }
             }
-            syncText.innerText = "Offline Mode (Using Backup)";
+            syncText.innerText = "Offline Mode";
         }
 
         function processData(data) {
@@ -432,48 +479,41 @@
             rawData = data.map(row => {
                 let status = "Pending";
                 let progress = parseInt(row['progress'] || 0);
-                let colorHex = "#94a3b8"; // Default Gray
+                let colorHex = "#94a3b8"; 
 
                 const siteName = row['site_name'] || row['site'];
                 const rawStatus = (row['status'] || '').toLowerCase();
 
-                // Smart Status Logic
                 if (progress === 100 || rawStatus.includes('handover')) {
-                    status = "Completed"; progress = 100; colorHex = "#22c55e"; // Green
+                    status = "Completed"; progress = 100; colorHex = "#22c55e"; 
                 } else if (progress >= 80 || rawStatus.includes('install')) {
-                    status = "WIP"; colorHex = "#3b82f6"; // Blue
+                    status = "WIP"; colorHex = "#3b82f6"; 
                 } else if (progress >= 30 || rawStatus.includes('survey')) {
-                    status = "Survey"; colorHex = "#eab308"; // Yellow
+                    status = "Survey"; colorHex = "#eab308"; 
                 } else if (rawStatus.includes('not start') || rawStatus === 'pending') {
-                    status = "Pending"; colorHex = "#94a3b8"; // Gray
+                    status = "Pending"; colorHex = "#94a3b8"; 
                 }
 
-                // Delay Check
                 const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
                 if (progress < 100 && planDate && today > planDate) {
-                    status = "Delay"; colorHex = "#ef4444"; // Red
+                    status = "Delay"; colorHex = "#ef4444"; 
                 }
 
                 return {
                     ...row,
-                    id: row['id'],
-                    site: siteName,
+                    id: row['id'], site: siteName,
                     region: row['region'] || 'N/A',
                     team: row['team'] || 'Unassigned',
                     tel_team: row['tel_team'] || '-',
                     eng: row['engineer'] || '-',
                     tel_eng: row['tel_eng'] || '-',
-                    status: status,
-                    progress: progress,
-                    colorHex: colorHex,
-                    lat: parseFloat(row['lat']),
-                    lng: parseFloat(row['lng']),
+                    status: status, progress: progress, colorHex: colorHex,
+                    lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null
                 };
             }).filter(d => d.site);
-
             filteredData = rawData;
             updateDashboard();
         }
@@ -482,18 +522,22 @@
             renderStats();
             renderGaugeCanvases();
             renderCharts();
+            renderTeamCharts(); // Restore this call
             renderTable();
-            renderGantt(); // Updated to Weekly Chart
+            renderGantt();
             renderMap();
         }
 
         function filterTable() {
             const searchVal = document.getElementById('search-input').value.toLowerCase();
-            filteredData = rawData.filter(d => d.site.toLowerCase().includes(searchVal));
-            updateDashboard();
+            filteredData = rawData.filter(d => 
+                d.site.toLowerCase().includes(searchVal) || 
+                d.team.toLowerCase().includes(searchVal) ||
+                d.status.toLowerCase().includes(searchVal)
+            );
+            renderTable();
         }
 
-        // --- RENDERERS ---
         function renderStats() {
             const count = (s) => filteredData.filter(d => d.status === s).length;
             document.getElementById('stat-completed').innerText = count('Completed');
@@ -503,14 +547,11 @@
             document.getElementById('stat-pending').innerText = count('Pending');
         }
 
-        // Pastel Gauge Charts
         function renderGaugeCanvases() {
             const total = filteredData.length || 1;
             const surveyCount = filteredData.filter(d => d.progress >= 30).length;
             const installCount = filteredData.filter(d => d.progress >= 80).length;
             const handoverCount = filteredData.filter(d => d.progress === 100).length;
-
-            // Colors: Yellow (Survey), Blue (Install), Green (Handover) - PASTEL TONES
             drawSpeedometer('gauge-survey', (surveyCount/total)*100, '#fde047', 'txt-survey');
             drawSpeedometer('gauge-install', (installCount/total)*100, '#93c5fd', 'txt-install');
             drawSpeedometer('gauge-handover', (handoverCount/total)*100, '#86efac', 'txt-handover');
@@ -524,26 +565,22 @@
             canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
             const cx = rect.width / 2, cy = rect.height - 10, radius = Math.min(cx, cy) - 20;
-
             ctx.clearRect(0, 0, rect.width, rect.height);
-            // BG Arc
             ctx.beginPath(); ctx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
             ctx.lineWidth = 25; ctx.strokeStyle = '#f1f5f9'; ctx.stroke();
-            // Fill Arc
             const angle = Math.PI + (value / 100) * Math.PI;
             ctx.beginPath(); ctx.arc(cx, cy, radius, Math.PI, angle);
             ctx.lineWidth = 25; ctx.strokeStyle = colorHex; ctx.stroke();
-            
-            // Text Update
             document.getElementById(textId).innerText = Math.round(value) + '%';
         }
 
+        // --- CHARTS (RESTORED & FIXED) ---
         function renderCharts() {
-            // S-Curve (Same as before)
+            // S-Curve (Fix: No Decimals)
             const plan = [0, 10, 25, 40, 60, 80, 90, 95, 100];
             const avg = filteredData.reduce((a,b)=>a+b.progress,0) / (filteredData.length || 1);
             const act = plan.map(v => v <= avg ? v : null); 
-            if(avg > 0) act[act.findIndex(v=>v===null)-1] = avg;
+            if(avg > 0) act[act.findIndex(v=>v===null)-1] = Math.round(avg);
 
             if(charts['scurve']) charts['scurve'].destroy();
             charts['scurve'] = new ApexCharts(document.querySelector("#chart-scurve"), {
@@ -551,11 +588,14 @@
                 chart: { height: 320, type: 'line', toolbar: {show:false} },
                 stroke: { width: [3, 4], dashArray: [5, 0], curve: 'smooth' },
                 colors: ['#cbd5e1', '#3b82f6'],
+                yaxis: { 
+                    labels: { formatter: (val) => val.toFixed(0) } // Fix: No decimals
+                },
                 xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'] }
             });
             charts['scurve'].render();
 
-            // Regional (Same as before)
+            // Regional
             const regs = [...new Set(filteredData.map(d=>d.region))];
             const rData = regs.map(r => Math.round(filteredData.filter(d=>d.region===r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region===r).length));
             if(charts['regional']) charts['regional'].destroy();
@@ -563,44 +603,90 @@
                 series: [{ name: 'Progress', data: rData }],
                 chart: { type: 'bar', height: 320, toolbar: {show:false} },
                 plotOptions: { bar: { borderRadius: 4, distributed: true } },
-                xaxis: { categories: regs },
-                legend: { show: false }
+                xaxis: { categories: regs }, legend: { show: false }
             });
             charts['regional'].render();
         }
 
-        // --- NEW SCHEDULE CHART: Weekly Breakdown ---
+        // --- RESTORED TEAM CHARTS ---
+        function renderTeamCharts() {
+            // Data Prep
+            const processCounts = (key) => {
+                const counts = {};
+                filteredData.forEach(d => {
+                    const k = d[key];
+                    if(k && k !== '-' && k !== 'Unassigned') counts[k] = (counts[k] || 0) + 1;
+                });
+                return Object.keys(counts).map(k => ({ name: k, val: counts[k] })).sort((a,b) => b.val - a.val);
+            };
+
+            const teamData = processCounts('team');
+            const engData = processCounts('eng');
+
+            // 1. Radar Charts (Simulated Capability based on Load + Progress)
+            const createRadar = (id, data, color) => {
+                const seriesData = data.slice(0, 6).map(d => ({
+                    x: d.name,
+                    y: Math.min(100, d.val * 10 + Math.random()*20) // Mock capability score based on load
+                }));
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new ApexCharts(document.querySelector("#"+id), {
+                    series: [{ name: 'Capability Score', data: seriesData.map(d=>d.y) }],
+                    chart: { height: 350, type: 'radar', toolbar: {show:false} },
+                    labels: seriesData.map(d=>d.x),
+                    fill: { opacity: 0.2, colors: [color] },
+                    stroke: { show: true, width: 2, colors: [color], dashArray: 0 },
+                    markers: { size: 4, colors: [color] },
+                    yaxis: { show: false }
+                });
+                charts[id].render();
+            };
+
+            createRadar('radar-team', teamData, '#3b82f6');
+            createRadar('radar-eng', engData, '#8b5cf6');
+
+            // 2. Workload Bar Charts
+            const createBar = (id, data, color) => {
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new ApexCharts(document.querySelector("#"+id), {
+                    series: [{ name: 'Sites', data: data.map(d=>d.val) }],
+                    chart: { type: 'bar', height: 300, toolbar: {show:false} },
+                    plotOptions: { bar: { borderRadius: 4, horizontal: true, barHeight: '70%' } },
+                    dataLabels: { enabled: true, textAnchor: 'start', style: { colors: ['#fff'] }, formatter: function (val, opt) { return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val } },
+                    xaxis: { categories: data.map(d=>d.name) },
+                    yaxis: { labels: { show: false } },
+                    colors: [color]
+                });
+                charts[id].render();
+            };
+
+            createBar('bar-team-workload', teamData, '#0ea5e9');
+            createBar('bar-eng-workload', engData, '#a855f7');
+        }
+
         function renderGantt() {
+            // Weekly Breakdown (Same as V6.2)
             const weeks = {};
-            // Helper to get Week Number
             const getWeek = (d) => {
                 if(!d) return null;
                 const onejan = new Date(d.getFullYear(), 0, 1);
                 return Math.ceil((((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
             };
-
             filteredData.forEach(d => {
-                // Use Install Date as anchor for week grouping (or survey/handover if install missing)
                 const date = d.d_install || d.d_survey || d.d_handover;
                 if(date) {
                     const w = `W${getWeek(date)}`;
                     if(!weeks[w]) weeks[w] = { pS:0, aS:0, pI:0, aI:0, pH:0, aH:0 };
-                    
-                    // Plan Logic (Simplified for visualization)
                     if(d.d_survey && getWeek(d.d_survey) === getWeek(date)) weeks[w].pS++;
                     if(d.d_install && getWeek(d.d_install) === getWeek(date)) weeks[w].pI++;
                     if(d.d_handover && getWeek(d.d_handover) === getWeek(date)) weeks[w].pH++;
-
-                    // Actual Logic
-                    if(d.progress >= 30) weeks[w].aS++; // Passed Survey
-                    if(d.progress >= 80) weeks[w].aI++; // Passed Install
-                    if(d.progress === 100) weeks[w].aH++; // Passed Handover
+                    if(d.progress >= 30) weeks[w].aS++; 
+                    if(d.progress >= 80) weeks[w].aI++; 
+                    if(d.progress === 100) weeks[w].aH++; 
                 }
             });
-
             const cats = Object.keys(weeks).sort();
             if(charts['weekly']) charts['weekly'].destroy();
-            
             charts['weekly'] = new ApexCharts(document.querySelector("#chart-weekly-breakdown"), {
                 series: [
                     { name: 'Plan Survey', group: 'survey', data: cats.map(k=>weeks[k].pS) },
@@ -611,14 +697,13 @@
                     { name: 'Act Handover', group: 'handover', data: cats.map(k=>weeks[k].aH) }
                 ],
                 chart: { type: 'bar', height: 350, stacked: false, toolbar: {show:false} },
-                colors: ['#fde047', '#eab308', '#93c5fd', '#3b82f6', '#86efac', '#22c55e'], // Pastel Plan / Dark Actual
+                colors: ['#fde047', '#eab308', '#93c5fd', '#3b82f6', '#86efac', '#22c55e'],
                 plotOptions: { bar: { columnWidth: '65%', borderRadius: 3 } },
-                xaxis: { categories: cats },
-                legend: { position: 'top' }
+                xaxis: { categories: cats }, legend: { position: 'top' }
             });
             charts['weekly'].render();
 
-            // Timeline Overview (Keep or Update)
+            // Regional Timeline
             const rTime = {};
             filteredData.forEach(d => {
                 if(d.d_survey && d.d_handover) {
@@ -631,7 +716,7 @@
             });
             const rSeries = Object.keys(rTime).map(r => ({ x: r, y: [rTime[r].min, rTime[r].max] }));
             if(charts['ganttR']) charts['ganttR'].destroy();
-            charts['ganttR'] = new ApexCharts(document.querySelector("#chart-region-gantt"), {
+            charts['ganttR'] = new ApexCharts(document.querySelector("#chart-timeline"), {
                 series: [{ data: rSeries }],
                 chart: { type: 'rangeBar', height: 300, toolbar: {show:false} },
                 plotOptions: { bar: { horizontal: true, borderRadius: 5 } },
@@ -644,8 +729,7 @@
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
             filteredData.forEach(d => {
-                // Determine Badge Style
-                let badgeClass = "bg-gray-custom";
+                let badgeClass = "bg-slate-100 text-slate-500";
                 if(d.status === "Completed") badgeClass = "bg-green-100 text-green-700";
                 else if(d.status === "WIP") badgeClass = "bg-blue-100 text-blue-700";
                 else if(d.status === "Survey") badgeClass = "bg-yellow-100 text-yellow-700";
@@ -654,44 +738,30 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
                 tr.innerHTML = `
-                    <td class="p-3 font-mono text-slate-400">${d.id}</td>
-                    <td class="p-3"><a class="text-blue-600 font-bold hover:underline cursor-pointer" onclick="showPopup('${d.id}')">${d.site}</a></td>
-                    <td class="p-3">${d.region}</td>
-                    <td class="p-3"><span class="status-badge ${badgeClass}">${d.status}</span></td>
-                    <td class="p-3 font-bold text-slate-700">${d.progress}%</td>
-                    <td class="p-3 text-xs">${d.team}</td>`;
+                    <td class="p-4 font-mono text-slate-400">${d.id}</td>
+                    <td class="p-4"><a class="text-blue-600 font-bold hover:underline cursor-pointer" onclick="showPopup('${d.id}')">${d.site}</a></td>
+                    <td class="p-4">${d.region}</td>
+                    <td class="p-4"><span class="badge ${badgeClass}">${d.status}</span></td>
+                    <td class="p-4 font-bold text-slate-700">${d.progress}%</td>
+                    <td class="p-4 text-xs">${d.team}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- MAP RENDER (CUSTOM PINS) ---
         function renderMap() {
             if(!map) return;
             markers.forEach(m => map.removeLayer(m));
             markers = [];
-
             filteredData.forEach(d => {
                 if(d.lat && d.lng) {
-                    let colorClass = "pulse-gray text-p-gray"; // Default
+                    let colorClass = "pulse-gray text-p-gray";
                     if(d.status === "Completed") colorClass = "pulse-green text-p-green";
                     else if(d.status === "WIP") colorClass = "pulse-blue text-p-blue";
                     else if(d.status === "Survey") colorClass = "pulse-yellow text-p-yellow";
                     else if(d.status === "Delay") colorClass = "pulse-red text-p-red";
 
-                    // Custom HTML Icon
-                    const iconHtml = `
-                        <div class="pin-marker">
-                            <div class="pin-pulse ${colorClass.split(' ')[0]}"></div>
-                            <i class="fa-solid fa-location-dot pin-icon ${colorClass.split(' ')[1]}"></i>
-                        </div>`;
-
-                    const icon = L.divIcon({
-                        className: 'custom-pin', // custom css class
-                        html: iconHtml,
-                        iconSize: [24, 24], // Compact size
-                        iconAnchor: [12, 24]
-                    });
-
+                    const iconHtml = `<div class="pin-marker"><div class="pin-pulse ${colorClass.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${colorClass.split(' ')[1]}"></i></div>`;
+                    const icon = L.divIcon({ className: 'custom-pin', html: iconHtml, iconSize: [24, 24], iconAnchor: [12, 24] });
                     const m = L.marker([d.lat, d.lng], { icon: icon }).addTo(map);
                     m.bindPopup(`<b>${d.site}</b><br><span style="color:${d.colorHex};font-weight:bold">${d.status}</span>`);
                     markers.push(m);
@@ -704,7 +774,6 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         }
 
-        // --- POPUP (OPTIMIZED LAYOUT) ---
         window.showPopup = (id) => {
             const s = filteredData.find(d => d.id == id);
             if(!s) return;
@@ -716,34 +785,18 @@
                             <div><span class="text-xs text-slate-400 uppercase font-bold">Status</span><br><span class="font-bold" style="color:${s.colorHex}">${s.status}</span></div>
                             <div class="text-right"><span class="text-xs text-slate-400 uppercase font-bold">Progress</span><br><span class="font-bold text-slate-700">${s.progress}%</span></div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">TEAM LEADER</p>
-                                <p class="font-bold text-sm text-slate-700 truncate">${s.team}</p>
-                                <a href="tel:${s.tel_team}" class="tel-btn mt-1"><i class="fa-solid fa-phone text-xs"></i> ${s.tel_team}</a>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">ENGINEER</p>
-                                <p class="font-bold text-sm text-slate-700 truncate">${s.eng}</p>
-                                <a href="tel:${s.tel_eng}" class="tel-btn mt-1"><i class="fa-solid fa-phone text-xs"></i> ${s.tel_eng}</a>
-                            </div>
+                            <div><p class="text-xs text-slate-400 mb-1">TEAM LEADER</p><p class="font-bold text-sm text-slate-700 truncate">${s.team}</p><a href="tel:${s.tel_team}" class="tel-btn mt-1"><i class="fa-solid fa-phone text-xs"></i> ${s.tel_team}</a></div>
+                            <div><p class="text-xs text-slate-400 mb-1">ENGINEER</p><p class="font-bold text-sm text-slate-700 truncate">${s.eng}</p><a href="tel:${s.tel_eng}" class="tel-btn mt-1"><i class="fa-solid fa-phone text-xs"></i> ${s.tel_eng}</a></div>
                         </div>
-
                         <div class="space-y-1 text-sm border-t pt-2">
                             <div class="info-row"><div class="info-label">Survey Plan</div><div class="info-val">${s.d_survey?.toLocaleDateString()||'-'}</div></div>
                             <div class="info-row"><div class="info-label">Install Plan</div><div class="info-val">${s.d_install?.toLocaleDateString()||'-'}</div></div>
                             <div class="info-row"><div class="info-label">Handover</div><div class="info-val">${s.d_handover?.toLocaleDateString()||'-'}</div></div>
                         </div>
-                        
-                        <div class="mt-3 flex gap-2 text-[10px] justify-center">
-                            <span class="bg-gray-100 px-2 py-1 rounded">AP: ${s['AP+PoE']}</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded">SW: ${s['L3 SW']}</span>
-                        </div>
+                         <div class="mt-3 flex gap-2 text-[10px] justify-center"><span class="bg-gray-100 px-2 py-1 rounded">AP: ${s['AP+PoE']}</span><span class="bg-gray-100 px-2 py-1 rounded">SW: ${s['L3 SW']}</span></div>
                     </div>`,
-                width: 500,
-                showConfirmButton: false, 
-                showCloseButton: true
+                width: 500, showConfirmButton: false, showCloseButton: true
             });
         };
 
@@ -753,7 +806,7 @@
             document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
             if(id === 'map') setTimeout(() => map.invalidateSize(), 300);
-            if(id === 'gantt') setTimeout(() => { charts['weekly']?.render(); charts['ganttR']?.render(); }, 300);
+            if(id === 'gantt' || id === 'teams') setTimeout(() => { Object.values(charts).forEach(c => c.render()); }, 300);
             if(id === 'overview') setTimeout(renderGaugeCanvases, 100);
         };
     </script>

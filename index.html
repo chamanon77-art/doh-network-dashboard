@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | CYBER MONITORING</title>
+    <title>DOH PROJECT 2026 | CYBER MONITORING V6.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -62,6 +62,13 @@
 
         /* Loader */
         .loader-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+
+        /* Gauge Canvas */
+        .gauge-canvas { width: 100%; height: 180px; }
+        
+        /* Map Pin Custom Icon */
+        .pin-marker { text-align: center; }
+        .pin-marker i { filter: drop-shadow(0 3px 2px rgba(0,0,0,0.4)); font-size: 32px; }
     </style>
 </head>
 <body>
@@ -69,7 +76,7 @@
     <div id="loader" class="loader-overlay">
         <i class="fa-solid fa-wifi fa-beat-fade text-6xl text-blue-500 mb-4"></i>
         <h2 class="text-2xl font-bold text-white font-[Orbitron]">SYSTEM INITIALIZING...</h2>
-        <p class="text-blue-400 text-sm mt-2">Loading Embedded 138 Sites Data</p>
+        <p class="text-blue-400 text-sm mt-2">Loading Hybrid Data Engine</p>
     </div>
 
     <header class="cyber-header">
@@ -117,9 +124,21 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">SURVEY PROGRESS</h3><div id="gauge-survey" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p></div>
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">INSTALL PROGRESS</h3><div id="gauge-install" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 60%</p></div>
-                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">HANDOVER PROGRESS</h3><div id="gauge-handover" class="-mt-4"></div><p class="text-xs text-slate-500 -mt-4">Phase Weight: 20%</p></div>
+                <div class="card p-6 flex flex-col items-center">
+                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">SURVEY PROGRESS</h3>
+                    <canvas id="gauge-survey" class="gauge-canvas"></canvas>
+                    <p class="text-xs text-slate-500 mt-[-20px]">Target: 20% Milestone</p>
+                </div>
+                <div class="card p-6 flex flex-col items-center">
+                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">INSTALL PROGRESS</h3>
+                    <canvas id="gauge-install" class="gauge-canvas"></canvas>
+                    <p class="text-xs text-slate-500 mt-[-20px]">Target: 60% Milestone</p>
+                </div>
+                <div class="card p-6 flex flex-col items-center">
+                    <h3 class="font-bold text-slate-700 mb-2 font-[Orbitron]">HANDOVER PROGRESS</h3>
+                    <canvas id="gauge-handover" class="gauge-canvas"></canvas>
+                    <p class="text-xs text-slate-500 mt-[-20px]">Target: 20% Milestone</p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -149,9 +168,32 @@
         </div>
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 gap-6">
-                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">WEEKLY INSTALLATION VELOCITY</h3><div id="chart-velocity"></div></div>
-                <div class="card p-6"><h3 class="text-lg font-bold text-slate-800 font-[Orbitron] mb-2">REGIONAL MASTER TIMELINE</h3><div id="chart-region-gantt"></div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                
+                <div class="card p-6">
+                    <div class="border-b pb-4 mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">
+                            <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>WEEKLY INSTALLATION VELOCITY
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">
+                            กราฟแสดงความเร็วในการติดตั้งเปรียบเทียบระหว่าง <span class="text-slate-400 font-bold">แผนงาน (Planned)</span> กับ <span class="text-blue-600 font-bold">ผลงานจริง (Actual)</span> รายสัปดาห์ ช่วยวิเคราะห์แนวโน้ม Productivity ของทีม
+                        </p>
+                    </div>
+                    <div id="chart-velocity"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="border-b pb-4 mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 font-[Orbitron]">
+                            <i class="fa-solid fa-clock text-purple-600 mr-2"></i>REGIONAL MASTER TIMELINE
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">
+                            ไทม์ไลน์แสดงช่วงเวลาเริ่มต้นและสิ้นสุดของแต่ละภูมิภาค (Duration Overview) ช่วยให้ผู้บริหารเห็นภาพรวมว่าภาคไหนเริ่มช้าหรือเร็ว และใช้เวลาดำเนินงานนานเท่าไหร่
+                        </p>
+                    </div>
+                    <div id="chart-region-gantt"></div>
+                </div>
+
             </div>
         </div>
 
@@ -171,10 +213,10 @@
                 <div class="flex justify-between items-center mb-4 px-2">
                     <h3 class="font-bold text-slate-800">Live Installation Map</h3>
                     <div class="flex gap-3 text-xs font-bold">
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500"></span> Completed</span>
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-600"></span> In Progress</span>
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-yellow-400"></span> Survey</span>
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Delay</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot text-green-600"></i> Completed</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot text-blue-600"></i> In Progress</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot text-yellow-500"></i> Survey</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot text-red-600"></i> Delay</span>
                     </div>
                 </div>
                 <div id="map"></div>
@@ -185,7 +227,6 @@
 
     <script>
         // --- 1. FULL EMBEDDED DATA (138 Sites) ---
-        // ใส่ข้อมูลทั้งหมดที่นี่ เพื่อแก้ปัญหาเปิดไม่ขึ้น
 const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
@@ -327,9 +368,6 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
 138,SITE-138,ศูนย์พัฒนาเทคโนโลยีงานทาง,2026-03-03,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.65,100.42,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+2,https://...,https://...,https://8,,,
 `;
 
-        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
-        const PROXIES = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
-        
         let rawData = [], filteredData = [], map, markers = [];
         let charts = {};
 
@@ -337,7 +375,7 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             
-            // 1. FAST LOAD: Load Backup Data Immediately
+            // 1. FAST LOAD
             console.log("Loading Backup Data...");
             Papa.parse(BACKUP_DATA, {
                 header: true, skipEmptyLines: true,
@@ -351,35 +389,7 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                     }, 500);
                 }
             });
-
-            // 2. BACKGROUND SYNC
-            fetchFreshData();
         });
-
-        async function fetchFreshData() {
-            for (let proxy of PROXIES) {
-                try {
-                    const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_CSV));
-                    if (!res.ok) continue;
-                    const text = await res.text();
-                    if(text.includes('site_name')) {
-                        console.log("Fresh Data Synced!");
-                        Papa.parse(text, {
-                            header: true, skipEmptyLines: true,
-                            complete: (results) => {
-                                if (results.data.length > 5) {
-                                    processData(results.data);
-                                    document.getElementById('conn-status').classList.remove('hidden');
-                                    setTimeout(() => document.getElementById('conn-status').classList.add('hidden'), 5000);
-                                }
-                            }
-                        });
-                        return;
-                    }
-                } catch (e) { console.warn("Proxy Failed:", proxy); }
-            }
-            console.log("Using Offline Mode");
-        }
 
         function processData(data) {
             const today = new Date();
@@ -388,7 +398,7 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                 let progress = parseInt(row['progress'] || 0);
                 let colorHex = "#94a3b8";
 
-                // Fix Field Mapping from CSV
+                // Map CSV fields
                 const siteName = row['site_name'] || row['site'];
                 
                 // Status Logic
@@ -412,7 +422,9 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                     site: siteName,
                     region: row['region'] || 'N/A',
                     team: row['team'] || 'Unassigned',
+                    tel_team: row['tel_team'] || '-',
                     eng: row['engineer'] || '-',
+                    tel_eng: row['tel_eng'] || '-',
                     status: status,
                     progress: progress,
                     colorHex: colorHex,
@@ -430,7 +442,7 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
 
         function updateDashboard() {
             renderStats();
-            renderGauges();
+            renderGaugeCanvases(); // 1. Custom Canvas Gauges
             renderCharts();
             renderTable();
             renderGantt();
@@ -455,22 +467,83 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
             document.getElementById('stat-delay').innerText = count('Delay');
         }
 
-        function renderGauges() {
+        // 1. CUSTOM SPEEDOMETER GAUGE (Canvas)
+        function renderGaugeCanvases() {
             const total = filteredData.length || 1;
-            const draw = (id, cnt, col) => {
-                const val = Math.round((cnt/total)*100);
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [val],
-                    chart: { type: 'radialBar', height: 250, offsetY: -20 },
-                    plotOptions: { radialBar: { startAngle: -90, endAngle: 90, hollow: { size: '60%' }, dataLabels: { value: { fontSize: '24px', fontWeight: 'bold', offsetY: -10 } } } },
-                    colors: [col], labels: ['Progress']
-                });
-                charts[id].render();
-            };
-            draw('gauge-survey', filteredData.filter(d => d.progress >= 30).length, '#eab308');
-            draw('gauge-install', filteredData.filter(d => d.progress >= 80).length, '#2563eb');
-            draw('gauge-handover', filteredData.filter(d => d.progress === 100).length, '#16a34a');
+            const surveyCount = filteredData.filter(d => d.progress >= 30).length;
+            const installCount = filteredData.filter(d => d.progress >= 80).length;
+            const handoverCount = filteredData.filter(d => d.progress === 100).length;
+
+            drawSpeedometer('gauge-survey', (surveyCount/total)*100, 'Survey');
+            drawSpeedometer('gauge-install', (installCount/total)*100, 'Install');
+            drawSpeedometer('gauge-handover', (handoverCount/total)*100, 'Handover');
+        }
+
+        function drawSpeedometer(canvasId, value, label) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            // Fix resolution
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const cx = rect.width / 2;
+            const cy = rect.height - 20; // Bottom aligned
+            const radius = Math.min(cx, cy) - 20;
+
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // Draw Background Arc (Gray)
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
+            ctx.lineWidth = 25;
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.stroke();
+
+            // Draw Color Zones
+            // Red (0-40%)
+            drawArc(ctx, cx, cy, radius, 0, 40, '#ef4444');
+            // Yellow (40-70%)
+            drawArc(ctx, cx, cy, radius, 40, 70, '#eab308');
+            // Green (70-100%)
+            drawArc(ctx, cx, cy, radius, 70, 100, '#22c55e');
+
+            // Draw Needle
+            const angle = Math.PI + (value / 100) * Math.PI;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, -5);
+            ctx.lineTo(radius - 10, 0); // Point
+            ctx.lineTo(0, 5);
+            ctx.fillStyle = '#dc2626'; // Red needle
+            ctx.fill();
+            ctx.restore();
+
+            // Needle Base
+            ctx.beginPath();
+            ctx.arc(cx, cy, 8, 0, 2 * Math.PI);
+            ctx.fillStyle = '#334155';
+            ctx.fill();
+
+            // Text
+            ctx.font = "bold 24px Orbitron";
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.round(value) + '%', cx, cy - 40);
+        }
+
+        function drawArc(ctx, cx, cy, r, startPct, endPct, color) {
+            const startAngle = Math.PI + (startPct / 100) * Math.PI;
+            const endAngle = Math.PI + (endPct / 100) * Math.PI;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, startAngle, endAngle);
+            ctx.lineWidth = 25;
+            ctx.strokeStyle = color;
+            ctx.stroke();
         }
 
         function renderCharts() {
@@ -609,13 +682,29 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
             });
         }
 
+        // 4. MAP PIN MARKERS
         function renderMap() {
             if(!map) return;
             markers.forEach(m => map.removeLayer(m));
             markers = [];
+
             filteredData.forEach(d => {
                 if(d.lat && d.lng) {
-                    const m = L.circleMarker([d.lat, d.lng], { radius: 8, fillColor: d.colorHex, color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map);
+                    let pinColor = "text-gray-400";
+                    if(d.status === "Completed") pinColor = "text-green-600";
+                    else if(d.status === "WIP") pinColor = "text-blue-600";
+                    else if(d.status === "Survey") pinColor = "text-yellow-500";
+                    else if(d.status === "Delay") pinColor = "text-red-600";
+
+                    // Custom Div Icon (FontAwesome Pin)
+                    const icon = L.divIcon({
+                        className: 'pin-marker',
+                        html: `<i class="fa-solid fa-location-dot ${pinColor}"></i>`,
+                        iconSize: [30, 42],
+                        iconAnchor: [15, 42]
+                    });
+
+                    const m = L.marker([d.lat, d.lng], { icon: icon }).addTo(map);
                     m.bindPopup(`<b>${d.site}</b><br><span style="color:${d.colorHex};font-weight:bold">${d.status}</span>`);
                     markers.push(m);
                 }
@@ -633,9 +722,15 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
             document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
             if(id === 'map') setTimeout(() => map.invalidateSize(), 300);
-            if(id === 'gantt') setTimeout(() => charts['velocity']?.render(), 300);
+            if(id === 'gantt') setTimeout(() => {
+                charts['velocity']?.render();
+                charts['ganttR']?.render();
+            }, 300);
+            // Re-render canvas when tab shows
+            if(id === 'overview') setTimeout(renderGaugeCanvases, 100);
         };
 
+        // 2. POPUP WITH PHONES
         window.showPopup = (id) => {
             const s = rawData.find(d => d.id == id);
             if(!s) return;
@@ -645,7 +740,11 @@ const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,s
                     <div class="text-left text-sm space-y-2 p-2">
                         <div class="grid grid-cols-2 gap-2 border-b pb-2"><span class="font-bold text-slate-500">Region:</span> <span>${s.region}</span></div>
                         <div class="bg-slate-50 p-3 rounded"><h4 class="font-bold text-blue-600">Plan</h4><p>Survey: ${s.d_survey?.toLocaleDateString()||'-'}</p><p>Install: ${s.d_install?.toLocaleDateString()||'-'}</p><p>Handover: ${s.d_handover?.toLocaleDateString()||'-'}</p></div>
-                        <div class="bg-slate-50 p-3 rounded"><h4 class="font-bold text-blue-600">Team</h4><p>${s.team}</p><p>Eng: ${s.eng}</p></div>
+                        <div class="bg-slate-50 p-3 rounded">
+                            <h4 class="font-bold text-blue-600">Contact Team</h4>
+                            <p><b>Team:</b> ${s.team} <br><i class="fa-solid fa-phone text-green-500"></i> ${s.tel_team}</p>
+                            <p><b>Eng:</b> ${s.eng} <br><i class="fa-solid fa-phone text-green-500"></i> ${s.tel_eng}</p>
+                        </div>
                         <div class="bg-slate-50 p-3 rounded"><h4 class="font-bold text-blue-600">Hardware</h4><p>AP+PoE: ${s['AP+PoE']||'-'}</p><p>L3 SW: ${s['L3 SW']||'-'}</p><p>Path 48: ${s['Path 48 (71)']||'-'}</p></div>
                         <div class="mt-4 text-center"><a href="${s.Google_Maps_Link||'#'}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded">Google Maps</a></div>
                     </div>`,

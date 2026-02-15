@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.7</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.8</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,103 +17,92 @@
 
     <style>
         :root { 
-            --bg-page: #f8fafc; 
+            --bg-page: #f1f5f9; 
             --card-bg: #ffffff;
+            --primary-blue: #2563eb;
         }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #334155; }
+        /* 3. RESIZE: Increased base font size */
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-page); color: #1e293b; font-size: 16px; }
         
         /* Cyber Header */
         .cyber-header {
             background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
             position: sticky; top: 0; z-index: 50;
-            border-bottom: 3px solid #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            border-bottom: 4px solid #3b82f6;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        .title-main { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px #3b82f6; letter-spacing: 1px; white-space: nowrap; }
-        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .title-main { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 1px; }
+        .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Navigation */
+        /* Navigation - Larger Touch Targets */
         .nav-pill { 
-            cursor: pointer; padding: 8px 20px; border-radius: 6px; 
-            font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 1px; 
+            cursor: pointer; padding: 10px 24px; border-radius: 8px; 
+            font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 1px; 
             color: #94a3b8; transition: all 0.3s; background: rgba(255,255,255,0.05);
+            font-weight: 600;
         }
-        .nav-pill:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-pill:hover { color: white; background: rgba(255,255,255,0.15); }
         .nav-pill.active { 
-            background: rgba(59, 130, 246, 0.25); color: #60a5fa; 
-            border: 1px solid #3b82f6; box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3); 
-            font-weight: bold;
+            background: rgba(59, 130, 246, 0.3); color: #60a5fa; 
+            border: 1px solid #3b82f6; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.4); 
         }
 
-        /* Cards */
+        /* Cards - Standardized Padding */
         .card { 
-            background: var(--card-bg); border-radius: 12px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-            border: 1px solid #e2e8f0; transition: transform 0.2s; 
+            background: var(--card-bg); border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+            border: 1px solid #e2e8f0; transition: transform 0.2s;
         }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-
-        /* Status Cards */
-        .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 110px; display: flex; flex-direction: column; justify-content: center; padding: 1.5rem; }
-        .card-stat h3 { position: relative; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .card-stat p { position: relative; z-index: 10; font-weight: 700; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; }
-        .stat-icon { position: absolute; right: 10px; bottom: 10px; font-size: 4rem; opacity: 0.2; z-index: 1; transform: rotate(-15deg); }
         
-        .bg-completed { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .bg-wip { background-color: #3b82f6; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px); }
-        .bg-survey { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); }
-        .bg-pending { background-color: #64748b; background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 10px 10px; }
-        .bg-delay { background-color: #ef4444; background-image: linear-gradient(135deg, #dc2626 25%, transparent 25%, transparent 50%, #dc2626 50%, #dc2626 75%, transparent 75%, transparent); background-size: 20px 20px; }
+        /* Status Cards */
+        .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 140px; display: flex; flex-direction: column; justify-content: center; padding: 1.5rem; }
+        .card-stat h3 { font-size: 3rem; font-weight: 800; line-height: 1; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .card-stat p { font-size: 1rem; font-weight: 600; z-index: 10; opacity: 0.95; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-icon { position: absolute; right: 15px; bottom: 15px; font-size: 5rem; opacity: 0.25; z-index: 1; transform: rotate(-15deg); }
+        
+        /* Background Patterns */
+        .bg-completed { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .bg-wip { background-color: #2563eb; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 20px, transparent 20px, transparent 40px); }
+        .bg-survey { background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%); }
+        .bg-pending { background-color: #475569; background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px); background-size: 15px 15px; }
+        .bg-delay { background-color: #dc2626; background-image: linear-gradient(135deg, #b91c1c 25%, transparent 25%, transparent 50%, #b91c1c 50%, #b91c1c 75%, transparent 75%, transparent); background-size: 30px 30px; }
 
-        /* --- 1. NEW WIFI LOGO STYLE --- */
+        /* Logo Animation */
         .logo-container {
-            width: 64px; height: 64px;
-            background: #2563eb;
-            border-radius: 50%; /* Circle */
+            width: 72px; height: 72px; background: #2563eb; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px #3b82f6, inset 0 0 10px #60a5fa; /* Glow */
-            border: 2px solid #93c5fd;
-            animation: logo-pulse 3s infinite ease-in-out;
+            box-shadow: 0 0 25px #3b82f6, inset 0 0 15px #60a5fa;
+            border: 3px solid #93c5fd; animation: logo-pulse 3s infinite ease-in-out;
         }
-        .wifi-animate { animation: wifi-blink 2s infinite; }
+        .wifi-animate { animation: wifi-blink 2s infinite; font-size: 2.5rem; }
+        @keyframes logo-pulse { 0%, 100% { box-shadow: 0 0 25px #3b82f6, inset 0 0 15px #60a5fa; } 50% { box-shadow: 0 0 45px #60a5fa, inset 0 0 25px #93c5fd; } }
+        @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
 
-        @keyframes logo-pulse {
-            0%, 100% { box-shadow: 0 0 20px #3b82f6, inset 0 0 10px #60a5fa; }
-            50% { box-shadow: 0 0 35px #60a5fa, inset 0 0 20px #93c5fd; }
-        }
-        @keyframes wifi-blink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.95); }
-        }
-
-        /* Map & Pin */
-        #map { height: 600px; width: 100%; border-radius: 12px; z-index: 1; }
+        /* Map */
+        #map { height: 650px; width: 100%; border-radius: 12px; z-index: 1; border: 1px solid #cbd5e1; }
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
-        .pin-icon { font-size: 18px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); z-index: 2; position: relative; top: -6px; }
-        .pin-pulse {
-            position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.8);
-            border-radius: 50%; bottom: 0px; left: 50%; transform: translateX(-50%);
-            z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; }
-            80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; }
-        }
+        .pin-icon { font-size: 24px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4)); z-index: 2; position: relative; top: -8px; }
+        .pin-pulse { position: absolute; width: 14px; height: 14px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring { 0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; } 80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; } }
 
+        /* Color Utilities */
         .text-p-green { color: #16a34a; } .pulse-green { background: #22c55e; }
         .text-p-blue { color: #2563eb; } .pulse-blue { background: #3b82f6; }
         .text-p-yellow { color: #ca8a04; } .pulse-yellow { background: #eab308; }
         .text-p-red { color: #dc2626; } .pulse-red { background: #ef4444; }
         .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
 
-        /* Popup & Contact */
-        .contact-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 8px; }
-        .contact-role { font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
-        .contact-tel { display: inline-flex; align-items: center; gap: 6px; color: #2563eb; font-size: 0.9rem; font-weight: 600; text-decoration: none; background: #eff6ff; padding: 2px 8px; border-radius: 4px; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .sync-badge { position: fixed; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.9); color: white; padding: 6px 14px; border-radius: 30px; font-size: 11px; z-index: 999; display: flex; align-items: center; gap: 6px; }
-        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
-        .sync-dot.active { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        /* Table & Fonts */
+        th { font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; letter-spacing: 0.5px; }
+        td { font-size: 0.95rem; }
+        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Chart Containers */
+        .chart-container-large { position: relative; min-height: 500px; } /* Prevent overlap */
+        
+        .sync-badge { position: fixed; bottom: 15px; right: 15px; background: rgba(15, 23, 42, 0.95); color: white; padding: 8px 16px; border-radius: 30px; font-size: 12px; z-index: 999; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; }
+        .sync-dot.active { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
 <body>
@@ -121,17 +110,17 @@
     <div class="sync-badge"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">System Init...</span></div>
 
     <header class="cyber-header">
-        <div class="max-w-[1900px] mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center gap-4 mb-3 md:mb-0">
+        <div class="max-w-[1900px] mx-auto px-8 py-5 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-5 mb-4 md:mb-0">
                 <div class="logo-container">
-                    <i class="fa-solid fa-wifi text-3xl text-white wifi-animate"></i>
+                    <i class="fa-solid fa-wifi text-white wifi-animate"></i>
                 </div>
                 <div>
                     <h1 class="title-main">PROJECT MONITORING SYSTEM</h1>
                     <p class="title-sub">DOH PROJECT 2026 | OPERATED BY FATIMA R.B.D.S. INTERNATIONAL</p>
                 </div>
             </div>
-            <nav class="flex gap-2 bg-slate-900/30 p-1.5 rounded-lg border border-white/10 backdrop-blur">
+            <nav class="flex gap-3 bg-slate-900/30 p-2 rounded-xl border border-white/10 backdrop-blur">
                 <div class="nav-pill active" onclick="switchTab('overview', this)">DASHBOARD</div>
                 <div class="nav-pill" onclick="switchTab('control', this)">CONTROL</div>
                 <div class="nav-pill" onclick="switchTab('gantt', this)">SCHEDULE</div>
@@ -141,105 +130,115 @@
         </div>
     </header>
 
-    <main class="max-w-[1900px] mx-auto p-6 space-y-6">
+    <main class="max-w-[1900px] mx-auto p-8 space-y-8">
 
         <div id="tab-overview" class="tab-content animate-fade-in">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                <div class="card card-stat bg-completed"><p>Completed</p><h3 class="text-4xl" id="stat-completed">0</h3><i class="fa-solid fa-check-circle stat-icon"></i></div>
-                <div class="card card-stat bg-wip"><p>In Progress</p><h3 class="text-4xl" id="stat-wip">0</h3><i class="fa-solid fa-person-digging stat-icon"></i></div>
-                <div class="card card-stat bg-survey"><p>Survey</p><h3 class="text-4xl" id="stat-survey">0</h3><i class="fa-solid fa-map-location-dot stat-icon"></i></div>
-                <div class="card card-stat bg-pending"><p>Pending</p><h3 class="text-4xl" id="stat-pending">0</h3><i class="fa-solid fa-hourglass-start stat-icon"></i></div>
-                <div class="card card-stat bg-delay"><p>Delayed</p><h3 class="text-4xl" id="stat-delay">0</h3><i class="fa-solid fa-triangle-exclamation stat-icon"></i></div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                <div class="card card-stat bg-completed"><p>Completed</p><h3 id="stat-completed">0</h3><i class="fa-solid fa-check-circle stat-icon"></i></div>
+                <div class="card card-stat bg-wip"><p>In Progress</p><h3 id="stat-wip">0</h3><i class="fa-solid fa-person-digging stat-icon"></i></div>
+                <div class="card card-stat bg-survey"><p>Survey</p><h3 id="stat-survey">0</h3><i class="fa-solid fa-map-location-dot stat-icon"></i></div>
+                <div class="card card-stat bg-pending"><p>Pending</p><h3 id="stat-pending">0</h3><i class="fa-solid fa-hourglass-start stat-icon"></i></div>
+                <div class="card card-stat bg-delay"><p>Delayed</p><h3 id="stat-delay">0</h3><i class="fa-solid fa-triangle-exclamation stat-icon"></i></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="card p-5 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest text-sm">SURVEY</h3><canvas id="gauge-survey" style="height:160px; width:100%"></canvas><p class="text-xl font-bold text-yellow-500 mt-[-30px]" id="txt-survey">0%</p></div>
-                <div class="card p-5 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest text-sm">INSTALLATION</h3><canvas id="gauge-install" style="height:160px; width:100%"></canvas><p class="text-xl font-bold text-blue-500 mt-[-30px]" id="txt-install">0%</p></div>
-                <div class="card p-5 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-2 font-[Orbitron] tracking-widest text-sm">HANDOVER</h3><canvas id="gauge-handover" style="height:160px; width:100%"></canvas><p class="text-xl font-bold text-green-500 mt-[-30px]" id="txt-handover">0%</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">SURVEY PROGRESS</h3><canvas id="gauge-survey" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-yellow-500 mt-[-40px]" id="txt-survey">0%</p></div>
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">INSTALLATION PROGRESS</h3><canvas id="gauge-install" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-blue-500 mt-[-40px]" id="txt-install">0%</p></div>
+                <div class="card p-6 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-4 font-[Orbitron] tracking-widest text-lg">HANDOVER PROGRESS</h3><canvas id="gauge-handover" style="height:180px; width:100%"></canvas><p class="text-3xl font-bold text-green-500 mt-[-40px]" id="txt-handover">0%</p></div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Project S-Curve</h3><div id="chart-scurve"></div></div>
-                <div class="card p-6"><h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Regional Performance</h3><div id="chart-regional"></div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card p-8">
+                    <h3 class="font-bold text-slate-700 text-xl mb-6 border-b pb-3">Project S-Curve</h3>
+                    <div id="chart-scurve"></div>
+                </div>
+                <div class="card p-8">
+                    <h3 class="font-bold text-slate-700 text-xl mb-6 border-b pb-3">Regional Performance</h3>
+                    <div id="chart-regional"></div>
+                </div>
             </div>
         </div>
 
         <div id="tab-control" class="tab-content hidden animate-fade-in">
-            <div class="card p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-700 text-lg">Master Control Table</h3>
-                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search..." class="border rounded px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <div class="card p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-slate-700 text-2xl">Master Control Table</h3>
+                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search site or team..." class="border-2 border-slate-200 rounded-lg px-5 py-3 text-base w-80 focus:outline-none focus:border-blue-500 transition shadow-sm">
                 </div>
-                <div class="overflow-auto max-h-[700px] border rounded-lg">
-                    <table class="w-full text-left border-collapse min-w-[1200px]">
-                        <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
+                <div class="overflow-auto max-h-[750px] border border-slate-200 rounded-xl shadow-inner">
+                    <table class="w-full text-left border-collapse min-w-[1400px]">
+                        <thead class="bg-slate-100 sticky top-0 shadow-sm z-10">
                             <tr>
-                                <th class="p-3 text-slate-500 uppercase">ID</th>
-                                <th class="p-3 text-slate-500 uppercase">Site Name</th>
-                                <th class="p-3 text-slate-500 uppercase">Region</th>
-                                <th class="p-3 text-slate-500 uppercase bg-yellow-50">Plan Surv</th>
-                                <th class="p-3 text-slate-500 uppercase bg-blue-50">Plan Inst</th>
-                                <th class="p-3 text-slate-500 uppercase bg-green-50">Plan HO</th>
-                                <th class="p-3 text-slate-500 uppercase">Status</th>
-                                <th class="p-3 text-slate-500 uppercase">Progress</th>
-                                <th class="p-3 text-slate-500 uppercase">Team</th>
-                                <th class="p-3 text-slate-500 uppercase">Engineer</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">ID</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Site Name</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Region</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold bg-yellow-50">Plan Surv</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold bg-blue-50">Plan Inst</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold bg-green-50">Plan HO</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Status</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Progress</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Team</th>
+                                <th class="p-4 text-slate-600 uppercase font-bold">Engineer</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body" class="text-sm text-slate-600 bg-white"></tbody>
+                        <tbody id="table-body" class="text-base text-slate-700 bg-white divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 gap-6">
-                <div class="card p-6">
-                    <div class="border-b pb-3 mb-4 flex justify-between items-end">
-                        <h3 class="font-bold text-slate-800 text-lg">WEEKLY INSTALLATION VELOCITY</h3>
-                        <div class="flex gap-2 text-xs"><span class="flex items-center gap-1"><span class="w-3 h-3 bg-yellow-200 rounded"></span>Plan Surv</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-200 rounded"></span>Plan Inst</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-200 rounded"></span>Plan HO</span></div>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="card p-8">
+                    <div class="border-b pb-4 mb-6 flex justify-between items-end">
+                        <h3 class="font-bold text-slate-800 text-2xl">WEEKLY INSTALLATION VELOCITY</h3>
+                        <div class="flex gap-4 text-sm font-semibold">
+                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-yellow-200 rounded"></span>Plan Surv</span>
+                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-blue-200 rounded"></span>Plan Inst</span>
+                            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-green-200 rounded"></span>Plan HO</span>
+                        </div>
                     </div>
                     <div id="chart-weekly-breakdown"></div>
                 </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-slate-800 mb-4">REGIONAL TIMELINE (ALL REGIONS)</h3>
+                <div class="card p-8">
+                    <h3 class="font-bold text-slate-800 text-2xl mb-6">REGIONAL TIMELINE (ALL REGIONS)</h3>
                     <div id="chart-timeline"></div>
                 </div>
             </div>
         </div>
 
         <div id="tab-map" class="tab-content hidden animate-fade-in">
-            <div class="card p-4 relative h-full">
+            <div class="card p-4 relative h-full shadow-xl">
                 <div id="map"></div>
-                <div class="absolute top-5 right-5 bg-white/95 backdrop-blur p-3 rounded-lg shadow-lg z-[400] text-xs font-bold space-y-2 border border-slate-200">
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-400"></span> Pending</div>
+                <div class="absolute top-6 right-6 bg-white/95 backdrop-blur p-4 rounded-xl shadow-2xl z-[400] text-sm font-bold space-y-3 border border-slate-200 min-w-[160px]">
+                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
+                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
+                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
+                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
+                    <div class="flex items-center gap-3"><span class="w-4 h-4 rounded-full bg-slate-400"></span> Pending</div>
                 </div>
             </div>
         </div>
 
         <div id="tab-teams" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="card p-6">
-                    <h3 class="font-bold text-center mb-4 text-sm">TEAM KPI (ACTUAL SITES)</h3>
-                    <div id="radar-team" class="h-[450px]"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="card p-8 chart-container-large">
+                    <h3 class="font-bold text-center mb-6 text-xl">TEAM KPI (ACTUAL SITES)</h3>
+                    <div id="radar-team" class="h-[500px]"></div>
                 </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-center mb-4 text-sm">ENGINEER KPI (ACTUAL SITES)</h3>
-                    <div id="radar-eng" class="h-[450px]"></div>
+                <div class="card p-8 chart-container-large">
+                    <h3 class="font-bold text-center mb-6 text-xl">ENGINEER KPI (ACTUAL SITES)</h3>
+                    <div id="radar-eng" class="h-[500px]"></div>
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="card p-6">
-                    <h3 class="font-bold mb-4">TEAM WORKLOAD DISTRIBUTION</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card p-8">
+                    <h3 class="font-bold mb-6 text-xl">TEAM WORKLOAD DISTRIBUTION</h3>
                     <div id="bar-team-workload"></div>
                 </div>
-                <div class="card p-6">
-                    <h3 class="font-bold mb-4">ENGINEER WORKLOAD DISTRIBUTION</h3>
+                <div class="card p-8">
+                    <h3 class="font-bold mb-6 text-xl">ENGINEER WORKLOAD DISTRIBUTION</h3>
                     <div id="bar-eng-workload"></div>
                 </div>
             </div>
@@ -248,7 +247,7 @@
     </main>
 
     <script>
-        // --- DATA (Same 138 Sites) ---
+        // --- DATA ---
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
@@ -396,6 +395,7 @@
         let rawData = [], filteredData = [], map, markers = [];
         let charts = {};
 
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             Papa.parse(BACKUP_DATA, {
@@ -465,6 +465,7 @@
             renderTable();
         }
 
+        // --- CHART & RENDER FUNCTIONS ---
         function renderStats() {
             const cnt = (s) => filteredData.filter(d => d.status === s).length;
             ['Completed','WIP','Survey','Delay','Pending'].forEach(s => {
@@ -481,12 +482,14 @@
         }
 
         function drawGauge(id, val, col, txt) {
-            const cv = document.getElementById(id), ctx = cv.getContext('2d');
+            const cv = document.getElementById(id);
+            if(!cv) return;
+            const ctx = cv.getContext('2d');
             cv.width = cv.clientWidth * 2; cv.height = cv.clientHeight * 2; ctx.scale(2,2);
-            const cx = cv.clientWidth/2, cy = cv.clientHeight-10, r = Math.min(cx, cy)-20;
+            const cx = cv.clientWidth/2, cy = cv.clientHeight-10, r = Math.min(cx, cy)-25;
             ctx.clearRect(0,0,999,999);
-            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 2*Math.PI); ctx.lineWidth=20; ctx.strokeStyle='#f1f5f9'; ctx.stroke();
-            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI + (val/100)*Math.PI); ctx.lineWidth=20; ctx.strokeStyle=col; ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 2*Math.PI); ctx.lineWidth=25; ctx.strokeStyle='#e2e8f0'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI + (val/100)*Math.PI); ctx.lineWidth=25; ctx.strokeStyle=col; ctx.stroke();
             document.getElementById(txt).innerText = Math.round(val)+'%';
         }
 
@@ -496,8 +499,8 @@
             if(charts.scurve) charts.scurve.destroy();
             charts.scurve = new ApexCharts(document.querySelector("#chart-scurve"), {
                 series: [{ name:'Plan', data:plan }, { name:'Actual', data:act }],
-                chart: { height:300, type:'line', toolbar:{show:false} },
-                stroke: { width:[3,4], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
+                chart: { height:350, type:'line', toolbar:{show:false} },
+                stroke: { width:[4,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
                 xaxis: { categories:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'] }
             }); charts.scurve.render();
 
@@ -505,45 +508,75 @@
             if(charts.regional) charts.regional.destroy();
             charts.regional = new ApexCharts(document.querySelector("#chart-regional"), {
                 series: [{ name:'Progress', data:regs.map(r=>Math.round(filteredData.filter(d=>d.region==r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region==r).length)) }],
-                chart: { type:'bar', height:300, toolbar:{show:false} }, plotOptions:{ bar:{ distributed:true, borderRadius:4 } }, xaxis:{ categories:regs }, legend:{ show:false }
+                chart: { type:'bar', height:350, toolbar:{show:false} }, plotOptions:{ bar:{ distributed:true, borderRadius:6 } }, xaxis:{ categories:regs }, legend:{ show:false }
             }); charts.regional.render();
         }
 
+        // --- 2. EXTRACT NICKNAME FUNCTION ---
+        const getNick = (name) => {
+            const match = name.match(/\(([^)]+)\)/);
+            return match ? match[1] : name.split(' ')[0];
+        };
+
         function renderTeamCharts() {
-            const getD = (k) => Object.entries(filteredData.reduce((a,b)=>{ if(b[k]&&b[k]!='-'&&b[k]!='Unassigned') a[b[k]]=(a[b[k]]||0)+1; return a; },{}))
-                .map(([n,v])=>({x:n,y:v})).sort((a,b)=>b.y-a.y);
+            // Count actual sites
+            const getD = (k) => Object.entries(filteredData.reduce((a,b)=>{ 
+                if(b[k] && b[k]!='-' && b[k]!='Unassigned') {
+                    const n = getNick(b[k]); // Use Nickname
+                    a[n]=(a[n]||0)+1; 
+                }
+                return a; 
+            },{})).map(([n,v])=>({x:n,y:v})).sort((a,b)=>b.y-a.y);
+            
             const tD = getD('team'), eD = getD('eng');
             
-            // 3. KPI LOGIC: USE ACTUAL COUNTS (No multipliers)
-            const radar = (id, d, col) => {
-                if(charts[id]) charts[id].destroy(); // 2. FIX: Prevent overlap
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [{ name:'Total Sites', data:d.map(x=>x.y) }],
-                    chart: { height: 450, type:'radar', toolbar:{show:false} }, // 2. FIX: Fixed Height
-                    labels: d.map(x=>x.x),
-                    fill: { opacity:0.2, colors:[col] }, stroke:{ width:2, colors:[col] }, markers:{ size:4, colors:[col] },
-                    yaxis:{ show:false },
-                    xaxis: { labels: { style: { fontSize: '11px', fontWeight:'bold' } } }
-                }); charts[id].render();
-            };
-            radar('radar-team', tD, '#3b82f6'); radar('radar-eng', eD, '#8b5cf6');
+            // 1. FIX OVERLAP: Explicit destruction & check
+            const renderRadar = (id, d, col) => {
+                const el = document.querySelector("#"+id);
+                if(!el) return;
+                if(charts[id]) { charts[id].destroy(); charts[id] = null; } // Destroy old
+                el.innerHTML = ""; // Clear DOM
 
-            // 4. WORKLOAD CHART: Gradient Color & Large Fonts
-            const getColor = (val) => val > 15 ? '#b91c1c' : val > 10 ? '#ef4444' : val > 5 ? '#3b82f6' : '#93c5fd';
-            
-            const bar = (id, d) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new ApexCharts(document.querySelector("#"+id), {
-                    series: [{ name:'Sites', data:d.map(x=>x.y) }],
-                    chart: { type:'bar', height: Math.max(400, d.length * 35), toolbar:{show:false} },
-                    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight: '75%', distributed: true } }, // Thicker bars
-                    colors: d.map(x => getColor(x.y)), // Gradient Logic
-                    xaxis: { categories:d.map(x=>x.x) },
-                    yaxis: { labels: { style: { fontSize: '14px', fontWeight: 'bold' } } }, // Larger Font
-                    legend: { show: false }
-                }); charts[id].render();
+                charts[id] = new ApexCharts(el, {
+                    series: [{ name:'Total Sites', data:d.map(x=>x.y) }],
+                    chart: { height: 500, type:'radar', toolbar:{show:false} },
+                    labels: d.map(x=>x.x),
+                    fill: { opacity:0.2, colors:[col] }, stroke:{ width:3, colors:[col] }, markers:{ size:5, colors:[col] },
+                    yaxis:{ show:false },
+                    xaxis: { labels: { style: { fontSize: '13px', fontWeight:'bold', fontFamily:'Prompt' } } }
+                }); 
+                charts[id].render();
             };
-            bar('bar-team-workload', tD); bar('bar-eng-workload', eD);
+            
+            // Short delay to ensure DOM is ready if switching tabs rapidly
+            setTimeout(() => {
+                renderRadar('radar-team', tD, '#3b82f6');
+                renderRadar('radar-eng', eD, '#8b5cf6');
+            }, 100);
+
+            // Workload Bar Charts
+            const getColor = (val) => val > 15 ? '#dc2626' : val > 10 ? '#f59e0b' : val > 5 ? '#3b82f6' : '#93c5fd';
+            const renderBar = (id, d) => {
+                const el = document.querySelector("#"+id);
+                if(!el) return;
+                if(charts[id]) { charts[id].destroy(); charts[id] = null; }
+                el.innerHTML = "";
+
+                charts[id] = new ApexCharts(el, {
+                    series: [{ name:'Sites', data:d.map(x=>x.y) }],
+                    chart: { type:'bar', height: Math.max(450, d.length * 40), toolbar:{show:false} },
+                    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight: '70%', distributed: true } },
+                    colors: d.map(x => getColor(x.y)),
+                    xaxis: { categories:d.map(x=>x.x) },
+                    yaxis: { labels: { style: { fontSize: '14px', fontWeight: 'bold' } } },
+                    legend: { show: false }
+                }); 
+                charts[id].render();
+            };
+            setTimeout(() => {
+                renderBar('bar-team-workload', tD);
+                renderBar('bar-eng-workload', eD);
+            }, 100);
         }
 
         function renderGantt() {
@@ -570,9 +603,9 @@
                     { name: 'Plan Install', group:'I', data: cats.map(k=>weeks[k].pI) }, { name: 'Act Install', group:'I', data: cats.map(k=>weeks[k].aI) },
                     { name: 'Plan Handover', group:'H', data: cats.map(k=>weeks[k].pH) }, { name: 'Act Handover', group:'H', data: cats.map(k=>weeks[k].aH) }
                 ],
-                chart: { type: 'bar', height: 350, stacked: false, toolbar: {show:false} },
+                chart: { type: 'bar', height: 400, stacked: false, toolbar: {show:false} },
                 colors: ['#fef08a', '#eab308', '#bfdbfe', '#2563eb', '#bbf7d0', '#16a34a'],
-                plotOptions: { bar: { columnWidth: '70%', borderRadius: 2 } },
+                plotOptions: { bar: { columnWidth: '65%', borderRadius: 3 } },
                 xaxis: { categories: cats }, legend: { position: 'top' }
             });
             charts.weekly.render();
@@ -587,7 +620,7 @@
             if(charts.timeline) charts.timeline.destroy();
              charts.timeline = new ApexCharts(document.querySelector("#chart-timeline"), {
                 series: [{ data: Object.keys(rTime).map(r => ({ x: r, y: [rTime[r].min, rTime[r].max] })) }],
-                chart: { type:'rangeBar', height:350, toolbar:{show:false} }, plotOptions:{ bar:{ horizontal:true } }, xaxis:{ type:'datetime' }
+                chart: { type:'rangeBar', height:400, toolbar:{show:false} }, plotOptions:{ bar:{ horizontal:true, borderRadius: 5 } }, xaxis:{ type:'datetime' }
             }); charts.timeline.render();
         }
 
@@ -602,18 +635,18 @@
                 else if(d.status == "Survey") badge = "bg-yellow-100 text-yellow-700";
                 else if(d.status == "Delay") badge = "bg-red-100 text-red-700";
                 
-                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100";
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-3 text-xs text-slate-400 font-mono">${d.id}</td>
-                    <td class="p-3 font-bold text-blue-600 cursor-pointer whitespace-nowrap" onclick="showPopup('${d.id}')">${d.site}</td>
-                    <td class="p-3">${d.region}</td>
-                    <td class="p-3 font-mono text-xs bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
-                    <td class="p-3 font-mono text-xs bg-blue-50/50">${fmtDate(d.d_install)}</td>
-                    <td class="p-3 font-mono text-xs bg-green-50/50">${fmtDate(d.d_handover)}</td>
-                    <td class="p-3"><span class="badge ${badge}">${d.status}</span></td>
-                    <td class="p-3 font-bold">${d.progress}%</td>
-                    <td class="p-3 text-xs whitespace-nowrap">${d.team}</td>
-                    <td class="p-3 text-xs whitespace-nowrap text-slate-500">${d.eng}</td>`;
+                    <td class="p-4 font-mono text-slate-400 font-bold">${d.id}</td>
+                    <td class="p-4 font-bold text-blue-600 cursor-pointer hover:underline" onclick="showPopup('${d.id}')">${d.site}</td>
+                    <td class="p-4">${d.region}</td>
+                    <td class="p-4 font-mono text-sm bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
+                    <td class="p-4 font-mono text-sm bg-blue-50/50">${fmtDate(d.d_install)}</td>
+                    <td class="p-4 font-mono text-sm bg-green-50/50">${fmtDate(d.d_handover)}</td>
+                    <td class="p-4"><span class="badge ${badge}">${d.status}</span></td>
+                    <td class="p-4 font-bold text-slate-700">${d.progress}%</td>
+                    <td class="p-4 text-sm font-semibold">${d.team}</td>
+                    <td class="p-4 text-sm text-slate-500">${d.eng}</td>`;
                 tb.appendChild(tr);
             });
         }
@@ -629,7 +662,7 @@
                     else if(d.status=="Survey") c = "pulse-yellow text-p-yellow";
                     else if(d.status=="Delay") c = "pulse-red text-p-red";
 
-                    const icon = L.divIcon({ className:'custom-pin', html:`<div class="pin-marker"><div class="pin-pulse ${c.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${c.split(' ')[1]}"></i></div>`, iconSize:[20,20], iconAnchor:[10,10] });
+                    const icon = L.divIcon({ className:'custom-pin', html:`<div class="pin-marker"><div class="pin-pulse ${c.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${c.split(' ')[1]}"></i></div>`, iconSize:[24,24], iconAnchor:[12,12] });
                     const m = L.marker([d.lat, d.lng], { icon }).addTo(map);
                     m.on('click', () => showPopup(d.id));
                     markers.push(m);
@@ -645,30 +678,30 @@
         window.showPopup = (id) => {
             const s = filteredData.find(d => d.id == id);
             Swal.fire({
-                title: `<div class="text-left border-b pb-2"><h3 class="text-lg font-bold text-slate-800">${s.site}</h3><p class="text-xs text-slate-500 font-normal">${s.region}</p></div>`,
+                title: `<div class="text-left border-b pb-3"><h3 class="text-xl font-bold text-slate-800">${s.site}</h3><p class="text-sm text-slate-500 font-normal mt-1">${s.region}</p></div>`,
                 html: `
-                    <div class="mt-3 text-left">
-                        <div class="grid grid-cols-2 gap-2 mb-3">
-                            <div class="bg-slate-50 p-2 rounded text-center"><p class="text-[10px] font-bold text-slate-400">STATUS</p><p class="font-bold text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.status}</p></div>
-                            <div class="bg-slate-50 p-2 rounded text-center"><p class="text-[10px] font-bold text-slate-400">PROGRESS</p><p class="font-bold text-slate-700">${s.progress}%</p></div>
+                    <div class="mt-4 text-left">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-slate-50 p-3 rounded-lg text-center shadow-sm"><p class="text-[11px] font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-lg text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.status}</p></div>
+                            <div class="bg-slate-50 p-3 rounded-lg text-center shadow-sm"><p class="text-[11px] font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-lg text-slate-700">${s.progress}%</p></div>
                         </div>
-                        <div class="contact-box">
-                            <div class="contact-item border-b border-slate-200 pb-2 mb-2">
-                                <p class="contact-role">Installation Team</p>
-                                <div class="flex justify-between items-center"><span class="contact-name">${s.team}</span><a href="tel:${s.tel_team}" class="contact-tel"><i class="fa-solid fa-phone"></i> ${s.tel_team}</a></div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-4">
+                            <div class="border-b border-slate-200 pb-2 mb-2">
+                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Installation Team</p>
+                                <div class="flex justify-between items-center"><span class="font-bold text-slate-700">${s.team}</span><a href="tel:${s.tel_team}" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
                             </div>
-                            <div class="contact-item">
-                                <p class="contact-role">Site Engineer</p>
-                                <div class="flex justify-between items-center"><span class="contact-name">${s.eng}</span><a href="tel:${s.tel_eng}" class="contact-tel"><i class="fa-solid fa-phone"></i> ${s.tel_eng}</a></div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Site Engineer</p>
+                                <div class="flex justify-between items-center"><span class="font-bold text-slate-700">${s.eng}</span><a href="tel:${s.tel_eng}" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a></div>
                             </div>
                         </div>
-                        <div class="mt-3 space-y-1 text-xs">
-                            <div class="popup-row"><span class="popup-label">Plan Survey</span><span class="popup-val">${fmtDate(s.d_survey)}</span></div>
-                            <div class="popup-row"><span class="popup-label">Plan Install</span><span class="popup-val">${fmtDate(s.d_install)}</span></div>
-                            <div class="popup-row"><span class="popup-label">Plan Handover</span><span class="popup-val">${fmtDate(s.d_handover)}</span></div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Survey</span><span class="font-mono font-bold">${fmtDate(s.d_survey)}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Install</span><span class="font-mono font-bold">${fmtDate(s.d_install)}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Handover</span><span class="font-mono font-bold">${fmtDate(s.d_handover)}</span></div>
                         </div>
                     </div>`,
-                width: 450, showConfirmButton: false, showCloseButton: true
+                width: 500, showConfirmButton: false, showCloseButton: true
             });
         };
 
@@ -677,8 +710,11 @@
             document.getElementById('tab-'+id).classList.remove('hidden');
             document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
+            
+            // Force Redraw & Cleanup
             if(id=='map') setTimeout(()=>map.invalidateSize(),300);
-            if(id=='gantt'||id=='teams') setTimeout(()=>{Object.values(charts).forEach(c=>c.render())},300);
+            if(id=='teams') setTimeout(renderTeamCharts, 200); // Re-render to prevent overlap
+            if(id=='gantt') setTimeout(()=>{if(charts.weekly)charts.weekly.render(); if(charts.timeline)charts.timeline.render();},300);
             if(id=='overview') setTimeout(renderGauge,200);
         }
     </script>

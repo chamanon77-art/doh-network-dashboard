@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.10</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.12</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -466,7 +466,7 @@
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
-                    // Actual Dates (New Logic)
+                    // Actual Dates
                     ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
                     ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
                     ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
@@ -515,22 +515,21 @@
         }
 
         function renderCharts() {
-            // --- NEW: S-Curve Calculation based on Dates ---
+            // S-Curve Calculation (Logic Update)
             const months = [
-                { name: 'Jan 26', end: new Date('2026-01-31') },
-                { name: 'Feb 26', end: new Date('2026-02-28') },
-                { name: 'Mar 26', end: new Date('2026-03-31') },
-                { name: 'Apr 26', end: new Date('2026-04-30') },
-                { name: 'May 26', end: new Date('2026-05-31') },
-                { name: 'Jun 26', end: new Date('2026-06-30') },
-                { name: 'Jul 26', end: new Date('2026-07-31') },
-                { name: 'Aug 26', end: new Date('2026-08-31') }
+                { name: 'Jan 26', start: new Date('2026-01-01'), end: new Date('2026-01-31') },
+                { name: 'Feb 26', start: new Date('2026-02-01'), end: new Date('2026-02-28') },
+                { name: 'Mar 26', start: new Date('2026-03-01'), end: new Date('2026-03-31') },
+                { name: 'Apr 26', start: new Date('2026-04-01'), end: new Date('2026-04-30') },
+                { name: 'May 26', start: new Date('2026-05-01'), end: new Date('2026-05-31') },
+                { name: 'Jun 26', start: new Date('2026-06-01'), end: new Date('2026-06-30') },
+                { name: 'Jul 26', start: new Date('2026-07-01'), end: new Date('2026-07-31') },
+                { name: 'Aug 26', start: new Date('2026-08-01'), end: new Date('2026-08-31') }
             ];
 
             const totalSites = filteredData.length || 1;
             const wSurvey = 30, wInstall = 50, wHandover = 20;
 
-            // Plan Calculation
             const planLine = months.map(m => {
                 let score = 0;
                 filteredData.forEach(d => {
@@ -538,39 +537,41 @@
                     if (d.d_install && d.d_install <= m.end) score += wInstall;
                     if (d.d_handover && d.d_handover <= m.end) score += wHandover;
                 });
-                return Math.min(100, (score / (totalSites * 100)) * 100);
+                return Math.round(Math.min(100, (score / (totalSites * 100)) * 100));
             });
 
-            // Actual Calculation (Based on Date Columns)
             const today = new Date();
             const actLine = months.map(m => {
-                if(m.end > today) return null; // No future prediction
+                if(m.start > today) return null; // Don't show future months
                 let score = 0;
                 filteredData.forEach(d => {
-                    // Check if Actual Date exists and is past
-                    if (d.ad_survey && d.ad_survey <= m.end) score += wSurvey;
-                    if (d.ad_install && d.ad_install <= m.end) score += wInstall;
-                    if (d.ad_handover && d.ad_handover <= m.end) score += wHandover;
+                    if (d.ad_survey && d.ad_survey <= m.end && d.ad_survey <= today) score += wSurvey;
+                    if (d.ad_install && d.ad_install <= m.end && d.ad_install <= today) score += wInstall;
+                    if (d.ad_handover && d.ad_handover <= m.end && d.ad_handover <= today) score += wHandover;
                 });
-                return Math.min(100, (score / (totalSites * 100)) * 100);
+                return Math.round(Math.min(100, (score / (totalSites * 100)) * 100));
             });
 
             if(charts.scurve) charts.scurve.destroy();
             charts.scurve = new ApexCharts(document.querySelector("#chart-scurve"), {
                 series: [{ name:'Plan', data:planLine }, { name:'Actual', data:actLine }],
-                chart: { height:400, type:'line', toolbar:{show:false} },
+                chart: { height:400, type:'line', toolbar:{show:false}, animations: { enabled: true } },
                 stroke: { width:[5,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
-                xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px' } } },
-                yaxis: { max: 100, labels:{ style:{ fontSize:'14px' } } },
-                tooltip: { y: { formatter: (v) => v ? v.toFixed(1) + '%' : '-' } }
+                xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' } } },
+                yaxis: { max: 100, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } },
+                tooltip: { y: { formatter: (v) => v !== null ? v + '%' : '-' } },
+                markers: { size: 5, hover: { size: 7 } }
             }); charts.scurve.render();
 
             const regs = [...new Set(filteredData.map(d=>d.region))];
             if(charts.regional) charts.regional.destroy();
             charts.regional = new ApexCharts(document.querySelector("#chart-regional"), {
                 series: [{ name:'Progress', data:regs.map(r=>Math.round(filteredData.filter(d=>d.region==r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region==r).length)) }],
-                chart: { type:'bar', height:400, toolbar:{show:false} }, plotOptions:{ bar:{ distributed:true, borderRadius:8 } }, 
-                xaxis:{ categories:regs, labels:{ style:{ fontSize:'14px' } } }, legend:{ show:false }
+                chart: { type:'bar', height:400, toolbar:{show:false} }, 
+                plotOptions:{ bar:{ distributed:true, borderRadius:8, dataLabels: { position: 'top' } } }, 
+                dataLabels: { enabled: true, formatter: function (val) { return val + "%"; }, offsetY: -20, style: { fontSize: '14px', colors: ["#304758"] } },
+                xaxis:{ categories:regs, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' } } }, 
+                legend:{ show:false }
             }); charts.regional.render();
         }
 

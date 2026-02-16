@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.9</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.10</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -20,19 +20,19 @@
             --bg-page: #f1f5f9; 
             --card-bg: #ffffff;
             --primary-blue: #2563eb;
-            --deep-navy: #001f52; /* 3. Dark Blue Color */
+            --deep-navy: #001f52; 
         }
 
-        /* 1. FONT SIZE UPGRADE: Base font increased to 18px for readability */
+        /* Base Font Size 18px */
         body { 
             font-family: 'Prompt', sans-serif; 
             background-color: var(--bg-page); 
             color: #1e293b; 
-            font-size: 18px; /* Bigger Base Font */
+            font-size: 18px; 
             line-height: 1.6;
         }
         
-        /* Cyber Header */
+        /* Header */
         .cyber-header {
             background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%);
             position: sticky; top: 0; z-index: 50;
@@ -42,7 +42,7 @@
         .title-main { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 1px; }
         .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Navigation - Larger */
+        /* Navigation */
         .nav-pill { 
             cursor: pointer; padding: 12px 28px; border-radius: 10px; 
             font-family: 'Orbitron', sans-serif; font-size: 1rem; letter-spacing: 1px; 
@@ -62,7 +62,7 @@
             border: 1px solid #cbd5e1; 
         }
 
-        /* Status Cards - Big Numbers */
+        /* Status Cards */
         .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
         .card-stat h3 { font-size: 4rem; font-weight: 800; line-height: 1; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 3px 6px rgba(0,0,0,0.3); }
         .card-stat p { font-size: 1.2rem; font-weight: 700; z-index: 10; opacity: 1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
@@ -74,10 +74,10 @@
         .bg-pending { background-color: #475569; background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px); background-size: 15px 15px; }
         .bg-delay { background-color: #dc2626; background-image: linear-gradient(135deg, #b91c1c 25%, transparent 25%, transparent 50%, #b91c1c 50%, #b91c1c 75%, transparent 75%, transparent); background-size: 30px 30px; }
 
-        /* 3. LOGO: Dark Blue Background + White Blink */
+        /* Logo */
         .logo-container {
             width: 80px; height: 80px; 
-            background: var(--deep-navy); /* Dark Blue */
+            background: var(--deep-navy);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 25px rgba(30, 58, 138, 0.6), inset 0 0 20px rgba(96, 165, 250, 0.3);
@@ -88,10 +88,10 @@
         @keyframes logo-pulse { 0%, 100% { box-shadow: 0 0 25px rgba(30, 58, 138, 0.6); } 50% { box-shadow: 0 0 45px rgba(59, 130, 246, 0.8); } }
         @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.95); } }
 
-        /* 2. MAP: Full Height */
+        /* Map */
         #map { 
-            height: 85vh; /* 85% of Viewport Height */
-            min-height: 800px; /* Minimum height ensures it's always big */
+            height: 85vh; 
+            min-height: 800px; 
             width: 100%; border-radius: 12px; z-index: 1; border: 2px solid #94a3b8; 
         }
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
@@ -99,26 +99,24 @@
         .pin-pulse { position: absolute; width: 18px; height: 18px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; } 80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; } }
 
-        /* Color Utilities */
+        /* Utils */
         .text-p-green { color: #16a34a; } .pulse-green { background: #22c55e; }
         .text-p-blue { color: #2563eb; } .pulse-blue { background: #3b82f6; }
         .text-p-yellow { color: #ca8a04; } .pulse-yellow { background: #eab308; }
         .text-p-red { color: #dc2626; } .pulse-red { background: #ef4444; }
         .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
 
-        /* Table & Fonts */
+        /* Table */
         th { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; letter-spacing: 0.5px; padding: 16px !important; }
         td { font-size: 1.1rem; padding: 16px !important; }
         .badge { padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Chart Containers - Bigger for visibility */
         .chart-container-large { position: relative; min-height: 600px; } 
         
         .sync-badge { position: fixed; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.95); color: white; padding: 10px 20px; border-radius: 40px; font-size: 14px; z-index: 999; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .sync-dot { width: 12px; height: 12px; border-radius: 50%; background: #94a3b8; }
         .sync-dot.active { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
 
-        /* Custom Swal Font */
         .swal2-title { font-size: 1.8rem !important; font-family: 'Prompt', sans-serif !important; }
         .swal2-html-container { font-size: 1.2rem !important; font-family: 'Prompt', sans-serif !important; }
     </style>
@@ -167,8 +165,9 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div class="card p-10">
-                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Project S-Curve</h3>
+                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Project S-Curve (Plan vs Actual Dates)</h3>
                     <div id="chart-scurve"></div>
+                    <p class="text-sm text-slate-400 mt-2 text-right">*Calculated from Plan/Actual Dates (W: Survey 30%, Inst 50%, HO 20%)</p>
                 </div>
                 <div class="card p-10">
                     <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Regional Performance</h3>
@@ -181,7 +180,7 @@
             <div class="card p-10">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="font-bold text-slate-700 text-3xl">Master Control Table</h3>
-                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหาชื่อไซต์ หรือ ทีม..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl w-96 focus:outline-none focus:border-blue-600 transition shadow-sm">
+                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหา..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl w-96 focus:outline-none focus:border-blue-600 transition shadow-sm">
                 </div>
                 <div class="overflow-auto max-h-[800px] border border-slate-300 rounded-xl shadow-inner">
                     <table class="w-full text-left border-collapse min-w-[1500px]">
@@ -219,7 +218,7 @@
                     <div id="chart-weekly-breakdown"></div>
                 </div>
                 <div class="card p-10">
-                    <h3 class="font-bold text-slate-800 text-3xl mb-8">REGIONAL TIMELINE (ALL REGIONS)</h3>
+                    <h3 class="font-bold text-slate-800 text-3xl mb-8">REGIONAL TIMELINE</h3>
                     <div id="chart-timeline"></div>
                 </div>
             </div>
@@ -242,13 +241,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
                 <div class="card p-10 chart-container-large">
                     <h3 class="font-bold text-center mb-8 text-2xl">TEAM KPI (ACTUAL SITES)</h3>
-                    <div id="radar-team" class="h-[600px]"></div> </div>
+                    <div id="radar-team" class="h-[600px]"></div>
+                </div>
                 <div class="card p-10 chart-container-large">
                     <h3 class="font-bold text-center mb-8 text-2xl">ENGINEER KPI (ACTUAL SITES)</h3>
                     <div id="radar-eng" class="h-[600px]"></div>
                 </div>
             </div>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div class="card p-10">
                     <h3 class="font-bold mb-8 text-2xl">TEAM WORKLOAD DISTRIBUTION</h3>
@@ -264,7 +263,6 @@
     </main>
 
     <script>
-        // --- DATA ---
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
 2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
@@ -456,6 +454,7 @@
                 else if (rawStatus.includes('not start') || rawStatus === 'pending') { status = "Pending"; }
                 const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
                 if (progress < 100 && planDate && today > planDate) { status = "Delay"; }
+                
                 return {
                     ...row,
                     id: row['id'], site: row['site_name']||row['site'], region: row['region']||'-',
@@ -463,9 +462,14 @@
                     eng: row['engineer']||'-', tel_eng: row['tel_eng']||'-',
                     status, progress,
                     lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
+                    // Plan Dates
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
-                    d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null
+                    d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
+                    // Actual Dates (New Logic)
+                    ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
+                    ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
+                    ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
                 };
             }).filter(d => d.site);
             filteredData = rawData;
@@ -511,15 +515,54 @@
         }
 
         function renderCharts() {
-            const plan = [0,10,25,40,60,80,90,100], avg = filteredData.reduce((a,b)=>a+b.progress,0)/(filteredData.length||1);
-            const act = plan.map(v => v<=avg?v:null); act[act.indexOf(null)-1] = Math.round(avg);
+            // --- NEW: S-Curve Calculation based on Dates ---
+            const months = [
+                { name: 'Jan 26', end: new Date('2026-01-31') },
+                { name: 'Feb 26', end: new Date('2026-02-28') },
+                { name: 'Mar 26', end: new Date('2026-03-31') },
+                { name: 'Apr 26', end: new Date('2026-04-30') },
+                { name: 'May 26', end: new Date('2026-05-31') },
+                { name: 'Jun 26', end: new Date('2026-06-30') },
+                { name: 'Jul 26', end: new Date('2026-07-31') },
+                { name: 'Aug 26', end: new Date('2026-08-31') }
+            ];
+
+            const totalSites = filteredData.length || 1;
+            const wSurvey = 30, wInstall = 50, wHandover = 20;
+
+            // Plan Calculation
+            const planLine = months.map(m => {
+                let score = 0;
+                filteredData.forEach(d => {
+                    if (d.d_survey && d.d_survey <= m.end) score += wSurvey;
+                    if (d.d_install && d.d_install <= m.end) score += wInstall;
+                    if (d.d_handover && d.d_handover <= m.end) score += wHandover;
+                });
+                return Math.min(100, (score / (totalSites * 100)) * 100);
+            });
+
+            // Actual Calculation (Based on Date Columns)
+            const today = new Date();
+            const actLine = months.map(m => {
+                if(m.end > today) return null; // No future prediction
+                let score = 0;
+                filteredData.forEach(d => {
+                    // Check if Actual Date exists and is past
+                    if (d.ad_survey && d.ad_survey <= m.end) score += wSurvey;
+                    if (d.ad_install && d.ad_install <= m.end) score += wInstall;
+                    if (d.ad_handover && d.ad_handover <= m.end) score += wHandover;
+                });
+                return Math.min(100, (score / (totalSites * 100)) * 100);
+            });
+
             if(charts.scurve) charts.scurve.destroy();
             charts.scurve = new ApexCharts(document.querySelector("#chart-scurve"), {
-                series: [{ name:'Plan', data:plan }, { name:'Actual', data:act }],
+                series: [{ name:'Plan', data:planLine }, { name:'Actual', data:actLine }],
                 chart: { height:400, type:'line', toolbar:{show:false} },
-                stroke: { width:[5,6], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
-                xaxis: { categories:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], labels:{ style:{ fontSize:'14px' } } },
-                yaxis: { labels:{ style:{ fontSize:'14px' } } }
+                stroke: { width:[5,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
+                xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px' } } },
+                yaxis: { max: 100, labels:{ style:{ fontSize:'14px' } } },
+                tooltip: { y: { formatter: (v) => v ? v.toFixed(1) + '%' : '-' } }
             }); charts.scurve.render();
 
             const regs = [...new Set(filteredData.map(d=>d.region))];

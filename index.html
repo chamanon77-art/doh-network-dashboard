@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.15</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.16</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -23,7 +23,6 @@
             --deep-navy: #001f52; 
         }
 
-        /* Base Font Size 18px */
         body { 
             font-family: 'Prompt', sans-serif; 
             background-color: var(--bg-page); 
@@ -32,7 +31,6 @@
             line-height: 1.6;
         }
         
-        /* Header */
         .cyber-header {
             background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%);
             position: sticky; top: 0; z-index: 50;
@@ -42,7 +40,6 @@
         .title-main { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px #3b82f6; letter-spacing: 1px; }
         .title-sub { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: #bae6fd; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Navigation */
         .nav-pill { 
             cursor: pointer; padding: 12px 28px; border-radius: 10px; 
             font-family: 'Orbitron', sans-serif; font-size: 1rem; letter-spacing: 1px; 
@@ -55,14 +52,12 @@
             border: 2px solid #3b82f6; box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.4); 
         }
 
-        /* Cards */
         .card { 
             background: var(--card-bg); border-radius: 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
             border: 1px solid #cbd5e1; 
         }
 
-        /* Status Cards */
         .card-stat { position: relative; overflow: hidden; color: white; border: none; min-height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
         .card-stat h3 { font-size: 4rem; font-weight: 800; line-height: 1; z-index: 10; font-family: 'Orbitron', sans-serif; text-shadow: 0 3px 6px rgba(0,0,0,0.3); }
         .card-stat p { font-size: 1.2rem; font-weight: 700; z-index: 10; opacity: 1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
@@ -74,7 +69,6 @@
         .bg-pending { background-color: #475569; background-image: radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px); background-size: 15px 15px; }
         .bg-delay { background-color: #dc2626; background-image: linear-gradient(135deg, #b91c1c 25%, transparent 25%, transparent 50%, #b91c1c 50%, #b91c1c 75%, transparent 75%, transparent); background-size: 30px 30px; }
 
-        /* Logo */
         .logo-container {
             width: 80px; height: 80px; 
             background: var(--deep-navy);
@@ -88,28 +82,21 @@
         @keyframes logo-pulse { 0%, 100% { box-shadow: 0 0 25px rgba(30, 58, 138, 0.6); } 50% { box-shadow: 0 0 45px rgba(59, 130, 246, 0.8); } }
         @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.95); } }
 
-        /* Map */
-        #map { 
-            height: 85vh; 
-            min-height: 800px; 
-            width: 100%; border-radius: 12px; z-index: 1; border: 2px solid #94a3b8; 
-        }
+        #map { height: 85vh; min-height: 800px; width: 100%; border-radius: 12px; z-index: 1; border: 2px solid #94a3b8; }
         .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
         .pin-icon { font-size: 30px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); z-index: 2; position: relative; top: -10px; }
         .pin-pulse { position: absolute; width: 18px; height: 18px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; } 80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; } }
 
-        /* Utils */
         .text-p-green { color: #16a34a; } .pulse-green { background: #22c55e; }
         .text-p-blue { color: #2563eb; } .pulse-blue { background: #3b82f6; }
         .text-p-yellow { color: #ca8a04; } .pulse-yellow { background: #eab308; }
         .text-p-red { color: #dc2626; } .pulse-red { background: #ef4444; }
         .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
 
-        /* Table */
         th { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; letter-spacing: 0.5px; padding: 16px !important; }
-        td { font-size: 1.1rem; padding: 16px !important; }
-        .badge { padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { font-size: 1.1rem; padding: 16px !important; vertical-align: middle; }
+        .badge { padding: 8px 16px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .chart-container-large { position: relative; min-height: 600px; } 
         
@@ -121,52 +108,22 @@
         .swal2-title { font-size: 1.8rem !important; font-family: 'Prompt', sans-serif !important; }
         .swal2-html-container { font-size: 1.2rem !important; font-family: 'Prompt', sans-serif !important; }
 
-        /* ========================================= */
-        /* CSS สำหรับการ Print และ Export เป็น PDF (A4 แนวตั้ง) */
-        /* ========================================= */
+        /* CSS สำหรับ Print (PDF) */
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
-            
-            body { 
-                background-color: white !important; 
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact; 
-            }
-
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             body * { visibility: hidden; }
             #tab-control, #tab-control * { visibility: visible; }
-            
-            #tab-control { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-            }
-
+            #tab-control { position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; padding: 0 !important; }
             .cyber-header, .sync-badge, #search-input, .print-btn { display: none !important; }
-
             .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
             .overflow-auto { max-height: none !important; overflow: visible !important; border: none !important; }
-
             table { width: 100% !important; min-width: 0 !important; table-layout: auto !important; border-collapse: collapse !important; }
-            
-            th, td { 
-                padding: 4px 2px !important; 
-                border: 1px solid #94a3b8 !important; 
-                font-size: 9px !important; 
-                line-height: 1.2 !important; 
-                white-space: normal !important; 
-                word-wrap: break-word !important; 
-            }
-            
+            th, td { padding: 4px 2px !important; border: 1px solid #94a3b8 !important; font-size: 9px !important; line-height: 1.2 !important; white-space: normal !important; word-wrap: break-word !important; }
             th { font-size: 10px !important; background-color: #e2e8f0 !important; color: #0f172a !important; text-align: center; }
             .badge { padding: 2px 4px !important; font-size: 8px !important; border: 1px solid #cbd5e1; }
-
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; } 
-            
             h3 { font-size: 16px !important; margin-bottom: 10px !important; text-align: center; color: #000 !important; }
             td.text-blue-600 { color: #000 !important; text-decoration: none !important; }
         }
@@ -249,7 +206,7 @@
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-yellow-100">Plan Surv</th>
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-blue-100">Plan Inst</th>
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-green-100">Plan HO</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Status</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg text-center">Phase / Status</th>
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg">Prog.</th>
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg">Team</th>
                                 <th class="p-5 text-slate-700 uppercase font-bold text-lg">Engineer</th>
@@ -320,7 +277,6 @@
     </main>
 
     <script>
-        // ข้อมูลสำรอง
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,`;
 
@@ -330,10 +286,8 @@
         let rawData = [], filteredData = [], map, markers = [];
         let charts = {};
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            // Load Backup First
             Papa.parse(BACKUP_DATA, {
                 header: true, skipEmptyLines: true,
                 complete: (results) => {
@@ -341,18 +295,13 @@
                     updateSyncStatus("System Ready (Backup Mode)", false);
                 }
             });
-            // Try Fetch Online
             fetchFreshData();
-            
-            // Auto-Refresh ทุกๆ 30 วินาที
             setInterval(fetchFreshData, 30000);
         });
 
         async function fetchFreshData() {
             updateSyncStatus("Syncing...", null);
             let success = false;
-            
-            // ป้องกัน Cache ด้วย Time parameter
             const noCacheUrl = GOOGLE_SHEET_URL + '&_t=' + new Date().getTime();
 
             for (let proxy of PROXIES) {
@@ -390,35 +339,47 @@
             }
         }
 
+        // --- ประมวลผลจาก Phase และ Status ของชีตโดยตรง ---
         function processData(data) {
-            const today = new Date();
             rawData = data.map(row => {
-                let progress = parseInt(row['progress'] || 0);
-                let rawStatus = row['status'] ? row['status'].trim() : "Pending";
                 let phase = row['phase'] ? row['phase'].trim() : "-";
+                let rawStatus = row['status'] ? row['status'].trim() : "Not Start";
+                let progress = parseInt(row['progress'] || 0);
                 
-                let badgeStatus = rawStatus;
-                const sLower = rawStatus.toLowerCase();
-                if(sLower.includes('done') || sLower.includes('complete') || sLower.includes('handover')) badgeStatus = "Completed";
-                else if(sLower.includes('wip') || sLower.includes('progress') || sLower.includes('install')) badgeStatus = "WIP";
-                else if(sLower.includes('survey')) badgeStatus = "Survey";
-                else if(sLower.includes('delay')) badgeStatus = "Delay";
-                else if(sLower.includes('not start') || sLower.includes('pending')) badgeStatus = "Pending";
+                // แปลง Phase และ Status เป็นกลุ่มสำหรับ Dashboard/Maps (สีและกราฟ)
+                let badgeStatus = "Pending";
+                const p = phase.toLowerCase();
+                const s = rawStatus.toLowerCase();
+
+                if (s.includes('delay')) {
+                    badgeStatus = "Delay";
+                } else if (s.includes('not start')) {
+                    badgeStatus = "Pending";
+                } else if (p.includes('handover') && s.includes('done')) {
+                    badgeStatus = "Completed";
+                } else if (p.includes('install') || p.includes('handover')) {
+                    badgeStatus = "WIP";
+                } else if (p.includes('survey')) {
+                    badgeStatus = "Survey";
+                } else {
+                    badgeStatus = "Pending";
+                }
                 
                 return {
                     ...row,
                     id: row['id'], site: row['site_name']||row['site'], region: row['region']||'-',
                     team: row['team']||'Unassigned', tel_team: row['tel_team']||'-',
                     eng: row['engineer']||'-', tel_eng: row['tel_eng']||'-',
-                    status: badgeStatus, displayStatus: rawStatus, phase: phase, progress: progress,
+                    status: badgeStatus, // ใช้เฉพาะจัดกลุ่มสี (Completed, WIP, Survey, Delay, Pending)
+                    phase: phase, // ดึง Phase ตามจริง
+                    rawStatus: rawStatus, // ดึง Status ตามจริง
+                    progress: progress,
                     lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
                     
-                    // Plan Dates
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
                     
-                    // Actual Dates (เพิ่มกลับเข้ามาเพื่อให้คำนวณกราฟ Actual ได้)
                     ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
                     ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
                     ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
@@ -434,11 +395,10 @@
 
         function filterTable() {
             const val = document.getElementById('search-input').value.toLowerCase();
-            filteredData = rawData.filter(d => d.site.toLowerCase().includes(val) || d.team.toLowerCase().includes(val));
+            filteredData = rawData.filter(d => d.site.toLowerCase().includes(val) || d.team.toLowerCase().includes(val) || d.phase.toLowerCase().includes(val) || d.rawStatus.toLowerCase().includes(val));
             renderTable();
         }
 
-        // --- CHART & RENDER FUNCTIONS ---
         function renderStats() {
             const cnt = (s) => filteredData.filter(d => d.status === s).length;
             ['Completed','WIP','Survey','Delay','Pending'].forEach(s => {
@@ -449,9 +409,14 @@
 
         function renderGauge() {
             const tot = filteredData.length || 1;
-            drawGauge('gauge-survey', (filteredData.filter(d=>d.progress>=30).length/tot)*100, '#eab308', 'txt-survey');
-            drawGauge('gauge-install', (filteredData.filter(d=>d.progress>=80).length/tot)*100, '#3b82f6', 'txt-install');
-            drawGauge('gauge-handover', (filteredData.filter(d=>d.progress==100).length/tot)*100, '#22c55e', 'txt-handover');
+            // นับจากกลุ่มสถานะ เพื่อให้ตัวเลขเปอร์เซ็นต์สะท้อนว่างานไปถึงเฟสนั้นหรือยัง
+            const pSurvey = filteredData.filter(d => d.status === "Survey" || d.status === "WIP" || d.status === "Completed").length;
+            const pInstall = filteredData.filter(d => d.status === "WIP" || d.status === "Completed").length;
+            const pHandover = filteredData.filter(d => d.status === "Completed").length;
+
+            drawGauge('gauge-survey', (pSurvey/tot)*100, '#eab308', 'txt-survey');
+            drawGauge('gauge-install', (pInstall/tot)*100, '#3b82f6', 'txt-install');
+            drawGauge('gauge-handover', (pHandover/tot)*100, '#22c55e', 'txt-handover');
         }
 
         function drawGauge(id, val, col, txt) {
@@ -509,12 +474,7 @@
                 chart: { height:400, type:'line', toolbar:{show:false}, animations: { enabled: true } },
                 stroke: { width:[5,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
                 xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' } } },
-                yaxis: { 
-                    min: 0, 
-                    max: 100, 
-                    tickAmount: 10, // บังคับสเกลให้กระโดดทีละ 10 ช่อง (ช่องละ 10%)
-                    labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } 
-                },
+                yaxis: { min: 0, max: 100, tickAmount: 10, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } },
                 tooltip: { y: { formatter: (v) => v !== null ? v + '%' : '-' } },
                 markers: { size: 5, hover: { size: 7 } }
             }); charts.scurve.render();
@@ -606,9 +566,9 @@
                     if(d.d_survey && getW(d.d_survey) == getW(targetDate)) weeks[w].pS++;
                     if(d.d_install && getW(d.d_install) == getW(targetDate)) weeks[w].pI++;
                     if(d.d_handover && getW(d.d_handover) == getW(targetDate)) weeks[w].pH++;
-                    if(d.progress >= 30) weeks[w].aS++;
-                    if(d.progress >= 80) weeks[w].aI++;
-                    if(d.progress == 100) weeks[w].aH++;
+                    if(d.status === "Survey" || d.status === "WIP" || d.status === "Completed") weeks[w].aS++;
+                    if(d.status === "WIP" || d.status === "Completed") weeks[w].aI++;
+                    if(d.status === "Completed") weeks[w].aH++;
                 }
             });
             const cats = Object.keys(weeks).sort();
@@ -662,7 +622,12 @@
                     <td class="font-mono text-base bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
                     <td class="font-mono text-base bg-blue-50/50">${fmtDate(d.d_install)}</td>
                     <td class="font-mono text-base bg-green-50/50">${fmtDate(d.d_handover)}</td>
-                    <td class=""><span class="badge ${badge}">${d.displayStatus}</span></td>
+                    <td class="text-center">
+                        <span class="badge ${badge} inline-flex flex-col items-center justify-center leading-tight min-w-[110px] py-2">
+                            <span class="text-[15px] font-bold">${d.phase}</span>
+                            <span class="text-[11px] uppercase opacity-80 mt-1 tracking-wider">${d.rawStatus}</span>
+                        </span>
+                    </td>
                     <td class="font-bold text-slate-700">${d.progress}%</td>
                     <td class="text-base font-semibold">${d.team}</td>
                     <td class="text-base text-slate-500">${d.eng}</td>`;
@@ -701,7 +666,7 @@
                 html: `
                     <div class="mt-4 text-left">
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.displayStatus}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PHASE & STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.phase} <span class="text-sm font-normal text-slate-500">(${s.rawStatus})</span></p></div>
                             <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-xl text-slate-700">${s.progress}%</p></div>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
@@ -727,7 +692,6 @@
                             </div>
                         </div>
                         <div class="space-y-2 text-base">
-                            <div class="flex justify-between border-b border-slate-100 pb-2 mb-2"><span class="font-semibold text-slate-700 uppercase tracking-wide">Phase</span><span class="font-bold text-blue-600 text-lg">${s.phase}</span></div>
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Survey</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_survey)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_survey)}</span></div>
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Install</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_install)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_install)}</span></div>
                             <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Handover</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_handover)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_handover)}</span></div>
@@ -743,7 +707,6 @@
             document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
             
-            // Force Redraw & Cleanup
             if(id=='map') setTimeout(()=>map.invalidateSize(),300);
             if(id=='teams') setTimeout(renderTeamCharts, 200); 
             if(id=='gantt') setTimeout(()=>{if(charts.weekly)charts.weekly.render(); if(charts.timeline)charts.timeline.render();},300);

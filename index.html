@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.13 (Print Support)</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.15</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -125,7 +125,6 @@
         /* CSS สำหรับการ Print และ Export เป็น PDF (A4 แนวตั้ง) */
         /* ========================================= */
         @media print {
-            /* ตั้งค่าขนาดกระดาษ A4 แนวตั้ง (Portrait) */
             @page { size: A4 portrait; margin: 10mm; }
             
             body { 
@@ -134,13 +133,9 @@
                 print-color-adjust: exact; 
             }
 
-            /* ซ่อนทุกอย่างบนหน้าจอก่อน */
             body * { visibility: hidden; }
-
-            /* แสดงเฉพาะตารางในหน้า Control */
             #tab-control, #tab-control * { visibility: visible; }
             
-            /* ดันตารางให้ชิดขอบกระดาษด้านซ้ายบนสุด */
             #tab-control { 
                 position: absolute; 
                 left: 0; 
@@ -150,17 +145,13 @@
                 padding: 0 !important; 
             }
 
-            /* ซ่อนเมนู ปุ่มค้นหา ปุ่มปริ้น และข้อความ Sync ด้านล่าง */
             .cyber-header, .sync-badge, #search-input, .print-btn { display: none !important; }
 
-            /* เอาขอบเงาและการจำกัดความสูงออกจากตัวการ์ดและตาราง เพื่อให้มันรันยาวลงไปได้หลายๆ หน้า */
             .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
             .overflow-auto { max-height: none !important; overflow: visible !important; border: none !important; }
 
-            /* ปรับตารางให้กว้าง 100% พอดีหน้ากระดาษและบีบให้พอดี A4 */
             table { width: 100% !important; min-width: 0 !important; table-layout: auto !important; border-collapse: collapse !important; }
             
-            /* ปรับขนาดฟอนต์ของตารางให้เล็กลงมาก เพื่อยัด 10 คอลัมน์ให้พอในหน้ากว้าง A4 แนวตั้ง */
             th, td { 
                 padding: 4px 2px !important; 
                 border: 1px solid #94a3b8 !important; 
@@ -170,20 +161,13 @@
                 word-wrap: break-word !important; 
             }
             
-            /* ทำให้หัวตารางเห็นชัดเจนเวลาพิมพ์ */
             th { font-size: 10px !important; background-color: #e2e8f0 !important; color: #0f172a !important; text-align: center; }
-            
-            /* ย่อขนาดป้ายกำกับ (Badge) ลง */
             .badge { padding: 2px 4px !important; font-size: 8px !important; border: 1px solid #cbd5e1; }
 
-            /* ให้หัวตารางแสดงซ้ำทุกๆ ครั้งที่มีการขึ้นหน้าใหม่ */
             thead { display: table-header-group; }
-            tr { page-break-inside: avoid; } /* ป้องกันตารางถูกตัดครึ่งกลางบรรทัดตอนขึ้นหน้าใหม่ */
+            tr { page-break-inside: avoid; } 
             
-            /* จัดกึ่งกลางหัวข้อตาราง */
             h3 { font-size: 16px !important; margin-bottom: 10px !important; text-align: center; color: #000 !important; }
-            
-            /* เปลี่ยนสีลิงก์ที่เป็นสีฟ้าให้เป็นสีดำเรียบๆ เวลาปรินท์ */
             td.text-blue-600 { color: #000 !important; text-decoration: none !important; }
         }
     </style>
@@ -336,7 +320,7 @@
     </main>
 
     <script>
-        // ย่อ Backup Data เพื่อประหยัดเนื้อที่โค้ด แต่อ่านจาก Online จริงแน่นอน
+        // ข้อมูลสำรอง
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
 1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,`;
 
@@ -359,14 +343,21 @@
             });
             // Try Fetch Online
             fetchFreshData();
+            
+            // Auto-Refresh ทุกๆ 30 วินาที
+            setInterval(fetchFreshData, 30000);
         });
 
         async function fetchFreshData() {
             updateSyncStatus("Syncing...", null);
             let success = false;
+            
+            // ป้องกัน Cache ด้วย Time parameter
+            const noCacheUrl = GOOGLE_SHEET_URL + '&_t=' + new Date().getTime();
+
             for (let proxy of PROXIES) {
                 try {
-                    const res = await fetch(proxy + encodeURIComponent(GOOGLE_SHEET_URL));
+                    const res = await fetch(proxy + encodeURIComponent(noCacheUrl));
                     if (!res.ok) continue;
                     const text = await res.text();
                     if(text.includes('site_name')) {
@@ -376,7 +367,7 @@
                             complete: (r) => {
                                 if(r.data.length > 10) {
                                     processData(r.data);
-                                    updateSyncStatus("Online (" + r.data.length + " records)", true);
+                                    updateSyncStatus("Online: Last Sync " + new Date().toLocaleTimeString(), true);
                                     success = true;
                                 }
                             }
@@ -385,7 +376,7 @@
                     }
                 } catch(e) { console.error(e); }
             }
-            if(!success) updateSyncStatus("Sync Failed - Using Backup", false);
+            if(!success) updateSyncStatus("Sync Failed - Retrying...", false);
         }
 
         function updateSyncStatus(msg, isOnline) {
@@ -402,27 +393,37 @@
         function processData(data) {
             const today = new Date();
             rawData = data.map(row => {
-                let status = "Pending", progress = parseInt(row['progress'] || 0);
-                const rawStatus = (row['status'] || '').toLowerCase();
-                if (progress === 100 || rawStatus.includes('handover')) { status = "Completed"; progress = 100; }
-                else if (progress >= 80 || rawStatus.includes('install')) { status = "WIP"; }
-                else if (progress >= 30 || rawStatus.includes('survey')) { status = "Survey"; }
-                else if (rawStatus.includes('not start') || rawStatus === 'pending') { status = "Pending"; }
-                const planDate = row['plan_handover'] ? new Date(row['plan_handover']) : null;
-                if (progress < 100 && planDate && today > planDate) { status = "Delay"; }
+                let progress = parseInt(row['progress'] || 0);
+                let rawStatus = row['status'] ? row['status'].trim() : "Pending";
+                let phase = row['phase'] ? row['phase'].trim() : "-";
+                
+                let badgeStatus = rawStatus;
+                const sLower = rawStatus.toLowerCase();
+                if(sLower.includes('done') || sLower.includes('complete') || sLower.includes('handover')) badgeStatus = "Completed";
+                else if(sLower.includes('wip') || sLower.includes('progress') || sLower.includes('install')) badgeStatus = "WIP";
+                else if(sLower.includes('survey')) badgeStatus = "Survey";
+                else if(sLower.includes('delay')) badgeStatus = "Delay";
+                else if(sLower.includes('not start') || sLower.includes('pending')) badgeStatus = "Pending";
                 
                 return {
                     ...row,
                     id: row['id'], site: row['site_name']||row['site'], region: row['region']||'-',
                     team: row['team']||'Unassigned', tel_team: row['tel_team']||'-',
                     eng: row['engineer']||'-', tel_eng: row['tel_eng']||'-',
-                    status, progress,
+                    status: badgeStatus, displayStatus: rawStatus, phase: phase, progress: progress,
                     lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
+                    
+                    // Plan Dates
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
+                    
+                    // Actual Dates (เพิ่มกลับเข้ามาเพื่อให้คำนวณกราฟ Actual ได้)
+                    ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
+                    ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
+                    ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
                 };
-            }).filter(d => d.site && d.site.trim() !== ''); // Ensure valid rows
+            }).filter(d => d.site && d.site.trim() !== '');
             filteredData = rawData;
             updateDashboard();
         }
@@ -508,7 +509,12 @@
                 chart: { height:400, type:'line', toolbar:{show:false}, animations: { enabled: true } },
                 stroke: { width:[5,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
                 xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' } } },
-                yaxis: { max: 100, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } },
+                yaxis: { 
+                    min: 0, 
+                    max: 100, 
+                    tickAmount: 10, // บังคับสเกลให้กระโดดทีละ 10 ช่อง (ช่องละ 10%)
+                    labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } 
+                },
                 tooltip: { y: { formatter: (v) => v !== null ? v + '%' : '-' } },
                 markers: { size: 5, hover: { size: 7 } }
             }); charts.scurve.render();
@@ -656,7 +662,7 @@
                     <td class="font-mono text-base bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
                     <td class="font-mono text-base bg-blue-50/50">${fmtDate(d.d_install)}</td>
                     <td class="font-mono text-base bg-green-50/50">${fmtDate(d.d_handover)}</td>
-                    <td class=""><span class="badge ${badge}">${d.status}</span></td>
+                    <td class=""><span class="badge ${badge}">${d.displayStatus}</span></td>
                     <td class="font-bold text-slate-700">${d.progress}%</td>
                     <td class="text-base font-semibold">${d.team}</td>
                     <td class="text-base text-slate-500">${d.eng}</td>`;
@@ -695,7 +701,7 @@
                 html: `
                     <div class="mt-4 text-left">
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.status}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.displayStatus}</p></div>
                             <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-xl text-slate-700">${s.progress}%</p></div>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
@@ -721,9 +727,10 @@
                             </div>
                         </div>
                         <div class="space-y-2 text-base">
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Survey</span><span class="font-mono font-bold">${fmtDate(s.d_survey)}</span></div>
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Install</span><span class="font-mono font-bold">${fmtDate(s.d_install)}</span></div>
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500">Plan Handover</span><span class="font-mono font-bold">${fmtDate(s.d_handover)}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-2 mb-2"><span class="font-semibold text-slate-700 uppercase tracking-wide">Phase</span><span class="font-bold text-blue-600 text-lg">${s.phase}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Survey</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_survey)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_survey)}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Install</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_install)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_install)}</span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Handover</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_handover)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_handover)}</span></div>
                         </div>
                     </div>`,
                 width: 600, showConfirmButton: false, showCloseButton: true

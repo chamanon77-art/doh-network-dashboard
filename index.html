@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.13</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.13 (Print Support)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -120,6 +120,72 @@
 
         .swal2-title { font-size: 1.8rem !important; font-family: 'Prompt', sans-serif !important; }
         .swal2-html-container { font-size: 1.2rem !important; font-family: 'Prompt', sans-serif !important; }
+
+        /* ========================================= */
+        /* CSS สำหรับการ Print และ Export เป็น PDF (A4 แนวตั้ง) */
+        /* ========================================= */
+        @media print {
+            /* ตั้งค่าขนาดกระดาษ A4 แนวตั้ง (Portrait) */
+            @page { size: A4 portrait; margin: 10mm; }
+            
+            body { 
+                background-color: white !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
+
+            /* ซ่อนทุกอย่างบนหน้าจอก่อน */
+            body * { visibility: hidden; }
+
+            /* แสดงเฉพาะตารางในหน้า Control */
+            #tab-control, #tab-control * { visibility: visible; }
+            
+            /* ดันตารางให้ชิดขอบกระดาษด้านซ้ายบนสุด */
+            #tab-control { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+            }
+
+            /* ซ่อนเมนู ปุ่มค้นหา ปุ่มปริ้น และข้อความ Sync ด้านล่าง */
+            .cyber-header, .sync-badge, #search-input, .print-btn { display: none !important; }
+
+            /* เอาขอบเงาและการจำกัดความสูงออกจากตัวการ์ดและตาราง เพื่อให้มันรันยาวลงไปได้หลายๆ หน้า */
+            .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            .overflow-auto { max-height: none !important; overflow: visible !important; border: none !important; }
+
+            /* ปรับตารางให้กว้าง 100% พอดีหน้ากระดาษและบีบให้พอดี A4 */
+            table { width: 100% !important; min-width: 0 !important; table-layout: auto !important; border-collapse: collapse !important; }
+            
+            /* ปรับขนาดฟอนต์ของตารางให้เล็กลงมาก เพื่อยัด 10 คอลัมน์ให้พอในหน้ากว้าง A4 แนวตั้ง */
+            th, td { 
+                padding: 4px 2px !important; 
+                border: 1px solid #94a3b8 !important; 
+                font-size: 9px !important; 
+                line-height: 1.2 !important; 
+                white-space: normal !important; 
+                word-wrap: break-word !important; 
+            }
+            
+            /* ทำให้หัวตารางเห็นชัดเจนเวลาพิมพ์ */
+            th { font-size: 10px !important; background-color: #e2e8f0 !important; color: #0f172a !important; text-align: center; }
+            
+            /* ย่อขนาดป้ายกำกับ (Badge) ลง */
+            .badge { padding: 2px 4px !important; font-size: 8px !important; border: 1px solid #cbd5e1; }
+
+            /* ให้หัวตารางแสดงซ้ำทุกๆ ครั้งที่มีการขึ้นหน้าใหม่ */
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; } /* ป้องกันตารางถูกตัดครึ่งกลางบรรทัดตอนขึ้นหน้าใหม่ */
+            
+            /* จัดกึ่งกลางหัวข้อตาราง */
+            h3 { font-size: 16px !important; margin-bottom: 10px !important; text-align: center; color: #000 !important; }
+            
+            /* เปลี่ยนสีลิงก์ที่เป็นสีฟ้าให้เป็นสีดำเรียบๆ เวลาปรินท์ */
+            td.text-blue-600 { color: #000 !important; text-decoration: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -179,10 +245,16 @@
 
         <div id="tab-control" class="tab-content hidden animate-fade-in">
             <div class="card p-10">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
                     <h3 class="font-bold text-slate-700 text-3xl">Master Control Table</h3>
-                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหา..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl w-96 focus:outline-none focus:border-blue-600 transition shadow-sm">
+                    <div class="flex w-full lg:w-auto gap-4">
+                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหา..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl flex-1 lg:w-80 focus:outline-none focus:border-blue-600 transition shadow-sm">
+                        <button onclick="window.print()" class="print-btn bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition shadow-lg text-lg min-w-[150px]">
+                            <i class="fa-solid fa-print"></i> พิมพ์ / PDF
+                        </button>
+                    </div>
                 </div>
+                
                 <div class="overflow-auto max-h-[800px] border border-slate-300 rounded-xl shadow-inner">
                     <table class="w-full text-left border-collapse min-w-[1500px]">
                         <thead class="bg-slate-100 sticky top-0 shadow-md z-10">
@@ -264,146 +336,9 @@
     </main>
 
     <script>
+        // ย่อ Backup Data เพื่อประหยัดเนื้อที่โค้ด แต่อ่านจาก Online จริงแน่นอน
         const BACKUP_DATA = `id,site_id,site_name,plan_survey,actual_survey_date,phase,status,progress,plan_install,actual_install_date,plan_handover,actual_handover,team,tel_team,engineer,tel_eng,risk,AP+PoE,L3 SW,Path 48 (71),Remark,approval_status,region,province,lat,lng,Google_Maps_Link,photo_survey,photo_install,photo_handover
-1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,
-2,SITE-002,แขวงทางหลวงเชียงใหม่ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+1,https://...,https://...,https://,,,
-3,SITE-003,แขวงทางหลวงเชียงใหม่ที่ 2,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.79,99,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+2,https://...,https://...,https://,,,
-4,SITE-004,แขวงทางหลวงเชียงใหม่ที่ 3,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,เชียงใหม่,18.85,98.95,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงใหม่ที่+3,https://...,https://...,https://,,,
-5,SITE-005,แขวงทางหลวงลำพูน,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,ลำพูน,18.57,99,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำพูน,https://...,https://...,https://,,,
-6,SITE-006,แขวงทางหลวงลำปางที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,1,,pending,ภาคเหนือ,ลำปาง,18.28,99.49,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำปางที่+1,https://...,https://...,https://,,,
-7,SITE-007,แขวงทางหลวงลำปางที่ 2,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,ลำปาง,18.29,99.5,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลำปางที่+2,https://...,https://...,https://,,,
-8,SITE-008,แขวงทางหลวงแม่ฮ่องสอน,2026-02-28,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,แม่ฮ่องสอน,19.3,97.96,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงแม่ฮ่องสอน,https://...,https://...,https://,,,
-9,SITE-009,สำนักงานทางหลวงที่ 2 (แพร่),2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,แพร่,18.14,100.14,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+2+แพร่,https://...,https://...,https://,,,
-10,SITE-010,แขวงทางหลวงแพร่,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,แพร่,18.14,100.14,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงแพร่,https://...,https://...,https://,,,
-11,SITE-011,แขวงทางหลวงน่านที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,น่าน,18.77,100.77,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+1,https://...,https://...,https://,,,
-12,SITE-012,แขวงทางหลวงน่านที่ 2,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,น่าน,18.78,100.78,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+2,https://...,https://...,https://,,,
-13,SITE-013,แขวงทางหลวงพะเยา,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,พะเยา,19.16,99.9,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพะเยา,https://...,https://...,https://,,,
-14,SITE-014,แขวงทางหลวงเชียงรายที่ 1,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,เชียงราย,19.9,99.83,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงรายที่+1,https://...,https://...,https://,,,
-15,SITE-015,แขวงทางหลวงเชียงรายที่ 2,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,,,pending,ภาคเหนือ,เชียงราย,19.91,99.84,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเชียงรายที่+2,https://...,https://...,https://,,,
-16,SITE-016,สำนักงานทางหลวงที่ 3 (สกลนคร),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,High,5,2,1,,pending,ภาคอีสาน,สกลนคร,17.1663,104.148,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+3+สกลนคร,https://...,https://...,https://,,,
-17,SITE-017,แขวงทางหลวงสกลนครที่ 1,2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,สกลนคร,17.1663,104.148,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสกลนครที่+1,https://...,https://...,https://,,,
-18,SITE-018,แขวงทางหลวงสกลนครที่ 2 (สว่างแดนดิน),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,สกลนคร,17.47,103.45,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสกลนครที่+2,https://...,https://...,https://,,,
-19,SITE-019,แขวงทางหลวงนครพนม,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,นครพนม,17.4,104.78,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครพนม,https://...,https://...,https://,,,
-20,SITE-020,แขวงทางหลวงหนองคาย,2026-03-12,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,หนองคาย,17.88,102.74,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงหนองคาย,https://...,https://...,https://,,,
-21,SITE-021,แขวงทางหลวงบึงกาฬ,2026-03-04,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,1,,pending,ภาคอีสาน,บึงกาฬ,18.36,103.65,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงบึงกาฬ,https://...,https://...,https://,,,
-22,SITE-022,แขวงทางหลวงมุกดาหาร,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,มุกดาหาร,16.54,104.72,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงมุกดาหาร,https://...,https://...,https://,,,
-23,SITE-023,สำนักงานทางหลวงที่ 4 (ตาก),2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.88,99.12,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+4+ตาก,https://...,https://...,https://,,,
-24,SITE-024,แขวงทางหลวงตากที่ 1,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.88,99.12,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตากที่+1,https://...,https://...,https://,,,
-25,SITE-025,แขวงทางหลวงตากที่ 2,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคตะวันตก,ตาก,16.71,98.57,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตากที่+2,https://...,https://...,https://,,,
-26,SITE-026,แขวงทางหลวงกำแพงเพชร,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปริญญา (เบส),086-928-7806,Medium,5,2,,,pending,ภาคกลาง,กำแพงเพชร,16.48,99.52,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกำแพงเพชร,https://...,https://...,https://,,,
-27,SITE-027,สำนักงานทางหลวงที่ 5 (พิษณุโลก),2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,1,,pending,ภาคกลาง,พิษณุโลก,16.82,100.26,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+5+พิษณุโลก,https://...,https://...,https://,,,
-28,SITE-028,แขวงทางหลวงพิษณุโลกที่ 1,2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,1,,pending,ภาคกลาง,พิษณุโลก,16.82,100.26,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิษณุโลกที่+1,https://...,https://...,https://,,,
-29,SITE-029,แขวงทางหลวงพิษณุโลกที่ 2 (วังทอง),2026-03-12,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,,,pending,ภาคกลาง,พิษณุโลก,16.82,100.43,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิษณุโลกที่+2,https://...,https://...,https://,,,
-30,SITE-030,แขวงทางหลวงสุโขทัย,2026-03-10,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปริญญา (เบส),086-928-7806,Medium,5,2,1,,pending,ภาคกลาง,สุโขทัย,17,99.82,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุโขทัย,https://...,https://...,https://,,,
-31,SITE-031,แขวงทางหลวงพิจิตร,2026-03-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,,,pending,ภาคกลาง,พิจิตร,16.44,100.35,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิจิตร,https://...,https://...,https://,,,
-32,SITE-032,แขวงทางหลวงอุตรดิตถ์ที่ 1,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,อุตรดิตถ์,17.62,100.09,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุตรดิตถ์ที่+1,https://...,https://...,https://,,,
-33,SITE-033,แขวงทางหลวงอุตรดิตถ์ที่ 2,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,สุรศักดิ์ (เป้า),098-004-7432,Medium,5,2,1,,pending,ภาคเหนือ,อุตรดิตถ์,17.62,100.1,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุตรดิตถ์ที่+2,https://...,https://...,https://,,,
-34,SITE-034,สำนักงานทางหลวงที่ 6 (เพชรบูรณ์),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคกลาง,เพชรบูรณ์,16.41,101.15,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+6+เพชรบูรณ์,https://...,https://...,https://,,,
-35,SITE-035,แขวงทางหลวงเพชรบูรณ์ที่ 1,2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคกลาง,เพชรบูรณ์,16.41,101.15,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเพชรบูรณ์ที่+1,https://...,https://...,https://,,,
-36,SITE-036,แขวงทางหลวงเพชรบูรณ์ที่ 2 (บึงสามพัน),2026-03-13,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,,,pending,ภาคกลาง,เพชรบูรณ์,15.79,101.03,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเพชรบูรณ์ที่+2,https://...,https://...,https://,,,
-37,SITE-037,แขวงทางหลวงเลยที่ 1,2026-03-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคอีสาน,เลย,17.48,101.72,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเลยที่+1,https://...,https://...,https://,,,
-38,SITE-038,แขวงทางหลวงเลยที่ 2 (ด่านซ้าย),2026-03-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคอีสาน,เลย,17.28,101.15,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเลยที่+2,https://...,https://...,https://,,,
-39,SITE-039,แขวงทางหลวงหนองบัวลำภู,2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,ชนะภัย (แดง),090-346-4959,Medium,5,2,,,pending,ภาคอีสาน,หนองบัวลำภู,17.2,102.44,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงหนองบัวลำภู,https://...,https://...,https://,,,
-40,SITE-040,สำนักงานทางหลวงที่ 7 (ขอนแก่น),2026-03-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,1,,pending,ภาคอีสาน,ขอนแก่น,16.43,102.83,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+7+ขอนแก่น,https://...,https://...,https://,,,
-41,SITE-041,แขวงทางหลวงขอนแก่นที่ 1,2026-03-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,,,pending,ภาคอีสาน,ขอนแก่น,16.43,102.83,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงขอนแก่นที่+1,https://...,https://...,https://,,,
-42,SITE-042,แขวงทางหลวงขอนแก่นที่ 2,2026-03-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,,,pending,ภาคอีสาน,ขอนแก่น,16.54,102.09,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงขอนแก่นที่+2,https://...,https://...,https://,,,
-43,SITE-043,แขวงทางหลวงขอนแก่นที่ 3 (บ้านไผ่),2026-03-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,,,pending,ภาคอีสาน,ขอนแก่น,16.05,102.73,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงขอนแก่นที่+3,https://...,https://...,https://,,,
-44,SITE-044,แขวงทางหลวงอุดรธานีที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,ชนะภัย (แดง),090-346-4959,Medium,5,2,1,,pending,ภาคอีสาน,อุดรธานี,17.41,102.79,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุดรธานีที่+1,https://...,https://...,https://,,,
-45,SITE-045,แขวงทางหลวงอุดรธานีที่ 2,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,บรรพต (ป้อ),098-585-7862,สอ.อภิชาติ (นิค),093-102-9677,Medium,5,2,,,pending,ภาคอีสาน,อุดรธานี,17.37,103.05,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุดรธานีที่+2,https://...,https://...,https://,,,
-46,SITE-046,แขวงทางหลวงชัยภูมิ,2026-03-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคอีสาน,ชัยภูมิ,15.8,102.03,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงชัยภูมิ,https://...,https://...,https://,,,
-47,SITE-047,สำนักงานทางหลวงที่ 8 (มหาสารคาม),2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,ปฏิภาณ (ทิว),064-798-9454,Medium,5,2,1,,pending,ภาคอีสาน,มหาสารคาม,16.18,103.3,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+8+มหาสารคาม,https://...,https://...,https://,,,
-48,SITE-048,แขวงทางหลวงมหาสารคาม,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,ปฏิภาณ (ทิว),064-798-9454,Medium,5,2,1,,pending,ภาคอีสาน,มหาสารคาม,16.18,103.3,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงมหาสารคาม,https://...,https://...,https://,,,
-49,SITE-049,แขวงทางหลวงยโสธร,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,ปฏิภาณ (ทิว),064-798-9454,Medium,5,2,1,,pending,ภาคอีสาน,ยโสธร,15.79,104.14,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงยโสธร,https://...,https://...,https://,,,
-50,SITE-050,แขวงทางหลวงกาฬสินธุ์,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,ปฏิภาณ (ทิว),064-798-9454,Medium,5,2,,,pending,ภาคอีสาน,กาฬสินธุ์,16.43,103.5,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกาฬสินธุ์,https://...,https://...,https://,,,
-51,SITE-051,แขวงทางหลวงร้อยเอ็ด,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,ปฏิภาณ (ทิว),064-798-9454,Medium,5,2,,,pending,ภาคอีสาน,ร้อยเอ็ด,16.05,103.65,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงร้อยเอ็ด,https://...,https://...,https://,,,
-52,SITE-052,สำนักงานทางหลวงที่ 9 (อุบลราชธานี),2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,1,,pending,ภาคอีสาน,อุบลราชธานี,15.22,104.85,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+9+อุบลราชธานี,https://...,https://...,https://,,,
-53,SITE-053,แขวงทางหลวงอุบลราชธานีที่ 1,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,1,,pending,ภาคอีสาน,อุบลราชธานี,15.23,104.85,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุบลราชธานีที่+1,https://...,https://...,https://,,,
-54,SITE-054,แขวงทางหลวงอุบลราชธานีที่ 2,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,1,,pending,ภาคอีสาน,อุบลราชธานี,15.24,104.84,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุบลราชธานีที่+2,https://...,https://...,https://,,,
-55,SITE-055,แขวงทางหลวงศรีสะเกษที่ 1,2026-02-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,1,,pending,ภาคอีสาน,ศรีสะเกษ,15.11,104.32,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงศรีสะเกษที่+1,https://...,https://...,https://,,,
-56,SITE-056,แขวงทางหลวงศรีสะเกษที่ 2,2026-02-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,,,pending,ภาคอีสาน,ศรีสะเกษ,15.12,104.33,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงศรีสะเกษที่+2,https://...,https://...,https://,,,
-57,SITE-057,แขวงทางหลวงอำนาจเจริญ,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,,,pending,ภาคอีสาน,อำนาจเจริญ,15.86,104.62,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอำนาจเจริญ,https://...,https://...,https://,,,
-58,SITE-058,แขวงทางหลวงสุรินทร์,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,สุเมธ (โจ้),088-564-4078,Medium,5,2,1,,pending,ภาคอีสาน,สุรินทร์,14.88,103.49,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุรินทร์,https://...,https://...,https://,,,
-59,SITE-059,สำนักงานทางหลวงที่ 10 (นครราชสีมา),2026-03-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,1,,pending,ภาคอีสาน,นครราชสีมา,14.97,102.1,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+10+นครราชสีมา,https://...,https://...,https://,,,
-60,SITE-060,แขวงทางหลวงนครราชสีมาที่ 1,2026-03-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,1,,pending,ภาคอีสาน,นครราชสีมา,14.97,102.1,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครราชสีมาที่+1,https://...,https://...,https://,,,
-61,SITE-061,แขวงทางหลวงนครราชสีมาที่ 2,2026-03-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,1,,pending,ภาคอีสาน,นครราชสีมา,14.98,102.11,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครราชสีมาที่+2,https://...,https://...,https://,,,
-62,SITE-062,แขวงทางหลวงนครราชสีมาที่ 3,2026-03-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,,,pending,ภาคอีสาน,นครราชสีมา,14.96,102.12,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครราชสีมาที่+3,https://...,https://...,https://,,,
-63,SITE-063,แขวงทางหลวงบุรีรัมย์,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อัษนน (บอม),094-282-4951,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,1,,pending,ภาคอีสาน,บุรีรัมย์,14.99,103.1,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงบุรีรัมย์,https://...,https://...,https://,,,
-64,SITE-064,แขวงทางหลวงปราจีนบุรี,2026-03-04,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,,,pending,ภาคตะวันออก,ปราจีนบุรี,14.05,101.37,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงปราจีนบุรี,https://...,https://...,https://,,,
-65,SITE-065,แขวงทางหลวงสระแก้ว (วัฒนานคร),2026-03-04,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,วิชญ์พล (บราวด์),087-001-1070,Medium,5,2,,,pending,ภาคตะวันออก,สระแก้ว,13.75,102.32,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสระแก้ว,https://...,https://...,https://,,,
-66,SITE-066,สำนักงานทางหลวงที่ 11 (ลพบุรี),2026-03-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,ลพบุรี,14.79,100.65,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+11+ลพบุรี,https://...,https://...,https://,,,
-67,SITE-067,แขวงทางหลวงลพบุรีที่ 1,2026-03-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,ลพบุรี,14.79,100.65,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลพบุรีที่+1,https://...,https://...,https://,,,
-68,SITE-068,แขวงทางหลวงลพบุรีที่ 2 (ลำนารายณ์),2026-02-20,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,ลพบุรี,15.12,101.14,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงลพบุรีที่+2,https://...,https://...,https://,,,
-69,SITE-069,แขวงทางหลวงนครสวรรค์ที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคกลาง,นครสวรรค์,15.69,100.11,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครสวรรค์ที่+1,https://...,https://...,https://,,,
-70,SITE-070,แขวงทางหลวงนครสวรรค์ที่ 2 (ตากฟ้า),2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,,,pending,ภาคกลาง,นครสวรรค์,15.34,100.49,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครสวรรค์ที่+2,https://...,https://...,https://,,,
-71,SITE-071,แขวงทางหลวงสระบุรี,2026-02-19,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,สระบุรี,14.53,100.91,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสระบุรี,https://...,https://...,https://,,,
-72,SITE-072,แขวงทางหลวงสิงห์บุรี,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,สิงห์บุรี,14.89,100.4,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสิงห์บุรี,https://...,https://...,https://,,,
-73,SITE-073,สำนักงานทางหลวงที่ 12 (สุพรรณบุรี),2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,,,pending,ภาคกลาง,สุพรรณบุรี,14.47,100.12,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+12+สุพรรณบุรี,https://...,https://...,https://,,,
-74,SITE-074,แขวงทางหลวงสุพรรณบุรีที่ 1,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,1,,pending,ภาคกลาง,สุพรรณบุรี,14.47,100.12,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุพรรณบุรีที่+1,https://...,https://...,https://,,,
-75,SITE-075,แขวงทางหลวงสุพรรณบุรีที่ 2 (อู่ทอง),2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,1,,pending,ภาคกลาง,สุพรรณบุรี,14.37,99.89,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุพรรณบุรีที่+2,https://...,https://...,https://,,,
-76,SITE-076,แขวงทางหลวงกาญจนบุรี,2026-02-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,,,pending,ภาคตะวันตก,กาญจนบุรี,14.02,99.53,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกาญจนบุรี,https://...,https://...,https://,,,
-77,SITE-077,แขวงทางหลวงชัยนาท,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,,,pending,ภาคกลาง,ชัยนาท,15.18,100.12,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงชัยนาท,https://...,https://...,https://,,,
-78,SITE-078,แขวงทางหลวงอุทัยธานี,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,,,pending,ภาคกลาง,อุทัยธานี,15.38,100.02,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอุทัยธานี,https://...,https://...,https://,,,
-79,SITE-079,แขวงทางหลวงอ่างทอง,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ณัฐวุฒิ (กายด์),093-294-0990,Medium,5,2,,,pending,ภาคกลาง,อ่างทอง,14.59,100.45,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอ่างทอง,https://...,https://...,https://,,,
-80,SITE-080,สำนักงานทางหลวงที่ 13 (กรุงเทพฯ),2026-02-13,2026-02-13,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,High,5,2,,,pending,ภาคกลาง,กรุงเทพมหานคร,13.913,100.596,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+13+กรุงเทพ,https://...,https://...,https://,,,
-81,SITE-081,แขวงทางหลวงกรุงเทพ,2026-02-13,2026-02-13,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.913,100.596,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกรุงเทพ,https://...,https://...,https://,,,
-82,SITE-082,แขวงทางหลวงสมุทรสาคร,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,สมุทรสาคร,13.54,100.27,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสมุทรสาคร,https://...,https://...,https://,,,
-83,SITE-083,แขวงทางหลวงอยุธยา,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,อยุธยา,14.35,100.57,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงอยุธยา,https://...,https://...,https://,,,
-84,SITE-084,แขวงทางหลวงปทุมธานี,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,ปทุมธานี,14.02,100.52,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงปทุมธานี,https://...,https://...,https://,,,
-85,SITE-085,แขวงทางหลวงสมุทรปราการ,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,,,pending,ภาคกลาง,สมุทรปราการ,13.59,100.59,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสมุทรปราการ,https://...,https://...,https://,,,
-86,SITE-086,แขวงทางหลวงนนทบุรี,2026-02-13,2026-02-13,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,นนทบุรี,13.86,100.51,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนนทบุรี,https://...,https://...,https://,,,
-87,SITE-087,แขวงทางหลวงธนบุรี,2026-02-06,2026-02-06,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.78,100.47,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงธนบุรี,https://...,https://...,https://,,,
-88,SITE-088,แขวงทางหลวงนครนายก,2026-03-04,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,พัทธพล (เอก),086-488-5748,Medium,5,2,,,pending,ภาคกลาง,นครนายก,14.2,101.21,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครนายก,https://...,https://...,https://,,,
-89,SITE-089,สำนักงานทางหลวงที่ 14 (ชลบุรี),2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,1,,pending,ภาคตะวันออก,ชลบุรี,13.36,100.98,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+14+ชลบุรี,https://...,https://...,https://,,,
-90,SITE-090,แขวงทางหลวงชลบุรีที่ 1,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,1,,pending,ภาคตะวันออก,ชลบุรี,13.36,100.98,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงชลบุรีที่+1,https://...,https://...,https://,,,
-91,SITE-091,แขวงทางหลวงชลบุรีที่ 2,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,,,pending,ภาคตะวันออก,ชลบุรี,13.37,100.99,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงชลบุรีที่+2,https://...,https://...,https://,,,
-92,SITE-092,แขวงทางหลวงฉะเชิงเทรา,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,1,,pending,ภาคตะวันออก,ฉะเชิงเทรา,13.69,101.07,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงฉะเชิงเทรา,https://...,https://...,https://,,,
-93,SITE-093,แขวงทางหลวงจันทบุรี,2026-03-06,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,,,pending,ภาคตะวันออก,จันทบุรี,12.61,102.1,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงจันทบุรี,https://...,https://...,https://,,,
-94,SITE-094,แขวงทางหลวงตราด,2026-03-06,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,,,pending,ภาคตะวันออก,ตราด,12.24,102.51,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตราด,https://...,https://...,https://,,,
-95,SITE-095,แขวงทางหลวงระยอง,2026-03-06,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,1,,pending,ภาคตะวันออก,ระยอง,12.68,101.28,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงระยอง,https://...,https://...,https://,,,
-96,SITE-096,สำนักงานทางหลวงที่ 15 (ประจวบคีรีขันธ์),2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วัลลภ (เหน่ง),083-559-9502,Medium,5,2,1,,pending,ภาคตะวันตก,ประจวบคีรีขันธ์,11.81,99.79,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+15+ประจวบคีรีขันธ์,https://...,https://...,https://,,,
-97,SITE-097,แขวงทางหลวงประจวบคีรีขันธ์,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วัลลภ (เหน่ง),083-559-9502,Medium,5,2,1,,pending,ภาคตะวันตก,ประจวบคีรีขันธ์,11.81,99.79,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงประจวบคีรีขันธ์,https://...,https://...,https://,,,
-98,SITE-098,แขวงทางหลวงนครปฐม,2026-02-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,,,pending,ภาคกลาง,นครปฐม,13.82,100.03,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครปฐม,https://...,https://...,https://,,,
-99,SITE-099,แขวงทางหลวงชุมพร,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วัลลภ (เหน่ง),083-559-9502,Medium,5,2,,,pending,ภาคใต้,ชุมพร,10.49,99.17,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงชุมพร,https://...,https://...,https://,,,
-100,SITE-100,แขวงทางหลวงราชบุรี,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,1,,pending,ภาคตะวันตก,ราชบุรี,13.53,99.81,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงราชบุรี,https://...,https://...,https://,,,
-101,SITE-101,แขวงทางหลวงสมุทรสงคราม,2026-02-27,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,,,pending,ภาคกลาง,สมุทรสงคราม,13.41,100,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสมุทรสงคราม,https://...,https://...,https://,,,
-102,SITE-102,แขวงทางหลวงเพชรบุรี,2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วัลลภ (เหน่ง),083-559-9502,Medium,5,2,,,pending,ภาคตะวันตก,เพชรบุรี,13.11,99.94,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงเพชรบุรี,https://...,https://...,https://,,,
-103,SITE-103,สำนักงานทางหลวงที่ 16 (นครศรีธรรมราช),2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,นครศรีธรรมราช,8.43,99.96,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+16+นครศรีธรรมราช,https://...,https://...,https://,,,
-104,SITE-104,แขวงทางหลวงนครศรีธรรมราชที่ 1,2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,นครศรีธรรมราช,8.43,99.96,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครศรีธรรมราชที่+1,https://...,https://...,https://,,,
-105,SITE-105,แขวงทางหลวงนครศรีธรรมราชที่ 2 (ทุ่งสง),2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,นครศรีธรรมราช,8.16,99.68,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนครศรีธรรมราชที่+2,https://...,https://...,https://,,,
-106,SITE-106,แขวงทางหลวงสุราษฏร์ธานีที่ 1,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,สุราษฏร์ธานี,9.13,99.33,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุราษฏร์ธานีที่+1,https://...,https://...,https://,,,
-107,SITE-107,แขวงทางหลวงสุราษฏร์ธานีที่ 2 (กาญจนดิษฐ์),2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,สุราษฏร์ธานี,9.16,99.47,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุราษฏร์ธานีที่+2,https://...,https://...,https://,,,
-108,SITE-108,แขวงทางหลวงสุราษฏร์ธานีที่ 3 (เวียงสระ),2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,สุราษฏร์ธานี,8.63,99.35,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสุราษฏร์ธานีที่+3,https://...,https://...,https://,,,
-109,SITE-109,แขวงทางหลวงตรัง,2026-02-19,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,,,pending,ภาคใต้,ตรัง,7.55,99.61,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงตรัง,https://...,https://...,https://,,,
-110,SITE-110,สำนักงานทางหลวงที่ 17 (กระบี่),2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,เอกสิทธิ์ (ออย),062-525-5978,Medium,5,2,,,pending,ภาคใต้,กระบี่,8.05,98.91,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+17+กระบี่,https://...,https://...,https://,,,
-111,SITE-111,แขวงทางหลวงกระบี่,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,เอกสิทธิ์ (ออย),062-525-5978,Medium,5,2,,,pending,ภาคใต้,กระบี่,8.06,98.91,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงกระบี่,https://...,https://...,https://,,,
-112,SITE-112,แขวงทางหลวงภูเก็ต,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,เอกสิทธิ์ (ออย),062-525-5978,High,5,2,1,,pending,ภาคใต้,ภูเก็ต,7.8804,98.3923,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงภูเก็ต,https://...,https://...,https://,,,
-113,SITE-113,แขวงทางหลวงระนอง,2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,เอกสิทธิ์ (ออย),062-525-5978,Medium,5,2,,,pending,ภาคใต้,ระนอง,9.97,98.63,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงระยอง,https://...,https://...,https://,,,
-114,SITE-114,แขวงทางหลวงพังงา,2026-02-23,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,เอกสิทธิ์ (ออย),062-525-5978,Medium,5,2,1,,pending,ภาคใต้,พังงา,8.44,98.52,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพังงา,https://...,https://...,https://,,,
-115,SITE-115,สำนักงานทางหลวงที่ 18 (สงขลา),2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,1,,pending,ภาคใต้,สงขลา,7.17,100.61,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+18+สงขลา,https://...,https://...,https://,,,
-116,SITE-116,แขวงทางหลวงสงขลาที่ 1,2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,1,,pending,ภาคใต้,สงขลา,7.18,100.61,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสงขลาที่+1,https://...,https://...,https://,,,
-117,SITE-117,แขวงทางหลวงสงขลาที่ 2 (นาหม่อม),2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,,,pending,ภาคใต้,สงขลา,6.97,100.55,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสงขลาที่+2,https://...,https://...,https://,,,
-118,SITE-118,แขวงทางหลวงพัทลุง,2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,1,,pending,ภาคใต้,พัทลุง,7.61,100.07,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพัทลุง,https://...,https://...,https://,,,
-119,SITE-119,แขวงทางหลวงยะลา,2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,,,pending,ภาคใต้,ยะลา,6.54,101.28,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงยะลา,https://...,https://...,https://,,,
-120,SITE-120,แขวงทางหลวงปัตตานี,2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,,,pending,ภาคใต้,ปัตตานี,6.86,101.25,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงปัตตานี,https://...,https://...,https://,,,
-121,SITE-121,แขวงทางหลวงนราธิวาส,2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,,,pending,ภาคใต้,นราธิวาส,6.42,101.82,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงนราธิวาส,https://...,https://...,https://,,,
-122,SITE-122,แขวงทางหลวงสตูล,2026-02-19,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,,,pending,ภาคใต้,สตูล,6.61,100.06,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงสตูล,https://...,https://...,https://,,,
-123,SITE-123,ศูนย์สร้างทางลำปาง,2026-02-16,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,Medium,5,2,,,pending,ภาคเหนือ,ลำปาง,18.28,99.49,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างทางลำปาง,https://...,https://...,https://,,,
-124,SITE-124,ศูนย์สร้างทางหล่มสัก,2026-03-12,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ธิติวัฒน์ (สันต์),096-778-8198,Medium,5,2,1,,pending,ภาคเหนือ,เพชรบูรณ์,16.78,101.21,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างทางหล่มสัก,https://...,https://...,https://,,,
-125,SITE-125,ศูนย์สร้างทางขอนแก่น,2026-03-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,1,,pending,ภาคอีสาน,ขอนแก่น,16.43,102.83,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างทางขอนแก่น,https://...,https://...,https://,,,
-126,SITE-126,ศูนย์สร้างทางกาญจนบุรี,2026-02-26,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,ปัณณพัฒน์ (ปอนด์),083-019-6694,Medium,5,2,,,pending,ภาคกลาง,กาญจนบุรี,14.02,99.53,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างทางกาญจนบุรี,https://...,https://...,https://,,,
-127,SITE-127,ศูนย์สร้างทางสงขลา,2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วรรณะ (เอ๋),089-655-9216,Medium,5,2,1,,pending,ภาคใต้,สงขลา,7.17,100.61,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างทางสงขลา,https://...,https://...,https://,,,
-128,SITE-128,ศูนย์สร้างและบูรณะสะพานที่ 1 (พิจิตร),2026-02-18,,Survey,Not Start,0,2026-04-20,,2026-06-30,,อานพ (นพ),085-600-8255,ราเมศร์ (ตั้ม),088-280-9753,Medium,5,2,1,,pending,ภาคเหนือ,พิจิตร,16.44,100.35,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างและบูรณะสะพานที่+1,https://...,https://...,https://,,,
-129,SITE-129,ศูนย์สร้างและบูรณะสะพานที่ 2 (ขอนแก่น),2026-03-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ธนาศักดิ์ (เอี่ยว),095-352-7080,ชนะภัย (แดง),090-346-4959,Medium,5,2,,,pending,ภาคอีสาน,ขอนแก่น,16.43,102.83,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างและบูรณะสะพานที่+2,https://...,https://...,https://,,,
-130,SITE-130,ศูนย์สร้างและบูรณะสะพานที่ 3 (ปทุมธานี),2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ศรายุทธ (ติ๊ก),090-148-3070,พัทธพล (เอก),086-488-5748,Medium,5,2,,,pending,ภาคกลาง,ปทุมธานี,14.02,100.52,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างและบูรณะสะพานที่+3,https://...,https://...,https://,,,
-131,SITE-131,ศูนย์สร้างและบูรณะสะพานที่ 4 (นครศรีธรรมราช),2026-02-17,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,สุรวัฒน์ (หนึ่ง),084-447-1430,Medium,5,2,1,,pending,ภาคใต้,นครศรีธรรมราช,8.43,99.96,https://www.google.com/maps/search/?api=1&query=ศูนย์สร้างและบูรณะสะพานที่+4,https://...,https://...,https://,,,
-132,SITE-132,ศูนย์พัฒนาทรัพยากรบุคคลงานทาง,2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,,,pending,ภาคตะวันออก,ชลบุรี,13.36,100.98,https://www.google.com/maps/search/?api=1&query=ศูนย์พัฒนาทรัพยากรบุคคลงานทาง,https://...,https://...,https://,,,
-133,SITE-133,สำนักเครื่องกลและสื่อสาร,2026-03-02,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,นนทบุรี,13.86,100.51,https://www.google.com/maps/search/?api=1&query=สำนักเครื่องกลและสื่อสาร,https://...,https://...,https://,,,
-134,SITE-134,ศูนย์ทดสอบสมรรถนะและพัฒนาทักษะการใช้เครื่องจักรกล,2026-03-02,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.913,100.596,https://www.google.com/maps/search/?api=1&query=ส่วนเครื่องจักรกล+สทล.15,https://...,https://...,https://,,,
-135,SITE-135,ส่วนเครื่องจักรกล (สำนักงานทางหลวงที่ 14),2026-03-05,,Survey,Not Start,0,2026-04-20,,2026-06-30,,วีระชัย (วี),080-205-1380,กรกช (ต้น),092-996-5176,Medium,5,2,1,,pending,ภาคตะวันออก,ชลบุรี,13.36,100.98,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงพิเศษระหว่างเมือง,https://...,https://...,https://,,,
-136,SITE-136,ส่วนเครื่องจักรกล (สำนักงานทางหลวงที่ 15),2026-02-25,,Survey,Not Start,0,2026-04-20,,2026-06-30,,นาคินทร์ (อ้น),083-5322275,วัลลภ (เหน่ง),083-559-9502,Medium,5,2,1,,pending,ภาคใต้,ประจวบคีรีขันธ์,11.81,99.79,https://www.google.com/maps/search/?api=1&query=ศูนย์พัฒนาเทคโนโลยีงานทาง,https://...,https://...,https://,,,
-137,SITE-137,แขวงทางหลวงพิเศษระหว่างเมือง,2026-03-03,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.72,100.76,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+2,https://...,https://...,https://7,,,
-138,SITE-138,ศูนย์พัฒนาเทคโนโลยีงานทาง,2026-03-03,,Survey,Not Start,0,2026-04-20,,2026-06-30,,ฉัตรชัย (เจมส์),092-393-9289,พัทธพล (เอก),086-488-5748,Medium,5,2,1,,pending,ภาคกลาง,กรุงเทพมหานคร,13.65,100.42,https://www.google.com/maps/search/?api=1&query=แขวงทางหลวงน่านที่+2,https://...,https://...,https://8,,,
-`;
+1,SITE-001,สำนักงานทางหลวงที่ 1 (เชียงใหม่),2026-02-24,,Survey,Not Start,0,2026-04-20,,2026-06-30,,พิสิฎฐ์ (ตุ๊),086-428-8959,พันธ์วัจน์ (ฟิช),094-286-2181,High,5,2,1,,Pending,ภาคเหนือ,เชียงใหม่,18.7966,98.9669,https://www.google.com/maps/search/?api=1&query=สำนักงานทางหลวงที่+1+เชียงใหม่,https://...,https://...,https://,,,`;
 
         const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI-n79_JcVW97jGyOqAZ2rq10slKgZjGfD6Q/pub?output=csv';
         const PROXIES = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
@@ -419,7 +354,7 @@
                 header: true, skipEmptyLines: true,
                 complete: (results) => {
                     processData(results.data);
-                    updateSyncStatus("System Ready (Backup Mode: " + results.data.length + " records)", false);
+                    updateSyncStatus("System Ready (Backup Mode)", false);
                 }
             });
             // Try Fetch Online
@@ -483,14 +418,9 @@
                     eng: row['engineer']||'-', tel_eng: row['tel_eng']||'-',
                     status, progress,
                     lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
-                    // Plan Dates
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
-                    // Actual Dates
-                    ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
-                    ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
-                    ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
                 };
             }).filter(d => d.site && d.site.trim() !== ''); // Ensure valid rows
             filteredData = rawData;
@@ -536,7 +466,6 @@
         }
 
         function renderCharts() {
-            // S-Curve Calculation
             const months = [
                 { name: 'Jan 26', start: new Date('2026-01-01'), end: new Date('2026-01-31') },
                 { name: 'Feb 26', start: new Date('2026-02-01'), end: new Date('2026-02-28') },
@@ -563,7 +492,7 @@
 
             const today = new Date();
             const actLine = months.map(m => {
-                if(m.start > today) return null; // Don't show future months
+                if(m.start > today) return null; 
                 let score = 0;
                 filteredData.forEach(d => {
                     if (d.ad_survey && d.ad_survey <= m.end && d.ad_survey <= today) score += wSurvey;
@@ -584,7 +513,7 @@
                 markers: { size: 5, hover: { size: 7 } }
             }); charts.scurve.render();
 
-            const regs = [...new Set(filteredData.map(d=>d.region).filter(r=>r))]; // Ensure unique regions
+            const regs = [...new Set(filteredData.map(d=>d.region).filter(r=>r))]; 
             if(charts.regional) charts.regional.destroy();
             charts.regional = new ApexCharts(document.querySelector("#chart-regional"), {
                 series: [{ name:'Progress', data:regs.map(r=>Math.round(filteredData.filter(d=>d.region==r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region==r).length)) }],

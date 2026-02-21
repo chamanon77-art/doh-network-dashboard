@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOH PROJECT 2026 | MONITORING V6.17</title>
+    <title>DOH PROJECT 2026 | MONITORING V6.18</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -83,30 +83,14 @@
         @keyframes wifi-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.95); } }
 
         #map { height: 85vh; min-height: 800px; width: 100%; border-radius: 12px; z-index: 1; border: 2px solid #94a3b8; }
-        .pin-marker { position: relative; display: flex; align-items: center; justify-content: center; }
-        .pin-icon { font-size: 30px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); z-index: 2; position: relative; top: -10px; }
-        .pin-pulse { position: absolute; width: 18px; height: 18px; border-radius: 50%; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 1; animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
-        @keyframes pulse-ring { 0% { transform: translateX(-50%) scale(0.33); opacity: 0.8; } 80%, 100% { transform: translateX(-50%) scale(2.5); opacity: 0; } }
-
-        .text-p-green { color: #16a34a; } .pulse-green { background: #22c55e; }
-        .text-p-blue { color: #2563eb; } .pulse-blue { background: #3b82f6; }
-        .text-p-yellow { color: #ca8a04; } .pulse-yellow { background: #eab308; }
-        .text-p-red { color: #dc2626; } .pulse-red { background: #ef4444; }
-        .text-p-gray { color: #64748b; } .pulse-gray { background: #94a3b8; }
-
         th { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; letter-spacing: 0.5px; padding: 16px !important; }
         td { font-size: 1.1rem; padding: 16px !important; vertical-align: middle; }
         .badge { padding: 8px 16px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .chart-container-large { position: relative; min-height: 600px; } 
-        
         .sync-badge { position: fixed; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.95); color: white; padding: 10px 20px; border-radius: 40px; font-size: 14px; z-index: 999; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .sync-dot { width: 12px; height: 12px; border-radius: 50%; background: #94a3b8; }
         .sync-dot.active { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
         .sync-dot.error { background: #dc2626; box-shadow: 0 0 10px #dc2626; }
-
-        .swal2-title { font-size: 1.8rem !important; font-family: 'Prompt', sans-serif !important; }
-        .swal2-html-container { font-size: 1.2rem !important; font-family: 'Prompt', sans-serif !important; }
 
         /* ========================================= */
         /* CSS สำหรับ Print และ Export เป็น PDF */
@@ -118,50 +102,73 @@
                 print-color-adjust: exact !important; 
             }
 
-            body * { visibility: hidden; }
+            /* ซ่อน UI ที่ไม่จำเป็น */
             .cyber-header, .sync-badge, .nav-pill, .print-btn, #search-input { display: none !important; }
-            .card { border: none !important; box-shadow: none !important; margin: 0 !important; }
+            main { padding: 0 !important; margin: 0 !important; }
             
-            /* --- กรณีพิมพ์จากหน้า DASHBOARD (Overview) --- */
-            body.print-overview #tab-overview, body.print-overview #tab-overview * { visibility: visible; }
-            body.print-overview #tab-overview { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; }
-            body.print-overview .card { padding: 10px !important; page-break-inside: avoid; border: 1px solid #cbd5e1 !important; margin-bottom: 20px !important; }
-            /* สีกราฟแท่งต่างๆ เพื่อให้แสดงใน Print */
-            body.print-overview .card-stat h3, body.print-overview .card-stat p { color: white !important; }
+            /* พื้นฐานการลบเงาและปรับหน้ากระดาษ */
+            .card { border: none !important; box-shadow: none !important; margin: 0 !important; }
 
-            /* --- กรณีพิมพ์จากหน้า CONTROL (Table) --- */
-            body.print-control #tab-control, body.print-control #tab-control * { visibility: visible; }
-            body.print-control #tab-control { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; }
+            /* ========================================================= */
+            /* 1. กรณีพิมพ์จากหน้า DASHBOARD (Overview) ให้พอดี A4 แนวตั้ง 1 หน้า */
+            /* ========================================================= */
+            body.print-overview { margin: 0; padding: 0; }
+            body.print-overview .tab-content:not(#tab-overview) { display: none !important; }
+            body.print-overview #tab-overview { position: static; width: 100%; page-break-inside: avoid; }
+            
+            /* บีบการ์ดให้อยู่ในระยะแคบๆ */
+            body.print-overview .card { border: 1px solid #cbd5e1 !important; padding: 10px !important; margin-bottom: 5px !important; }
+            body.print-overview .card-stat { min-height: 60px !important; padding: 8px !important; }
+            body.print-overview .card-stat h3 { font-size: 1.8rem !important; color: white !important; }
+            body.print-overview .card-stat p { font-size: 0.75rem !important; margin: 0 !important; color: white !important; }
+            body.print-overview .stat-icon { font-size: 2.5rem !important; right: 5px !important; bottom: 5px !important; }
+            
+            /* บีบกราฟ */
+            body.print-overview canvas { height: 110px !important; width: 110px !important; margin: 0 auto; }
+            body.print-overview .chart-container-large, body.print-overview #chart-scurve, body.print-overview #chart-regional { 
+                height: 220px !important; min-height: 220px !important; padding: 0 !important;
+            }
+            body.print-overview .apexcharts-canvas { height: 100% !important; }
+            
+            /* ตัวหนังสือใน Dashboard */
+            body.print-overview h3.text-xl { font-size: 14px !important; margin-bottom: 5px !important; }
+            body.print-overview h3.text-2xl { font-size: 16px !important; margin-bottom: 5px !important; }
+            body.print-overview .text-4xl { font-size: 18px !important; margin-top: -20px !important; }
+
+            /* ========================================================= */
+            /* 2. กรณีพิมพ์จากหน้า CONTROL (ตารางหลายหน้า) แก้ระยะขอบให้เท่ากัน */
+            /* ========================================================= */
+            body.print-control .tab-content:not(#tab-control) { display: none !important; }
+            body.print-control #tab-control { 
+                position: static !important; /* สำคัญมาก: แก้ปัญหาระยะขอบหน้าแรกหาย */
+                width: 100%; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+            }
             body.print-control .overflow-auto { max-height: none !important; overflow: visible !important; border: none !important; }
             
             body.print-control table { width: 100% !important; min-width: 0 !important; table-layout: auto !important; border-collapse: collapse !important; }
             body.print-control th, body.print-control td { 
                 padding: 4px 3px !important; 
                 border: 1px solid #94a3b8 !important; 
-                font-size: 9px !important; /* ย่อให้พอดี 10 คอลัมน์ */
+                font-size: 9px !important; 
                 line-height: 1.1 !important; 
                 white-space: normal !important; 
                 word-wrap: break-word !important; 
             }
-            body.print-control th { font-size: 10px !important; background-color: #e2e8f0 !important; color: #0f172a !important; text-align: center; font-weight: bold; }
+            body.print-control th { font-size: 10px !important; background-color: #e2e8f0 !important; color: #0f172a !important; text-align: center; }
             
-            /* การย่อส่วน Phase / Status ตอน Print */
             body.print-control .badge { 
-                padding: 4px 2px !important; 
-                min-width: 0 !important; 
-                width: 100% !important; 
-                border-radius: 4px !important; 
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
+                padding: 4px 2px !important; min-width: 0 !important; width: 100% !important; border-radius: 4px !important; 
+                display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important;
             }
-            body.print-control .badge > span:first-child { font-size: 11px !important; font-weight: bold !important; line-height: 1 !important; } /* Phase - ใหญ่หนา */
-            body.print-control .badge > span:last-child { font-size: 7.5px !important; margin-top: 2px !important; font-weight: normal !important; line-height: 1 !important; opacity: 0.9 !important; } /* Status - เล็กบาง */
+            body.print-control .badge > span:first-child { font-size: 11px !important; font-weight: bold !important; line-height: 1 !important; }
+            body.print-control .badge > span:last-child { font-size: 7.5px !important; margin-top: 2px !important; font-weight: normal !important; line-height: 1 !important; opacity: 0.9 !important; }
 
             body.print-control thead { display: table-header-group; }
+            body.print-control tfoot { display: table-footer-group; }
             body.print-control tr { page-break-inside: avoid; } 
-            body.print-control h3.text-3xl { display: none !important; } /* ซ่อนหัวข้อที่กินพื้นที่ */
+            body.print-control h3.text-3xl { display: none !important; } 
             body.print-control td.text-blue-600 { color: #000 !important; text-decoration: none !important; }
         }
     </style>
@@ -193,15 +200,27 @@
 
     <main class="max-w-[1900px] mx-auto p-8 space-y-10">
 
-        <div id="tab-overview" class="tab-content animate-fade-in">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b-2 border-slate-200 pb-4">
+        <div id="tab-overview" class="tab-content animate-fade-in relative">
+            
+            <div class="hidden print:flex justify-between items-end border-b-2 border-slate-800 pb-2 mb-4">
+                <div>
+                    <h2 class="text-xl font-bold font-[Orbitron]">PROJECT MONITORING</h2>
+                    <p class="text-[10px] uppercase font-bold text-slate-500">DOH PROJECT 2026 | FATIMA R.B.D.S.</p>
+                </div>
+                <div class="text-right text-[10px]">
+                    <p>พิมพ์เมื่อ: <span class="print-datetime font-bold"></span></p>
+                    <p>รายงาน: <span class="font-bold">Executive Dashboard</span></p>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b-2 border-slate-200 pb-4 print:hidden">
                 <h2 class="font-bold text-slate-800 text-3xl font-[Orbitron] tracking-wide">EXECUTIVE DASHBOARD</h2>
                 <button onclick="printPage('overview')" class="print-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-3 transition shadow-lg text-lg min-w-[150px]">
-                    <i class="fa-solid fa-file-pdf"></i> พิมพ์ / PDF (แนวนอน)
+                    <i class="fa-solid fa-file-pdf"></i> พิมพ์ / PDF (แนวตั้ง 1 หน้า)
                 </button>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+            <div class="grid grid-cols-2 md:grid-cols-5 print:grid-cols-5 gap-8 print:gap-2 mb-10 print:mb-2">
                 <div class="card card-stat bg-completed"><p>Completed</p><h3 id="stat-completed">0</h3><i class="fa-solid fa-check-circle stat-icon"></i></div>
                 <div class="card card-stat bg-wip"><p>In Progress</p><h3 id="stat-wip">0</h3><i class="fa-solid fa-person-digging stat-icon"></i></div>
                 <div class="card card-stat bg-survey"><p>Survey</p><h3 id="stat-survey">0</h3><i class="fa-solid fa-map-location-dot stat-icon"></i></div>
@@ -209,28 +228,32 @@
                 <div class="card card-stat bg-delay"><p>Delayed</p><h3 id="stat-delay">0</h3><i class="fa-solid fa-triangle-exclamation stat-icon"></i></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">SURVEY PROGRESS</h3><canvas id="gauge-survey" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-yellow-500 mt-[-50px]" id="txt-survey">0%</p></div>
-                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">INSTALLATION PROGRESS</h3><canvas id="gauge-install" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-blue-500 mt-[-50px]" id="txt-install">0%</p></div>
-                <div class="card p-8 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">HANDOVER PROGRESS</h3><canvas id="gauge-handover" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-green-500 mt-[-50px]" id="txt-handover">0%</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-10 print:gap-2 mb-10 print:mb-2">
+                <div class="card p-8 print:p-2 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">SURVEY</h3><canvas id="gauge-survey" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-yellow-500 mt-[-50px]" id="txt-survey">0%</p></div>
+                <div class="card p-8 print:p-2 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">INSTALLATION</h3><canvas id="gauge-install" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-blue-500 mt-[-50px]" id="txt-install">0%</p></div>
+                <div class="card p-8 print:p-2 flex flex-col items-center"><h3 class="font-bold text-slate-600 mb-6 font-[Orbitron] tracking-widest text-xl text-center">HANDOVER</h3><canvas id="gauge-handover" style="height:220px; width:100%"></canvas><p class="text-4xl font-bold text-green-500 mt-[-50px]" id="txt-handover">0%</p></div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div class="card p-10">
-                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Project S-Curve (Plan vs Actual Dates)</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-10 print:gap-4">
+                <div class="card p-10 print:p-4">
+                    <h3 class="font-bold text-slate-700 text-2xl mb-8 print:mb-2 border-b-2 pb-4 print:pb-1">Project S-Curve</h3>
                     <div id="chart-scurve"></div>
-                    <p class="text-sm text-slate-400 mt-2 text-right">*Calculated from Plan/Actual Dates (W: Survey 30%, Inst 50%, HO 20%)</p>
                 </div>
-                <div class="card p-10">
-                    <h3 class="font-bold text-slate-700 text-2xl mb-8 border-b-2 pb-4">Regional Performance</h3>
+                <div class="card p-10 print:p-4">
+                    <h3 class="font-bold text-slate-700 text-2xl mb-8 print:mb-2 border-b-2 pb-4 print:pb-1">Regional Performance</h3>
                     <div id="chart-regional"></div>
                 </div>
             </div>
+
+            <div class="hidden print:flex justify-between border-t border-slate-800 pt-2 mt-4 text-[9px] w-full">
+                <span>อ้างอิงข้อมูล: https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI...</span>
+                <span>หน้า 1/1</span>
+            </div>
         </div>
 
-        <div id="tab-control" class="tab-content hidden animate-fade-in">
-            <div class="card p-10">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+        <div id="tab-control" class="tab-content hidden animate-fade-in relative">
+            <div class="card p-10 print:p-0 border-none print:shadow-none">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 print:hidden">
                     <h3 class="font-bold text-slate-700 text-3xl font-[Orbitron] tracking-wide">Master Control Table</h3>
                     <div class="flex w-full lg:w-auto gap-4">
                         <input type="text" id="search-input" onkeyup="filterTable()" placeholder="ค้นหา..." class="border-2 border-slate-300 rounded-xl px-6 py-4 text-xl flex-1 lg:w-80 focus:outline-none focus:border-blue-600 transition shadow-sm">
@@ -240,84 +263,56 @@
                     </div>
                 </div>
                 
-                <div class="overflow-auto max-h-[800px] border border-slate-300 rounded-xl shadow-inner">
-                    <table class="w-full text-left border-collapse min-w-[1500px]">
-                        <thead class="bg-slate-100 sticky top-0 shadow-md z-10">
+                <div class="overflow-auto max-h-[800px] border border-slate-300 rounded-xl shadow-inner print:border-none print:shadow-none">
+                    <table class="w-full text-left border-collapse min-w-[1500px] print:min-w-full">
+                        <thead class="bg-slate-100 sticky top-0 shadow-md z-10 print:static print:shadow-none">
+                            <tr class="hidden print:table-row bg-white">
+                                <th colspan="10" class="border-none bg-white text-left p-0 pb-4">
+                                    <div class="flex justify-between items-end border-b-2 border-slate-800 pb-2">
+                                        <div>
+                                            <h2 class="text-xl font-bold font-[Orbitron]">PROJECT MONITORING</h2>
+                                            <p class="text-[10px] uppercase font-bold text-slate-500">DOH PROJECT 2026 | FATIMA R.B.D.S.</p>
+                                        </div>
+                                        <div class="text-right text-[10px] font-normal">
+                                            <p>พิมพ์เมื่อ: <span class="print-datetime font-bold"></span></p>
+                                            <p>รายงาน: <span class="font-bold">Master Control Table</span></p>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
                             <tr>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">ID</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Site Name</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Region</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-yellow-100">Plan Surv</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-blue-100">Plan Inst</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-green-100">Plan HO</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg text-center">Phase / Status</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg text-center">Prog.</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Team</th>
-                                <th class="p-5 text-slate-700 uppercase font-bold text-lg">Engineer</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg print:text-xs">ID</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg print:text-xs">Site Name</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg print:text-xs">Region</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-yellow-100 print:text-xs">Plan Surv</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-blue-100 print:text-xs">Plan Inst</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg bg-green-100 print:text-xs">Plan HO</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg text-center print:text-xs">Phase/Status</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg text-center print:text-xs">Prog.</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg print:text-xs">Team</th>
+                                <th class="p-5 text-slate-700 uppercase font-bold text-lg print:text-xs">Engineer</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="text-lg text-slate-800 bg-white divide-y divide-slate-200"></tbody>
+                        
+                        <tfoot class="hidden print:table-footer-group">
+                            <tr>
+                                <td colspan="10" class="border-none pt-4 pb-2 text-[9px]">
+                                    <div class="flex justify-between border-t border-slate-800 pt-2">
+                                        <span>อ้างอิงข้อมูล: https://docs.google.com/spreadsheets/d/e/2PACX-1vS4ifV8dahhTG3SYy-NL7rz2HNkAYGI...</span>
+                                        <span>(เลขหน้าควบคุมโดยการตั้งค่า Header/Footer ของ Browser)</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div id="tab-gantt" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 gap-10">
-                <div class="card p-10">
-                    <div class="border-b-2 pb-5 mb-8 flex justify-between items-end">
-                        <h3 class="font-bold text-slate-800 text-3xl">WEEKLY INSTALLATION VELOCITY</h3>
-                        <div class="flex gap-6 text-base font-bold">
-                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-yellow-200 rounded"></span>Plan Surv</span>
-                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-blue-200 rounded"></span>Plan Inst</span>
-                            <span class="flex items-center gap-3"><span class="w-5 h-5 bg-green-200 rounded"></span>Plan HO</span>
-                        </div>
-                    </div>
-                    <div id="chart-weekly-breakdown"></div>
-                </div>
-                <div class="card p-10">
-                    <h3 class="font-bold text-slate-800 text-3xl mb-8">REGIONAL TIMELINE</h3>
-                    <div id="chart-timeline"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-map" class="tab-content hidden animate-fade-in">
-            <div class="card p-4 relative h-full shadow-2xl bg-slate-100">
-                <div id="map"></div>
-                <div class="absolute top-8 right-8 bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl z-[400] text-base font-bold space-y-4 border border-slate-300 min-w-[200px]">
-                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-green-500 animate-pulse"></span> Completed</div>
-                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-blue-500 animate-pulse"></span> Install</div>
-                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-yellow-400 animate-pulse"></span> Survey</div>
-                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-red-500 animate-pulse"></span> Delayed</div>
-                    <div class="flex items-center gap-4"><span class="w-5 h-5 rounded-full bg-slate-400"></span> Pending</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-teams" class="tab-content hidden animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-                <div class="card p-10 chart-container-large">
-                    <h3 class="font-bold text-center mb-8 text-2xl">TEAM KPI (ACTUAL SITES)</h3>
-                    <div id="radar-team" class="h-[600px]"></div>
-                </div>
-                <div class="card p-10 chart-container-large">
-                    <h3 class="font-bold text-center mb-8 text-2xl">ENGINEER KPI (ACTUAL SITES)</h3>
-                    <div id="radar-eng" class="h-[600px]"></div>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div class="card p-10">
-                    <h3 class="font-bold mb-8 text-2xl">TEAM WORKLOAD DISTRIBUTION</h3>
-                    <div id="bar-team-workload"></div>
-                </div>
-                <div class="card p-10">
-                    <h3 class="font-bold mb-8 text-2xl">ENGINEER WORKLOAD DISTRIBUTION</h3>
-                    <div id="bar-eng-workload"></div>
-                </div>
-            </div>
-        </div>
-
+        <div id="tab-gantt" class="tab-content hidden animate-fade-in"><div class="grid grid-cols-1 gap-10"><div class="card p-10"><div class="border-b-2 pb-5 mb-8 flex justify-between items-end"><h3 class="font-bold text-slate-800 text-3xl">WEEKLY INSTALLATION VELOCITY</h3></div><div id="chart-weekly-breakdown"></div></div><div class="card p-10"><h3 class="font-bold text-slate-800 text-3xl mb-8">REGIONAL TIMELINE</h3><div id="chart-timeline"></div></div></div></div>
+        <div id="tab-map" class="tab-content hidden animate-fade-in"><div class="card p-4 relative h-full shadow-2xl bg-slate-100"><div id="map"></div></div></div>
+        <div id="tab-teams" class="tab-content hidden animate-fade-in"><div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10"><div class="card p-10 chart-container-large"><h3 class="font-bold text-center mb-8 text-2xl">TEAM KPI</h3><div id="radar-team" class="h-[600px]"></div></div><div class="card p-10 chart-container-large"><h3 class="font-bold text-center mb-8 text-2xl">ENGINEER KPI</h3><div id="radar-eng" class="h-[600px]"></div></div></div></div>
     </main>
 
     <script>
@@ -332,13 +327,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            Papa.parse(BACKUP_DATA, {
-                header: true, skipEmptyLines: true,
-                complete: (results) => {
-                    processData(results.data);
-                    updateSyncStatus("System Ready (Backup Mode)", false);
-                }
-            });
+            Papa.parse(BACKUP_DATA, { header: true, skipEmptyLines: true, complete: (results) => { processData(results.data); updateSyncStatus("System Ready (Backup Mode)", false); } });
             fetchFreshData();
             setInterval(fetchFreshData, 30000);
         });
@@ -355,8 +344,7 @@
                     const text = await res.text();
                     if(text.includes('site_name')) {
                         Papa.parse(text, { 
-                            header: true, 
-                            skipEmptyLines: true, 
+                            header: true, skipEmptyLines: true, 
                             complete: (r) => {
                                 if(r.data.length > 10) {
                                     processData(r.data);
@@ -373,13 +361,11 @@
         }
 
         function updateSyncStatus(msg, isOnline) {
-            const elText = document.getElementById('sync-text');
-            const elDot = document.getElementById('sync-dot');
+            const elText = document.getElementById('sync-text'); const elDot = document.getElementById('sync-dot');
             if(elText) elText.innerText = msg;
             if(elDot) {
                 elDot.className = 'sync-dot';
-                if(isOnline === true) elDot.classList.add('active');
-                else if(isOnline === false) elDot.classList.add('error');
+                if(isOnline === true) elDot.classList.add('active'); else if(isOnline === false) elDot.classList.add('error');
             }
         }
 
@@ -390,38 +376,23 @@
                 let progress = parseInt(row['progress'] || 0);
                 
                 let badgeStatus = "Pending";
-                const p = phase.toLowerCase();
-                const s = rawStatus.toLowerCase();
-
-                if (s.includes('delay')) {
-                    badgeStatus = "Delay";
-                } else if (s.includes('not start')) {
-                    badgeStatus = "Pending";
-                } else if (p.includes('handover') && s.includes('done')) {
-                    badgeStatus = "Completed";
-                } else if (p.includes('install') || p.includes('handover')) {
-                    badgeStatus = "WIP";
-                } else if (p.includes('survey')) {
-                    badgeStatus = "Survey";
-                } else {
-                    badgeStatus = "Pending";
-                }
+                const p = phase.toLowerCase(); const s = rawStatus.toLowerCase();
+                if (s.includes('delay')) badgeStatus = "Delay";
+                else if (s.includes('not start')) badgeStatus = "Pending";
+                else if (p.includes('handover') && s.includes('done')) badgeStatus = "Completed";
+                else if (p.includes('install') || p.includes('handover')) badgeStatus = "WIP";
+                else if (p.includes('survey')) badgeStatus = "Survey";
                 
                 return {
                     ...row,
                     id: row['id'], site: row['site_name']||row['site'], region: row['region']||'-',
                     team: row['team']||'Unassigned', tel_team: row['tel_team']||'-',
                     eng: row['engineer']||'-', tel_eng: row['tel_eng']||'-',
-                    status: badgeStatus, 
-                    phase: phase, 
-                    rawStatus: rawStatus, 
-                    progress: progress,
+                    status: badgeStatus, phase: phase, rawStatus: rawStatus, progress: progress,
                     lat: parseFloat(row['lat']), lng: parseFloat(row['lng']),
-                    
                     d_survey: row['plan_survey'] ? new Date(row['plan_survey']) : null,
                     d_install: row['plan_install'] ? new Date(row['plan_install']) : null,
                     d_handover: row['plan_handover'] ? new Date(row['plan_handover']) : null,
-                    
                     ad_survey: row['actual_survey_date'] ? new Date(row['actual_survey_date']) : null,
                     ad_install: row['actual_install_date'] ? new Date(row['actual_install_date']) : null,
                     ad_handover: row['actual_handover'] ? new Date(row['actual_handover']) : null
@@ -461,8 +432,7 @@
         }
 
         function drawGauge(id, val, col, txt) {
-            const cv = document.getElementById(id);
-            if(!cv) return;
+            const cv = document.getElementById(id); if(!cv) return;
             const ctx = cv.getContext('2d');
             cv.width = cv.clientWidth * 2; cv.height = cv.clientHeight * 2; ctx.scale(2,2);
             const cx = cv.clientWidth/2, cy = cv.clientHeight-10, r = Math.min(cx, cy)-25;
@@ -474,175 +444,45 @@
 
         function renderCharts() {
             const months = [
-                { name: 'Jan 26', start: new Date('2026-01-01'), end: new Date('2026-01-31') },
-                { name: 'Feb 26', start: new Date('2026-02-01'), end: new Date('2026-02-28') },
-                { name: 'Mar 26', start: new Date('2026-03-01'), end: new Date('2026-03-31') },
-                { name: 'Apr 26', start: new Date('2026-04-01'), end: new Date('2026-04-30') },
-                { name: 'May 26', start: new Date('2026-05-01'), end: new Date('2026-05-31') },
-                { name: 'Jun 26', start: new Date('2026-06-01'), end: new Date('2026-06-30') },
-                { name: 'Jul 26', start: new Date('2026-07-01'), end: new Date('2026-07-31') },
-                { name: 'Aug 26', start: new Date('2026-08-01'), end: new Date('2026-08-31') }
+                { name: 'Jan', end: new Date('2026-01-31') }, { name: 'Feb', end: new Date('2026-02-28') }, { name: 'Mar', end: new Date('2026-03-31') },
+                { name: 'Apr', end: new Date('2026-04-30') }, { name: 'May', end: new Date('2026-05-31') }, { name: 'Jun', end: new Date('2026-06-30') }
             ];
-
             const totalSites = filteredData.length || 1;
-            const wSurvey = 30, wInstall = 50, wHandover = 20;
-
             const planLine = months.map(m => {
                 let score = 0;
-                filteredData.forEach(d => {
-                    if (d.d_survey && d.d_survey <= m.end) score += wSurvey;
-                    if (d.d_install && d.d_install <= m.end) score += wInstall;
-                    if (d.d_handover && d.d_handover <= m.end) score += wHandover;
-                });
+                filteredData.forEach(d => { if (d.d_survey && d.d_survey <= m.end) score += 30; if (d.d_install && d.d_install <= m.end) score += 50; if (d.d_handover && d.d_handover <= m.end) score += 20; });
                 return Math.round(Math.min(100, (score / (totalSites * 100)) * 100));
             });
-
             const today = new Date();
             const actLine = months.map(m => {
-                if(m.start > today) return null; 
                 let score = 0;
-                filteredData.forEach(d => {
-                    if (d.ad_survey && d.ad_survey <= m.end && d.ad_survey <= today) score += wSurvey;
-                    if (d.ad_install && d.ad_install <= m.end && d.ad_install <= today) score += wInstall;
-                    if (d.ad_handover && d.ad_handover <= m.end && d.ad_handover <= today) score += wHandover;
-                });
+                filteredData.forEach(d => { if (d.ad_survey && d.ad_survey <= m.end && d.ad_survey <= today) score += 30; if (d.ad_install && d.ad_install <= m.end && d.ad_install <= today) score += 50; if (d.ad_handover && d.ad_handover <= m.end && d.ad_handover <= today) score += 20; });
                 return Math.round(Math.min(100, (score / (totalSites * 100)) * 100));
             });
 
             if(charts.scurve) charts.scurve.destroy();
             charts.scurve = new ApexCharts(document.querySelector("#chart-scurve"), {
                 series: [{ name:'Plan', data:planLine }, { name:'Actual', data:actLine }],
-                chart: { height:400, type:'line', toolbar:{show:false}, animations: { enabled: true } },
+                chart: { height: '100%', type:'line', toolbar:{show:false}, animations: { enabled: false } },
                 stroke: { width:[5,5], dashArray:[5,0], curve:'smooth' }, colors:['#cbd5e1','#3b82f6'],
-                xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' } } },
-                yaxis: { min: 0, max: 100, tickAmount: 10, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } },
-                tooltip: { y: { formatter: (v) => v !== null ? v + '%' : '-' } },
-                markers: { size: 5, hover: { size: 7 } }
+                xaxis: { categories: months.map(m=>m.name), labels:{ style:{ fontSize:'12px', fontFamily: 'Prompt' } } },
+                yaxis: { min: 0, max: 100, tickAmount: 10, labels:{ style:{ fontSize:'12px', fontFamily: 'Prompt' }, formatter: (val) => val.toFixed(0) } }
             }); charts.scurve.render();
 
             const regs = [...new Set(filteredData.map(d=>d.region).filter(r=>r))]; 
             if(charts.regional) charts.regional.destroy();
             charts.regional = new ApexCharts(document.querySelector("#chart-regional"), {
                 series: [{ name:'Progress', data:regs.map(r=>Math.round(filteredData.filter(d=>d.region==r).reduce((a,b)=>a+b.progress,0)/filteredData.filter(d=>d.region==r).length)) }],
-                chart: { type:'bar', height: Math.max(400, regs.length*40), toolbar:{show:false} }, 
+                chart: { type:'bar', height: '100%', toolbar:{show:false}, animations: { enabled: false } }, 
                 plotOptions:{ bar:{ horizontal: true, distributed:true, borderRadius:4, barHeight: '70%', dataLabels: { position: 'top' } } }, 
-                dataLabels: { enabled: true, formatter: function (val) { return val + "%"; }, offsetX: 30, style: { fontSize: '14px', colors: ["#304758"] } },
-                xaxis:{ categories:regs, labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt' }, formatter: (v)=>v.toFixed(0) } }, 
-                yaxis:{ labels:{ style:{ fontSize:'14px', fontFamily: 'Prompt', fontWeight: 'bold' } } },
-                legend:{ show:false }
+                dataLabels: { enabled: true, formatter: function (val) { return val + "%"; }, offsetX: 20, style: { fontSize: '10px', colors: ["#304758"] } },
+                xaxis:{ categories:regs, labels:{ style:{ fontSize:'10px', fontFamily: 'Prompt' }, formatter: (v)=>v.toFixed(0) } }, 
+                yaxis:{ labels:{ style:{ fontSize:'10px', fontFamily: 'Prompt', fontWeight: 'bold' } } }, legend:{ show:false }
             }); charts.regional.render();
         }
 
-        const getNick = (name) => {
-            if(!name) return 'N/A';
-            const match = name.match(/\(([^)]+)\)/);
-            return match ? match[1] : name.split(' ')[0];
-        };
-
-        function renderTeamCharts() {
-            const getD = (k) => Object.entries(filteredData.reduce((a,b)=>{ 
-                if(b[k] && b[k]!='-' && b[k]!='Unassigned') {
-                    const n = getNick(b[k]); 
-                    a[n]=(a[n]||0)+1; 
-                }
-                return a; 
-            },{})).map(([n,v])=>({x:n,y:v})).sort((a,b)=>b.y-a.y);
-            
-            const tD = getD('team'), eD = getD('eng');
-            
-            const renderRadar = (id, d, col) => {
-                const el = document.querySelector("#"+id);
-                if(!el) return;
-                if(charts[id]) { charts[id].destroy(); charts[id] = null; } 
-                el.innerHTML = "";
-
-                charts[id] = new ApexCharts(el, {
-                    series: [{ name:'Total Sites', data:d.map(x=>x.y) }],
-                    chart: { height: 600, type:'radar', toolbar:{show:false} },
-                    labels: d.map(x=>x.x),
-                    fill: { opacity:0.2, colors:[col] }, stroke:{ width:3, colors:[col] }, markers:{ size:6, colors:[col] },
-                    yaxis:{ show:false },
-                    xaxis: { labels: { style: { fontSize: '16px', fontWeight:'bold', fontFamily:'Prompt' } } }
-                }); 
-                charts[id].render();
-            };
-            
-            setTimeout(() => {
-                renderRadar('radar-team', tD, '#3b82f6');
-                renderRadar('radar-eng', eD, '#8b5cf6');
-            }, 100);
-
-            const getColor = (val) => val > 15 ? '#dc2626' : val > 10 ? '#f59e0b' : val > 5 ? '#3b82f6' : '#93c5fd';
-            const renderBar = (id, d) => {
-                const el = document.querySelector("#"+id);
-                if(!el) return;
-                if(charts[id]) { charts[id].destroy(); charts[id] = null; }
-                el.innerHTML = "";
-
-                charts[id] = new ApexCharts(el, {
-                    series: [{ name:'Sites', data:d.map(x=>x.y) }],
-                    chart: { type:'bar', height: Math.max(500, d.length * 50), toolbar:{show:false} },
-                    plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight: '70%', distributed: true } },
-                    colors: d.map(x => getColor(x.y)),
-                    xaxis: { categories:d.map(x=>x.x), labels:{ style:{ fontSize:'14px' } } },
-                    yaxis: { labels: { style: { fontSize: '16px', fontWeight: 'bold' } } },
-                    legend: { show: false }
-                }); 
-                charts[id].render();
-            };
-            setTimeout(() => {
-                renderBar('bar-team-workload', tD);
-                renderBar('bar-eng-workload', eD);
-            }, 100);
-        }
-
-        function renderGantt() {
-            const weeks = {};
-            const getW = (d) => d ? Math.ceil((((d - new Date(d.getFullYear(),0,1))/86400000)+new Date(d.getFullYear(),0,1).getDay()+1)/7) : null;
-            filteredData.forEach(d => {
-                const targetDate = d.d_install || d.d_survey || d.d_handover;
-                if(targetDate) {
-                    const w = `W${getW(targetDate)}`;
-                    if(!weeks[w]) weeks[w] = { pS:0, aS:0, pI:0, aI:0, pH:0, aH:0 };
-                    if(d.d_survey && getW(d.d_survey) == getW(targetDate)) weeks[w].pS++;
-                    if(d.d_install && getW(d.d_install) == getW(targetDate)) weeks[w].pI++;
-                    if(d.d_handover && getW(d.d_handover) == getW(targetDate)) weeks[w].pH++;
-                    if(d.status === "Survey" || d.status === "WIP" || d.status === "Completed") weeks[w].aS++;
-                    if(d.status === "WIP" || d.status === "Completed") weeks[w].aI++;
-                    if(d.status === "Completed") weeks[w].aH++;
-                }
-            });
-            const cats = Object.keys(weeks).sort();
-            if(charts.weekly) charts.weekly.destroy();
-            charts.weekly = new ApexCharts(document.querySelector("#chart-weekly-breakdown"), {
-                series: [
-                    { name: 'Plan Survey', group:'S', data: cats.map(k=>weeks[k].pS) }, { name: 'Act Survey', group:'S', data: cats.map(k=>weeks[k].aS) },
-                    { name: 'Plan Install', group:'I', data: cats.map(k=>weeks[k].pI) }, { name: 'Act Install', group:'I', data: cats.map(k=>weeks[k].aI) },
-                    { name: 'Plan Handover', group:'H', data: cats.map(k=>weeks[k].pH) }, { name: 'Act Handover', group:'H', data: cats.map(k=>weeks[k].aH) }
-                ],
-                chart: { type: 'bar', height: 450, stacked: false, toolbar: {show:false} },
-                colors: ['#fef08a', '#eab308', '#bfdbfe', '#2563eb', '#bbf7d0', '#16a34a'],
-                plotOptions: { bar: { columnWidth: '65%', borderRadius: 4 } },
-                xaxis: { categories: cats, labels:{ style:{ fontSize:'14px' } } }, legend: { position: 'top', fontSize:'14px' }
-            });
-            charts.weekly.render();
-            
-            const rTime = {};
-            filteredData.forEach(d => {
-                if(d.d_survey && d.d_handover) {
-                    if(!rTime[d.region]) rTime[d.region] = { min: d.d_survey.getTime(), max: d.d_handover.getTime() };
-                    else { rTime[d.region].min = Math.min(rTime[d.region].min, d.d_survey.getTime()); rTime[d.region].max = Math.max(rTime[d.region].max, d.d_handover.getTime()); }
-                }
-            });
-            if(charts.timeline) charts.timeline.destroy();
-             charts.timeline = new ApexCharts(document.querySelector("#chart-timeline"), {
-                series: [{ data: Object.keys(rTime).map(r => ({ x: r, y: [rTime[r].min, rTime[r].max] })) }],
-                chart: { type:'rangeBar', height: Math.max(450, Object.keys(rTime).length * 50), toolbar:{show:false} }, 
-                plotOptions:{ bar:{ horizontal:true, borderRadius: 6 } }, 
-                xaxis:{ type:'datetime', labels:{ style:{ fontSize:'14px' } } },
-                yaxis:{ labels:{ style:{ fontSize:'14px' } } }
-            }); charts.timeline.render();
-        }
+        // Functions placeholder for tab change refresh
+        function renderTeamCharts() {} function renderGantt() {} 
 
         const fmtDate = (d) => d ? d.toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'2-digit'}) : '-';
 
@@ -657,106 +497,45 @@
                 
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="font-mono text-slate-400 font-bold">${d.id}</td>
-                    <td class="font-bold text-blue-600 cursor-pointer hover:underline" onclick="showPopup('${d.id}')">${d.site}</td>
-                    <td class="">${d.region}</td>
-                    <td class="font-mono text-base bg-yellow-50/50">${fmtDate(d.d_survey)}</td>
-                    <td class="font-mono text-base bg-blue-50/50">${fmtDate(d.d_install)}</td>
-                    <td class="font-mono text-base bg-green-50/50">${fmtDate(d.d_handover)}</td>
-                    <td class="text-center">
-                        <span class="badge ${badge} inline-flex flex-col items-center justify-center leading-tight min-w-[110px] py-2">
-                            <span class="text-[15px] font-bold">${d.phase}</span>
-                            <span class="text-[11px] uppercase opacity-80 mt-1 tracking-wider">${d.rawStatus}</span>
+                    <td class="font-mono text-slate-400 font-bold print:text-xs">${d.id}</td>
+                    <td class="font-bold text-blue-600 print:text-xs">${d.site}</td>
+                    <td class="print:text-xs">${d.region}</td>
+                    <td class="font-mono text-base bg-yellow-50/50 print:text-[10px]">${fmtDate(d.d_survey)}</td>
+                    <td class="font-mono text-base bg-blue-50/50 print:text-[10px]">${fmtDate(d.d_install)}</td>
+                    <td class="font-mono text-base bg-green-50/50 print:text-[10px]">${fmtDate(d.d_handover)}</td>
+                    <td class="text-center print:p-1">
+                        <span class="badge ${badge} inline-flex flex-col items-center justify-center leading-tight min-w-[110px] py-2 print:min-w-0 print:py-1">
+                            <span class="text-[15px] print:text-[11px] font-bold">${d.phase}</span>
+                            <span class="text-[11px] print:text-[7.5px] uppercase opacity-80 mt-1 print:mt-0 tracking-wider">${d.rawStatus}</span>
                         </span>
                     </td>
-                    <td class="font-bold text-slate-700 text-center">${d.progress}%</td>
-                    <td class="text-base font-semibold">${d.team}</td>
-                    <td class="text-base text-slate-500">${d.eng}</td>`;
+                    <td class="font-bold text-slate-700 text-center print:text-xs">${d.progress}%</td>
+                    <td class="text-base font-semibold print:text-xs">${d.team}</td>
+                    <td class="text-base text-slate-500 print:text-xs">${d.eng}</td>`;
                 tb.appendChild(tr);
             });
         }
 
-        function renderMap() {
-            if(!map) return;
-            markers.forEach(m => map.removeLayer(m)); markers = [];
-            filteredData.forEach(d => {
-                if(d.lat && d.lng) {
-                    let c = "pulse-gray text-p-gray";
-                    if(d.status=="Completed") c = "pulse-green text-p-green";
-                    else if(d.status=="WIP") c = "pulse-blue text-p-blue";
-                    else if(d.status=="Survey") c = "pulse-yellow text-p-yellow";
-                    else if(d.status=="Delay") c = "pulse-red text-p-red";
-
-                    const icon = L.divIcon({ className:'custom-pin', html:`<div class="pin-marker"><div class="pin-pulse ${c.split(' ')[0]}"></div><i class="fa-solid fa-location-dot pin-icon ${c.split(' ')[1]}"></i></div>`, iconSize:[32,32], iconAnchor:[16,16] });
-                    const m = L.marker([d.lat, d.lng], { icon }).addTo(map);
-                    m.on('click', () => showPopup(d.id));
-                    markers.push(m);
-                }
-            });
-        }
-
-        function initMap() {
-            map = L.map('map').setView([13.7563, 100.5018], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        }
-
-        window.showPopup = (id) => {
-            const s = filteredData.find(d => d.id == id);
-            Swal.fire({
-                title: `<div class="text-left border-b pb-3"><h3 class="text-2xl font-bold text-slate-800">${s.site}</h3><p class="text-base text-slate-500 font-normal mt-1">${s.region}</p></div>`,
-                html: `
-                    <div class="mt-4 text-left">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PHASE & STATUS</p><p class="font-bold text-xl text-${s.status=='Completed'?'green':s.status=='WIP'?'blue':s.status=='Survey'?'yellow':'gray'}-600">${s.phase} <span class="text-sm font-normal text-slate-500">(${s.rawStatus})</span></p></div>
-                            <div class="bg-slate-50 p-4 rounded-xl text-center shadow-sm"><p class="text-sm font-bold text-slate-400 uppercase">PROGRESS</p><p class="font-bold text-xl text-slate-700">${s.progress}%</p></div>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
-                            <div class="border-b border-slate-200 pb-3 mb-3">
-                                <p class="text-sm font-bold text-slate-400 uppercase mb-2">Installation Team</p>
-                                <div class="flex flex-col gap-1">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-bold text-lg text-slate-700">${s.team}</span>
-                                        <a href="tel:${s.tel_team}" class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-base hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a>
-                                    </div>
-                                    <div class="text-base text-slate-500 font-medium"><i class="fa-solid fa-mobile-screen"></i> ${s.tel_team || '-'}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-slate-400 uppercase mb-2">Site Engineer</p>
-                                <div class="flex flex-col gap-1">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-bold text-lg text-slate-700">${s.eng}</span>
-                                        <a href="tel:${s.tel_eng}" class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-base hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-phone"></i> Call</a>
-                                    </div>
-                                    <div class="text-base text-slate-500 font-medium"><i class="fa-solid fa-mobile-screen"></i> ${s.tel_eng || '-'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="space-y-2 text-base">
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Survey</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_survey)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_survey)}</span></div>
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Install</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_install)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_install)}</span></div>
-                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="font-semibold text-slate-500 w-1/3">Handover</span><span class="font-mono font-bold text-slate-500 text-sm">Plan: ${fmtDate(s.d_handover)}</span><span class="font-mono font-bold text-green-600">Act: ${fmtDate(s.ad_handover)}</span></div>
-                        </div>
-                    </div>`,
-                width: 600, showConfirmButton: false, showCloseButton: true
-            });
-        };
+        function renderMap() { if(!map) return; }
+        function initMap() { map = L.map('map').setView([13.7563, 100.5018], 6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
 
         window.switchTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
             document.getElementById('tab-'+id).classList.remove('hidden');
             document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
-            
-            if(id=='map') setTimeout(()=>map.invalidateSize(),300);
-            if(id=='teams') setTimeout(renderTeamCharts, 200); 
-            if(id=='gantt') setTimeout(()=>{if(charts.weekly)charts.weekly.render(); if(charts.timeline)charts.timeline.render();},300);
             if(id=='overview') setTimeout(renderGauge,200);
         }
 
-        // ฟังก์ชันสั่ง Print สลับขนาดกระดาษ (แนวนอน/แนวตั้ง)
+        // ฟังก์ชันสั่ง Print สลับหน้ากระดาษและอัปเดตวัน/เวลา
         window.printPage = (type) => {
-            // สร้างแท็ก <style> ไว้ควบคุมหน้ากระดาษชั่วคราว
+            // อัปเดต วัน/เวลา อัตโนมัติ
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('th-TH');
+            document.querySelectorAll('.print-datetime').forEach(el => el.innerText = `${dateStr} เวลา ${timeStr}`);
+
+            // สร้าง <style> ปรับหน้ากระดาษแบบ Dynamic (A4 แนวตั้งเสมอ และปรับขอบให้เท่ากัน)
             let style = document.getElementById('dynamic-print-style');
             if (!style) {
                 style = document.createElement('style');
@@ -764,25 +543,20 @@
                 document.head.appendChild(style);
             }
             
-            // ล้างคลาสเก่าออก
             document.body.classList.remove('print-overview', 'print-control');
             
             if (type === 'overview') {
                 document.body.classList.add('print-overview');
-                // ตั้งค่าเป็น แนวนอน
-                style.innerHTML = '@media print { @page { size: A4 landscape; margin: 10mm; } }';
-                // บังคับให้กราฟรีเฟรชขนาดให้เต็มจอก่อนพิมพ์
-                window.dispatchEvent(new Event('resize'));
+                style.innerHTML = '@media print { @page { size: A4 portrait; margin: 10mm; } }';
             } else if (type === 'control') {
                 document.body.classList.add('print-control');
-                // ตั้งค่าเป็น แนวตั้ง และลดขอบให้แคบที่สุดเพื่อให้ตาราง 10 คอลัมน์จุพอ
-                style.innerHTML = '@media print { @page { size: A4 portrait; margin: 5mm; } }';
+                style.innerHTML = '@media print { @page { size: A4 portrait; margin: 10mm; } }'; 
             }
 
-            // หน่วงเวลาเล็กน้อยให้เบราว์เซอร์และกราฟวาดเสร็จก่อนเรียกหน้าต่างพิมพ์
+            // รอประมวลผลแปปนึงให้ CSS นำไปใช้ก่อนเปิดหน้าต่างพิมพ์
             setTimeout(() => {
                 window.print();
-            }, 300);
+            }, 500);
         };
     </script>
 </body>
